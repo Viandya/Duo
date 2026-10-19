@@ -19,6 +19,7 @@ const ICONS = {
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
   chev:'<path d="m9 6 6 6-6 6"/>',
+  refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
   hearts:'<path d="M9.5 18.5S4 15.2 4 10.9a3.1 3.1 0 0 1 5.5-1.9 3.1 3.1 0 0 1 5.5 1.9c0 4.3-5.5 7.6-5.5 7.6z"/><path d="M16 16.3s3.9-2.4 4-5.7a2.6 2.6 0 0 0-4.5-1.6" opacity=".6"/>',
   heart:'<path d="M12 20s-7.5-4.6-9.3-9.2A4.8 4.8 0 0 1 12 7.6a4.8 4.8 0 0 1 9.3 3.2C19.5 15.4 12 20 12 20z"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
@@ -152,7 +153,7 @@ function applyTheme(){
   document.querySelectorAll('[data-theme-opt]').forEach(b => b.classList.toggle('on', b.dataset.themeOpt === p));
 }
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch(_){}
-function tgSetup(){ const a = tgApp(); if (!a) return; try { a.ready(); a.expand(); a.onEvent?.('themeChanged', applyTheme); } catch(_){} applyTheme(); }
+function tgSetup(){ const a = tgApp(); if (!a) return; try { a.ready(); a.expand(); a.disableVerticalSwipes?.(); a.onEvent?.('themeChanged', applyTheme); } catch(_){} applyTheme(); }
 if (inTG) { tgSetup(); window.addEventListener('load', tgSetup); }
 
 // ===== Helpers =====

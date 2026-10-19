@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=11">
+<link rel="stylesheet" href="common.css?v=12">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
@@ -35,6 +35,7 @@
 .qa>*:active span{transform:scale(.92)}
 .qa em{white-space:pre-line;font-style:normal;font-size:12.5px;line-height:1.25;text-align:center;max-width:76px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pair>button:focus{outline:none}
 .pair>button{border:0;border-radius:22px;height:104px;padding:16px 14px;text-align:left;cursor:pointer;position:relative;overflow:hidden}
 .t-days{background:linear-gradient(150deg,var(--grad-a),var(--grad-b));color:#fff;display:flex;flex-direction:column;justify-content:space-between}
 .t-days .bgh{position:absolute;right:-20px;bottom:-24px;width:84px;height:84px;opacity:.16;stroke:#fff;stroke-width:1.6;fill:none}
@@ -135,6 +136,14 @@
 .moods button{border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:14px 6px;font-weight:600;cursor:pointer;color:var(--ink)}
 .moods button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 #editSheet input,#editSheet .field{margin-top:14px}
+.tap{cursor:pointer}
+.ev.tap:active,.row-item.tap:active{opacity:.6}
+.ev .chev,.row-item .chev{color:var(--muted);width:18px;height:18px;flex:none}
+.btn.link.del-link{color:#c0564f;margin:14px auto 0;display:flex}
+.ptr{position:fixed;left:50%;top:calc(8px + var(--safe-t));width:40px;height:40px;margin-left:-20px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--accent);z-index:30;opacity:0;transform:translateY(-60px);pointer-events:none}
+.ptr .ic{width:22px;height:22px}
+.ptr.spin .ic{animation:ptrspin .8s linear infinite}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .status{display:flex;gap:8px;align-items:center;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px}
@@ -312,12 +321,13 @@
 
 <!-- ===== SHEETS ===== -->
 <dialog id="dateSheet"><form class="sheet" method="dialog" id="dateForm">
-  <h2 data-t="importantDate"></h2>
+  <h2 id="dTitleH"></h2>
   <label data-t="whatDate"></label><input id="dTitle" required data-tp="whatDatePh">
   <label data-t="date"></label><button type="button" class="field" data-date id="dDate"></button>
   <label data-t="icon"></label><div class="icon-pick" id="dIcon"></div>
   <label class="toggle"><input type="checkbox" id="dYearly" checked><span data-t="yearly"></span></label>
   <div class="error" id="dErr"></div>
+  <button type="button" class="btn link del-link hidden" id="dDel" data-t="delete"></button>
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
 
@@ -329,7 +339,7 @@
 </form></dialog>
 
 <dialog id="eventSheet"><form class="sheet" method="dialog" id="eventForm">
-  <h2 data-t="event"></h2>
+  <h2 id="eTitleH"></h2>
   <label data-t="evKind"></label><div class="chips" id="eKind"></div>
   <label data-t="what"></label><input id="eTitle" required data-tp="eventPh">
   <label data-t="day"></label><button type="button" class="field" data-date id="eDate"></button>
@@ -338,6 +348,7 @@
   <label data-t="evRepeat"></label><div class="chips" id="eRepeat"></div>
   <label data-t="evRemind"></label><div class="chips" id="eRemind"></div>
   <label data-t="note"></label><textarea id="eNote" data-tp="optional" style="min-height:64px"></textarea>
+  <button type="button" class="btn link del-link hidden" id="eDel" data-t="delete"></button>
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
 
@@ -363,6 +374,7 @@
 </form></dialog>
 
 <div class="toast" id="toast"></div>
+<div class="ptr" id="ptr"><svg class="ic"><use href="#i-refresh"/></svg></div>
 
 <dialog id="ansSheet"><form class="sheet" method="dialog" id="ansForm">
   <div class="muted small" data-t="qotd"></div>
@@ -374,7 +386,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=11"></script>
+<script src="common.js?v=12"></script>
 <script>
 addT({
 ru: {
@@ -427,7 +439,7 @@ ru: {
   usGroup:'Мы', appGroup:'Приложение', startShort:'Начали встречаться', themeLightS:'Светлая', themeDarkS:'Тёмная',
   tgOnShort:'подключено', tgOffShort:'выключено', waitPartner:'ждём вторую половинку',
   statDays:n => plural(n,'день','дня','дней'), statAnswers:n => plural(n,'ответ','ответа','ответов'), statMovies:n => plural(n,'фильм','фильма','фильмов'),
-  ansReady:n => `${n}: ответ готов`, needName:'Введите имя'
+  ansReady:n => `${n}: ответ готов`, needName:'Введите имя', editEventT:'Изменить событие', editDateT:'Изменить дату', ptrPull:'Потяните, чтобы обновить'
 },
 en: {
   tagline:'A shared space for the two of you', tgLogin:'Sign in with Telegram', tgLoginHint:'No email or password. Notifications connect automatically.',
@@ -479,7 +491,7 @@ en: {
   usGroup:'Us', appGroup:'App', startShort:'Started dating', themeLightS:'Light', themeDarkS:'Dark',
   tgOnShort:'on', tgOffShort:'off', waitPartner:'waiting for your partner',
   statDays:n => n === 1 ? 'day' : 'days', statAnswers:n => n === 1 ? 'answer' : 'answers', statMovies:n => n === 1 ? 'film' : 'films',
-  ansReady:n => `${n} has answered`, needName:'Enter a name'
+  ansReady:n => `${n} has answered`, needName:'Enter a name', editEventT:'Edit event', editDateT:'Edit date', ptrPull:'Pull to refresh'
 }});
 
 // ===== State =====
@@ -659,12 +671,12 @@ function upcomingDates(){
   };
   if (S.couple?.start_date) {
     const n = next(S.couple.start_date, true), yrs = n.getFullYear() - parseYmd(S.couple.start_date).getFullYear();
-    if (yrs > 0) out.push({ id:null, title:t('yearsTogether', yrs), short:t('yearsN', yrs), icon:'heart', when:n });
+    if (yrs > 0) out.push({ id:null, open:'start', title:t('yearsTogether', yrs), short:t('yearsN', yrs), icon:'heart', when:n });
   }
-  for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= td) out.push({ id:x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), when:n }); }
+  for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= td) out.push({ id:x.id, open:'dt:' + x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), when:n }); }
   // birthdays and anniversaries added in the calendar
   for (const e of S.events.filter(e => (e.kind === 'birthday' || e.kind === 'anniversary'))) {
-    const n = next(ymd(new Date(e.starts_at)), e.repeat === 'yearly'); if (n >= td) out.push({ id:null, title:e.title, icon:e.kind === 'birthday' ? 'cake' : 'heart', when:n });
+    const n = next(ymd(new Date(e.starts_at)), e.repeat === 'yearly'); if (n >= td) out.push({ id:null, open:'ev:' + e.id, title:e.title, icon:e.kind === 'birthday' ? 'cake' : 'heart', when:n });
   }
   return out.sort((a,b) => a.when - b.when);
 }
@@ -679,18 +691,18 @@ function toast(msg){ const el = $('toast'); el.textContent = msg; el.classList.a
 function haptic(){ try { tgApp()?.HapticFeedback?.impactOccurred('light'); } catch(_){} }
 // Everything on a given day: important dates first, then events
 function dayItems(day){
-  const dts = datesOn(day).map(x => ({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title }));
+  const dts = datesOn(day).map(x => ({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title, open:x.open }));
   const evs = eventsOn(day).map(e => {
     const s = new Date(e.starts_at), y = day.getFullYear() - s.getFullYear();
     const time = isDayKind(e) ? (e.repeat === 'yearly' && y > 0 ? t('ageN', y) : '') : e.all_day ? t('allDayShort') : `${pad(s.getHours())}:${pad(s.getMinutes())}`;
     const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).join(' · ');
-    return { gold:isDayKind(e), time, title:e.title, sub, id:e.id };
+    return { gold:isDayKind(e), time, title:e.title, sub, open:'ev:' + e.id };
   });
   return [...dts, ...evs];
 }
-const itemRow = x => `<div class="ev"><div class="time">${esc(x.time)}</div><span class="vbar ${x.gold ? 'gold' : ''}"></span>
+const itemRow = x => `<div class="ev ${x.open ? 'tap' : ''}" ${x.open ? `data-open="${x.open}"` : ''}><div class="time">${esc(x.time)}</div><span class="vbar ${x.gold ? 'gold' : ''}"></span>
   <div class="grow"><div>${esc(x.title)}</div>${x.sub ? `<div class="muted small">${esc(x.sub)}</div>` : ''}</div>
-  ${x.id ? `<button class="icon-btn" data-del-ev="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`;
+  ${x.del ? `<button class="icon-btn" data-del-ev="${x.del}" aria-label="delete">${icon('x')}</button>` : x.open ? `<svg class="ic chev"><use href="#i-chev"/></svg>` : ''}</div>`;
 const dayTitle = d => {
   if (sameDay(d, today())) return t('todayTitle');
   const w = t('weekdays')[d.getDay()];
@@ -736,7 +748,7 @@ function renderHome(){
   }).join('');
   $('wkTitle').textContent = dayTitle(sel);
   const items = dayItems(sel);
-  $('wkItems').innerHTML = items.length ? items.map(x => itemRow({ ...x, id:null })).join('') : `<div class="empty" style="padding:10px 0 2px">${t('wkFree')}</div>`;
+  $('wkItems').innerHTML = items.length ? items.map(itemRow).join('') : `<div class="empty" style="padding:10px 0 2px">${t('wkFree')}</div>`;
 
   // question of the day
   $('qText').textContent = S.question ? qTextNow() : t('noQuestions');
@@ -758,7 +770,7 @@ function renderHome(){
 }
 function renderDatesList(){
   const ud = upcomingDates();
-  $('datesList').innerHTML = ud.length ? ud.map(x => `<div class="row-item"><div class="bubble">${icon(x.icon)}</div>
+  $('datesList').innerHTML = ud.length ? ud.map(x => `<div class="row-item tap" data-open="${x.open}"><div class="bubble">${icon(x.icon)}</div>
       <div class="grow"><div>${esc(x.title)}</div><div class="muted small">${fmtDay(x.when)}</div></div>
       <span class="badge">${untilLabel(x.when)}</span>
       ${x.id ? `<button class="icon-btn" data-del-date="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`).join('')
@@ -812,15 +824,36 @@ $('datesList').onclick = async e => {
   await sb.from('important_dates').delete().eq('id', id); scheduleReload();
 };
 let getDateIcon;
-$('addDateBtn').onclick = () => { $('dateForm').reset(); $('dErr').textContent = ''; $('dYearly').checked = true; setDate($('dDate'), ''); getDateIcon = iconPicker($('dIcon'), DATE_ICONS, 'heart'); $('dateSheet').showModal(); };
+let editDate = null;
+function openDateSheet(x){
+  editDate = x || null; $('dateForm').reset(); $('dErr').textContent = '';
+  $('dTitleH').textContent = t(x ? 'editDateT' : 'importantDate'); $('dDel').classList.toggle('hidden', !x);
+  $('dTitle').value = x?.title || ''; $('dYearly').checked = x ? !!x.repeats_yearly : true; setDate($('dDate'), x?.date || '');
+  getDateIcon = iconPicker($('dIcon'), DATE_ICONS, x ? safeIcon(x.emoji, DATE_ICONS, 'heart') : 'heart'); $('dateSheet').showModal();
+}
+$('addDateBtn').onclick = () => openDateSheet(null);
 $('dateForm').addEventListener('submit', e => {
   if (e.submitter?.value === 'ok' && !getDate($('dDate'))) { e.preventDefault(); $('dErr').textContent = t('needDate'); }
 });
+$('dDel').onclick = async () => {
+  if (!editDate || !confirm(t('confirmDelDate'))) return;
+  $('dateSheet').close('cancel'); await sb.from('important_dates').delete().eq('id', editDate.id); await loadAll();
+};
 $('dateSheet').onclose = async () => {
   if ($('dateSheet').returnValue !== 'ok' || !getDate($('dDate'))) return;
-  const { error } = await sb.from('important_dates').insert({ couple_id:S.couple.id, title:$('dTitle').value.trim(), date:getDate($('dDate')), emoji:getDateIcon(), repeats_yearly:$('dYearly').checked });
-  if (error) alert(errText(error)); scheduleReload();
+  const row = { title:$('dTitle').value.trim(), date:getDate($('dDate')), emoji:getDateIcon(), repeats_yearly:$('dYearly').checked };
+  const { error } = editDate ? await sb.from('important_dates').update(row).eq('id', editDate.id) : await sb.from('important_dates').insert({ couple_id:S.couple.id, ...row });
+  if (error) alert(errText(error)); await loadAll();
 };
+
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-del-ev],[data-del-date]')) return;
+  const o = e.target.closest('[data-open]')?.dataset.open; if (!o || o === 'undefined') return;
+  if (o === 'start') return document.querySelector('[data-edit="start"]').click();
+  const [k, id] = o.split(':');
+  if (k === 'ev') { const ev = S.events.find(x => x.id === id); if (ev) openEventSheet(ev); }
+  if (k === 'dt') { const dt = S.dates.find(x => x.id === id); if (dt) openDateSheet(dt); }
+});
 
 // ===== Plan: calendar + lists =====
 function setPlanView(v){
@@ -829,7 +862,7 @@ function setPlanView(v){
   $('planCal').classList.toggle('hidden', v !== 'cal'); $('planLists').classList.toggle('hidden', v !== 'lists');
 }
 document.querySelectorAll('#planSeg button').forEach(b => b.onclick = () => setPlanView(b.dataset.view));
-$('planAdd').onclick = () => S.planView === 'cal' ? openEventSheet() : openListSheet();
+$('planAdd').onclick = () => S.planView === 'cal' ? openEventSheet(null) : openListSheet();
 
 function renderLists(){
   $('listsWrap').innerHTML = S.lists.length ? S.lists.map(l => {
@@ -901,9 +934,9 @@ const eventsOn = day => S.events.filter(e => evOn(e, day)).sort((a,b) => (isDayK
 function occTime(e, day){ const s = new Date(e.starts_at); const d = new Date(day); d.setHours(s.getHours(), s.getMinutes(), 0, 0); return d; }
 function datesOn(day){
   const out = S.dates.filter(x => { const d = parseYmd(x.date); return x.repeats_yearly ? (d.getDate() === day.getDate() && d.getMonth() === day.getMonth() && day >= new Date(d.getFullYear(),0,1)) : ymd(d) === ymd(day); })
-    .map(x => ({ title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), age: x.repeats_yearly && x.emoji === 'cake' ? day.getFullYear() - parseYmd(x.date).getFullYear() : null }));
+    .map(x => ({ open:'dt:' + x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), age: x.repeats_yearly && x.emoji === 'cake' ? day.getFullYear() - parseYmd(x.date).getFullYear() : null }));
   if (S.couple?.start_date) { const s = parseYmd(S.couple.start_date), y = day.getFullYear() - s.getFullYear();
-    if (y > 0 && s.getDate() === day.getDate() && s.getMonth() === day.getMonth()) out.unshift({ title:t('yearsTogether', y), icon:'heart', age:null }); }
+    if (y > 0 && s.getDate() === day.getDate() && s.getMonth() === day.getMonth()) out.unshift({ open:'start', title:t('yearsTogether', y), icon:'heart', age:null }); }
   return out;
 }
 const KIND_ICON = { event:'calendar', birthday:'cake', anniversary:'heart', date:'glass', reminder:'clock' };
@@ -911,9 +944,9 @@ function evRow(e, day){
   day = day || new Date(e.starts_at); const s = new Date(e.starts_at), y = day.getFullYear() - s.getFullYear();
   const time = isDayKind(e) ? (e.repeat === 'yearly' && y > 0 ? t('ageN', y) : '') : e.all_day ? t('allDayShort') : `${pad(s.getHours())}:${pad(s.getMinutes())}`;
   const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).join(' · ');
-  return itemRow({ gold:isDayKind(e), time, title:e.title, sub, id:e.id });
+  return itemRow({ gold:isDayKind(e), time, title:e.title, sub, open:'ev:' + e.id, del:e.id });
 }
-function dateRow(x){ return itemRow({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title }); }
+function dateRow(x){ return itemRow({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title, open:x.open }); }
 const calShow = () => { try { return Object.assign({ events:true, dates:true, cycle:true }, JSON.parse(pref('calShow', '{}'))); } catch(_) { return { events:true, dates:true, cycle:true }; } };
 function renderCal(){
   if (!S.calMonth) { const td = today(); S.calMonth = new Date(td.getFullYear(), td.getMonth(), 1); S.selDay = ymd(td); }
@@ -958,12 +991,19 @@ function syncEventSheet(){
 }
 $('eAllDay').onchange = syncEventSheet;
 function wrapChips(el, after){ const orig = el.onclick; el.onclick = ev => { orig(ev); after(); }; }
-function openEventSheet(){
+let editEv = null;
+function openEventSheet(ev){
+  editEv = ev && ev.id ? ev : null;
   $('eventForm').reset(); fillTimeSelects(); $('eHour').value = '19'; $('eMin').value = '00';
-  setDate($('eDate'), S.selDay || ymd(today()));
-  getKind = chipPicker($('eKind'), t('kinds'), 'event');
-  getRepeat = chipPicker($('eRepeat'), t('repeats'), 'none');
-  getRemind = chipPicker($('eRemind'), t('reminds'), 'none');
+  $('eTitleH').textContent = t(editEv ? 'editEventT' : 'event'); $('eDel').classList.toggle('hidden', !editEv);
+  if (editEv) {
+    const s = new Date(editEv.starts_at);
+    $('eTitle').value = editEv.title; setDate($('eDate'), ymd(s)); $('eAllDay').checked = !!editEv.all_day;
+    $('eHour').value = pad(s.getHours()); $('eMin').value = pad(Math.round(s.getMinutes() / 5) * 5 % 60); $('eNote').value = editEv.note || '';
+  } else setDate($('eDate'), S.selDay || ymd(today()));
+  getKind = chipPicker($('eKind'), t('kinds'), editEv?.kind || 'event');
+  getRepeat = chipPicker($('eRepeat'), t('repeats'), editEv?.repeat || 'none');
+  getRemind = chipPicker($('eRemind'), t('reminds'), editEv?.remind || 'none');
   wrapChips($('eKind'), () => {
     const k = getKind();
     if (k === 'birthday' || k === 'anniversary') { getRepeat = chipPicker($('eRepeat'), t('repeats'), 'yearly'); getRemind = chipPicker($('eRemind'), t('reminds'), 'day'); }
@@ -971,14 +1011,20 @@ function openEventSheet(){
   });
   syncEventSheet(); $('eventSheet').showModal();
 }
+$('eDel').onclick = async () => {
+  if (!editEv || !confirm(editEv.repeat !== 'none' ? t('confirmDelSeries') : t('confirmDelEvent'))) return;
+  const id = editEv.id; $('eventSheet').close('cancel'); S.events = S.events.filter(x => x.id !== id); renderCal(); renderHome();
+  await sb.from('events').delete().eq('id', id);
+};
 $('eventSheet').onclose = async () => {
   if ($('eventSheet').returnValue !== 'ok' || !getDate($('eDate'))) return;
   const kind = getKind(), dayKind = kind === 'birthday' || kind === 'anniversary', allDay = dayKind || $('eAllDay').checked;
   const d = parseYmd(getDate($('eDate'))); if (allDay) d.setHours(12, 0); else d.setHours(+$('eHour').value, +$('eMin').value);
-  const { data, error } = await sb.from('events').insert({ couple_id:S.couple.id, title:$('eTitle').value.trim(), starts_at:d.toISOString(), all_day:allDay,
-    kind, repeat:getRepeat(), remind:getRemind(), note:$('eNote').value.trim() || null }).select().single();
+  const row = { title:$('eTitle').value.trim(), starts_at:d.toISOString(), all_day:allDay, kind, repeat:getRepeat(), remind:getRemind(), note:$('eNote').value.trim() || null };
+  const { data, error } = editEv ? await sb.from('events').update(row).eq('id', editEv.id).select().single()
+    : await sb.from('events').insert({ couple_id:S.couple.id, ...row }).select().single();
   if (error) return alert(errText(error));
-  if (!S.events.some(x => x.id === data.id)) { S.events.push(data); S.events.sort((a,b) => a.starts_at.localeCompare(b.starts_at)); }
+  S.events = S.events.filter(x => x.id !== data.id); S.events.push(data); S.events.sort((a,b) => a.starts_at.localeCompare(b.starts_at));
   d.setHours(0,0,0,0); S.selDay = ymd(d); S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); renderHome();
 };
 
@@ -1099,6 +1145,23 @@ function goTab(name){
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset.tab));
 document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => goTab(b.dataset.goto));
 { const a = tgApp(); try { a?.BackButton?.hide(); } catch(_){} }
+
+// ===== Pull to refresh (home) =====
+(function(){
+  const el = $('ptr'); let y0 = null, dy = 0, busy = false;
+  const active = () => !$('tab-home').classList.contains('hidden') && !document.querySelector('dialog[open]') && window.scrollY <= 0 && S.couple;
+  const set = (d, anim) => { el.style.transition = anim ? 'transform .25s, opacity .25s' : 'none'; el.style.transform = `translateY(${Math.min(d, 90) - 60}px)`; el.style.opacity = Math.min(1, d / 70);
+    el.querySelector('.ic').style.transform = busy ? '' : `rotate(${d * 3}deg)`; };
+  document.addEventListener('touchstart', e => { if (busy || !active()) return; y0 = e.touches[0].clientY; dy = 0; }, { passive:true });
+  document.addEventListener('touchmove', e => { if (y0 === null) return; dy = (e.touches[0].clientY - y0) * 0.55; if (dy > 0 && window.scrollY <= 0) set(dy); }, { passive:true });
+  document.addEventListener('touchend', async () => {
+    if (y0 === null) return; y0 = null;
+    if (dy < 70) { set(0, true); return; }
+    busy = true; el.classList.add('spin'); set(80, true); haptic();
+    try { await loadAll(); } catch(e){ console.error(e); }
+    busy = false; el.classList.remove('spin'); set(0, true);
+  });
+})();
 
 // ===== Install hint (iPhone Safari only) =====
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
