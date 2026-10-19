@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -143,6 +144,12 @@ dialog::backdrop{background:rgba(15,30,20,.4)}
 <!-- ===== AUTH ===== -->
 <section id="auth" class="wrap hidden">
   <div class="hero"><img src="icons/icon-192.png" alt="" width="88" height="88" style="border-radius:22px"><h1>Duo</h1><p class="muted">Общее пространство для двоих</p></div>
+  <div class="card hidden" id="tgAuthCard">
+    <button class="btn" id="tgLoginBtn">Войти через Telegram</button>
+    <p class="muted small" style="text-align:center;margin:12px 0 0">Без почты и пароля. Уведомления подключатся сами.</p>
+    <div class="error" id="tgAuthErr"></div>
+  </div>
+  <p class="muted small hidden" id="tgOrEmail" style="text-align:center;margin:4px 0 12px">Уже есть аккаунт с почтой? Войдите ниже, и Telegram привяжется к нему.</p>
   <div class="card">
     <div class="seg"><button id="segIn" class="on">Вход</button><button id="segUp">Регистрация</button></div>
     <form id="authForm">
@@ -251,6 +258,11 @@ dialog::backdrop{background:rgba(15,30,20,.4)}
       <div class="error" id="meErr"></div>
       <button class="btn" id="meSave">Сохранить</button>
     </div>
+    <div class="card">
+      <h2 style="font-size:20px">Уведомления в Telegram</h2>
+      <p class="muted small" id="tgStatus"></p>
+      <button class="btn ghost" id="tgBtn"></button>
+    </div>
     <button class="btn link" id="logout" style="display:block;margin:0 auto">Выйти из аккаунта</button>
   </section>
 
@@ -294,6 +306,23 @@ dialog::backdrop{background:rgba(15,30,20,.4)}
 const SUPABASE_URL = 'https://fuisujbwjwbddtfstkbh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_BOWxBrtsNsIaUQJYgqEXbQ_vZm6jwLl';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const BOT = 'DuoTogeherBot';
+
+// ===== Telegram Mini App =====
+const TG = window.Telegram?.WebApp;
+const inTG = !!(TG && TG.initData);
+if (inTG) { try { TG.ready(); TG.expand(); TG.setHeaderColor('#eef3ee'); TG.setBackgroundColor('#eef3ee'); } catch(_){} }
+async function tgAuth(mode){
+  const r = await fetch(SUPABASE_URL + '/functions/v1/tg-auth', { method:'POST',
+    headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY }, body: JSON.stringify({ initData: TG.initData, mode }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Не получилось войти через Telegram');
+  if (!j.linked) return false;
+  const { error } = await sb.auth.setSession({ access_token: j.access_token, refresh_token: j.refresh_token });
+  if (error) throw error;
+  return true;
+}
+let tgAutoTried = false, tgLinkTried = false;
 
 // ===== State =====
 const S = { user:null, profile:null, couple:null, partner:null, dates:[], lists:[], items:[], events:[],
@@ -363,12 +392,18 @@ let booting = false;
 async function boot(session){
   if (booting) return; booting = true;
   try {
-    if (!session) { S.user=null; show('auth'); return; }
+    if (!session) {
+      S.user = null;
+      if (inTG && !tgAutoTried) { tgAutoTried = true; try { if (await tgAuth('auto')) return; } catch(e){ console.error(e); } }
+      $('tgAuthCard').classList.toggle('hidden', !inTG); $('tgOrEmail').classList.toggle('hidden', !inTG);
+      show('auth'); return;
+    }
     S.user = session.user;
     const { data: profile, error } = await sb.from('profiles').select('*').eq('id', S.user.id).single();
     if (error) throw error;
     S.profile = profile;
     if (!profile.couple_id) { $('obName').textContent = profile.display_name; show('onboard'); return; }
+    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG.initData }).catch(() => {}); }
     await loadAll();
     subscribe();
     show('app');
@@ -399,7 +434,7 @@ $('obJoin').onclick = async () => {
 // ===== Data =====
 async function loadAll(){
   const cid = S.profile.couple_id, d = ymd(today());
-  const [c, p, dt, l, it, ev, q, an] = await Promise.all([
+  const [c, p, dt, l, it, ev, q, an, tl] = await Promise.all([
     sb.from('couples').select('*').eq('id', cid).single(),
     sb.from('profiles').select('*').eq('couple_id', cid),
     sb.from('important_dates').select('*').order('date'),
@@ -408,8 +443,10 @@ async function loadAll(){
     sb.from('events').select('*').order('starts_at'),
     sb.rpc('daily_question', { p_date: d }),
     sb.from('answers').select('*').eq('answer_date', d),
+    sb.rpc('tg_is_linked'),
   ]);
   for (const r of [c,p,dt,l,it,ev,q,an]) if (r.error) throw r.error;
+  S.tgLinked = !tl.error && tl.data === true;
   S.couple = c.data;
   S.profile = p.data.find(x => x.id === S.user.id) || S.profile;
   S.partner = p.data.find(x => x.id !== S.user.id) || null;
@@ -621,14 +658,31 @@ $('eventSheet').onclose = async () => {
 // ===== Me =====
 function renderMe(){
   $('inviteCode').textContent = S.couple.invite_code;
-  $('partnerStatus').textContent = S.partner ? `${S.partner.display_name} уже с вами 💞` : 'Отправьте этот код партнёру: он зарегистрируется и введёт его.';
+  $('partnerStatus').textContent = S.partner ? `${S.partner.display_name} уже с вами 💞` : 'Отправьте этот код партнёру: он откроет бота, войдёт и введёт код.';
+  $('tgStatus').textContent = S.tgLinked ? `Подключено ✓ Бот @${BOT} пишет, когда партнёр что-то добавил, и напоминает о вопросе дня и важных датах.` : 'Бот будет писать, когда партнёр ответил на вопрос дня или что-то добавил, и напоминать о важных датах.';
+  $('tgBtn').textContent = S.tgLinked ? 'Отключить уведомления' : 'Подключить Telegram';
   if (document.activeElement?.closest?.('#tab-me')) return;
   $('meName').value = S.profile.display_name; $('meCouple').value = S.couple.name; $('meStart').value = S.couple.start_date || '';
 }
 $('shareCode').onclick = async () => {
-  const text = `Присоединяйся ко мне в Duo 💞\n${location.origin + location.pathname}\nКод пары: ${S.couple.invite_code}`;
+  const text = `Присоединяйся ко мне в Duo 💞\nОткрой бота: https://t.me/${BOT}\nКод пары: ${S.couple.invite_code}`;
   if (navigator.share) { try { await navigator.share({ text }); } catch(_){} }
   else { await navigator.clipboard.writeText(text); alert('Скопировано'); }
+};
+$('tgBtn').onclick = async () => {
+  if (S.tgLinked) {
+    if (!confirm('Выключить уведомления в Telegram?')) return;
+    await sb.rpc('tg_unlink'); S.tgLinked = false; renderMe(); return;
+  }
+  if (inTG) { const { data } = await sb.rpc('tg_link_webapp', { p_init_data: TG.initData }); if (data) { S.tgLinked = true; renderMe(); return; } }
+  const { data: url, error } = await sb.rpc('tg_create_link');
+  if (error) return alert(errText(error));
+  if (inTG) TG.openTelegramLink(url); else location.href = url;
+};
+$('tgLoginBtn').onclick = async () => {
+  $('tgAuthErr').textContent = ''; $('tgLoginBtn').disabled = true;
+  try { await tgAuth('create'); } catch(e){ $('tgAuthErr').textContent = e.message; }
+  $('tgLoginBtn').disabled = false;
 };
 $('meSave').onclick = async () => {
   $('meErr').textContent='';
