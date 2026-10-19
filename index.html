@@ -15,17 +15,128 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=8">
+<link rel="stylesheet" href="common.css?v=9">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
-.counter{text-align:center;padding:26px 18px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff}
-.counter .num{font-family:Lora,serif;font-size:64px;line-height:1;font-weight:600;display:flex;justify-content:center}
-.counter .names{font-size:15px;opacity:.95;margin-bottom:8px}
-.counter .sub{opacity:.9;margin-top:6px}
 .q{font-family:Lora,serif;font-size:18px;font-style:italic;line-height:1.35;margin:4px 0 0}
-.qrow{display:flex;gap:12px;align-items:center}
-.qrow .grow{flex:1;min-width:0}
+/* Home */
+.h-top{display:flex;align-items:center;gap:10px;margin:4px 0 22px}
+.h-top .grow{flex:1;min-width:0}
+.h-logo{width:46px;height:46px;flex:none;margin-left:-4px;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.h-names{font-family:Lora,serif;font-size:21px;font-weight:600;line-height:1.2}
+.h-mood{font-size:14px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:7px}
+.h-mood i{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px}
+.qa>*{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:7px;text-decoration:none;color:var(--muted);cursor:pointer}
+.qa span{width:60px;height:60px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);display:grid;place-items:center;color:var(--accent);transition:transform .15s}
+.qa span .ic{width:25px;height:25px}
+.qa .hot span{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.qa>*:active span{transform:scale(.92)}
+.qa em{white-space:pre-line;font-style:normal;font-size:12.5px;line-height:1.25;text-align:center;max-width:76px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pair>button{border:0;border-radius:22px;height:104px;padding:16px 14px;text-align:left;cursor:pointer;position:relative;overflow:hidden}
+.t-days{background:linear-gradient(150deg,var(--grad-a),var(--grad-b));color:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.t-days .bgh{position:absolute;right:-20px;bottom:-24px;width:84px;height:84px;opacity:.16;stroke:#fff;stroke-width:1.6;fill:none}
+.t-days .lb{font-size:14px;opacity:.92}
+.t-days .n{font-family:Lora,serif;font-size:38px;line-height:1;font-weight:600}
+.t-days .n small{font-family:Manrope,sans-serif;font-size:14px;font-weight:500;margin-left:5px;opacity:.92}
+.t-next{background:var(--card);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);display:flex;align-items:center;gap:12px}
+.ring{position:relative;width:64px;height:64px;flex:none}
+.ring svg{width:64px;height:64px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:5.5}
+.ring .tr{stroke:var(--line)}.ring .pr{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .6s}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:Lora,serif;font-size:21px;font-weight:600;color:var(--accent)}
+.ring b .ic{width:22px;height:22px}
+.t-next{padding:14px 12px!important;gap:10px!important}
+.t-next .ring{width:58px;height:58px}.t-next .ring svg{width:58px;height:58px}
+.t-next .tt{min-width:0;font-size:14px;font-weight:600;line-height:1.25}
+.t-next .tt span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.t-next .tt div{font-size:12.5px;color:var(--accent);font-weight:600;margin-top:4px}
+.card.k-day,.card.k-list{box-shadow:inset 0 0 0 1px var(--line);padding:16px}
+.kh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.kh h2{font-size:18px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kh .btn.link{padding:4px;flex:none}
+.wk{display:flex;justify-content:space-between;gap:3px}
+.wk button{flex:1;max-width:44px;border:0;background:none;border-radius:13px;padding:6px 0 11px;font-weight:600;font-size:15px;cursor:pointer;position:relative;color:var(--ink)}
+.wk small{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:2px}
+.wk .td{color:var(--accent)}
+.wk .on{background:var(--sel-bg);color:var(--sel-ink)}
+.wk .on small{color:var(--sel-ink);opacity:.7}
+.wk .dots{position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:3px}
+.wk .dots i,.day .dots i{width:5px;height:5px;border-radius:50%;display:block}
+#wkItems{margin-top:6px}
+.qcard{background:var(--warm);border-radius:22px;padding:16px;margin-bottom:14px;color:var(--ink)}
+.qcard .lb{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--warm-ink)}
+.qcard .q{margin:8px 0 14px}
+.qft{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qft #qStatus{font-size:13.5px;font-weight:600;color:var(--warm-ink);display:flex;align-items:center;gap:6px;min-width:0}
+.qft #qStatus .ic{width:16px;height:16px}
+.qft #qStatus.soft{color:var(--muted);font-weight:500}
+.qcard .btn.sm{border-radius:999px;padding:9px 18px;flex:none}
+.qcard .ans{background:color-mix(in srgb,var(--card) 70%,transparent)}
+.qcard .ans:first-child{margin-top:0}
+.qcard .lock{background:none;padding:10px 0 0;margin:0}
+/* rows (plan list, day list) */
+.ev{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
+.ev:first-child{border-top:0;padding-top:2px}
+.ev:last-child{padding-bottom:2px}
+.ev .time{font-weight:700;color:var(--accent);width:46px;font-size:13.5px;line-height:1.2;flex:none}
+.ev .time .muted{font-weight:500}
+.ev .vbar{width:4px;align-self:stretch;min-height:34px;border-radius:2px;background:var(--accent);flex:none}
+.ev .vbar.gold{background:#c99a3b}
+.ev .grow{flex:1;min-width:0;font-weight:600}
+.ev .grow .muted{font-weight:400}
+.grp{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:20px 6px 8px}
+.showchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.showchips button{border:0;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;gap:6px;cursor:pointer}
+.showchips button i{width:8px;height:8px;border-radius:50%}
+.showchips button.off{background:none;color:var(--muted);box-shadow:inset 0 0 0 1.5px var(--line)}
+.showchips button.off i{opacity:.4}
+/* list rows (sections, profile) */
+.k-list .mrow{display:flex;align-items:center;gap:12px;padding:12px 0;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;color:var(--ink);text-decoration:none;font-size:16px;font-weight:600;cursor:pointer}
+.k-list .mrow:first-child{border-top:0;padding-top:0}
+.k-list .mrow:last-child{padding-bottom:0}
+.mrow .grow{flex:1;min-width:0}
+.mrow small,.mrow .sub{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-top:2px}
+.mrow .chev{color:var(--muted);width:18px;height:18px}
+.mrow .mval{color:var(--muted);font-weight:500;font-size:14px;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sq{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none}
+.sq .ic{width:21px;height:21px}
+.c1{background:var(--accent-soft);color:var(--accent)}
+.c2{background:var(--warm);color:var(--warm-ink)}
+.c3{background:var(--rose);color:var(--rose-ink)}
+.c4{background:var(--blue-s);color:var(--blue)}
+.c5{background:var(--violet-s);color:var(--violet)}
+.newdot{width:9px;height:9px;border-radius:50%;background:#c99a3b;flex:none}
+.cnt{font-family:Lora,serif;font-size:19px;font-weight:600;color:var(--accent)}
+.k-list.soon{opacity:.55}
+.k-list.soon .mrow{cursor:default}
+.k-list .mrow.hid{opacity:.4}
+.sw{width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.sw:after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on{background:var(--accent)}.sw.on:after{transform:translateX(18px)}
+.seg.mini{padding:3px;border-radius:11px;flex:none}
+.seg.mini button{padding:6px 9px;font-size:13px;border-radius:9px}
+.me-hero{border-radius:24px;padding:22px 18px 16px;background:linear-gradient(150deg,var(--grad-a),var(--grad-b));color:#fff;text-align:center;position:relative;overflow:hidden;margin:4px 0 14px}
+.me-hero .bgh{position:absolute;right:-22px;top:-26px;width:150px;height:150px;opacity:.12;stroke:#fff;stroke-width:1.4;fill:none}
+.me-hero .avs{display:flex;justify-content:center;margin-bottom:12px}
+.me-hero .av{width:62px;height:62px;font-size:22px;border:3px solid rgba(255,255,255,.85);background:rgba(255,255,255,.22)}
+.me-hero .av+.av{margin-left:-16px;background:rgba(0,0,0,.14)}
+.me-hero .av.empty{border-style:dashed;background:transparent}
+.me-hero h2{font-size:22px}
+.me-hero .since{font-size:14px;opacity:.9;margin-top:4px}
+.me-hero .stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;background:rgba(255,255,255,.15);border-radius:16px;padding:10px 0;font-size:12.5px}
+.me-hero .stats b{display:block;font-family:Lora,serif;font-size:22px;font-weight:600;line-height:1.15}
+.k-code{text-align:center;box-shadow:inset 0 0 0 1px var(--line)}
+.k-code h2{font-size:19px}
+.btn.link.logout{margin:18px auto 0;color:#c0564f}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.moods button{border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:14px 6px;font-weight:600;cursor:pointer;color:var(--ink)}
+.moods button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+#editSheet input,#editSheet .field{margin-top:14px}
+.toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 .status{display:flex;gap:8px;align-items:center;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px}
 .status.warm{background:var(--warm);color:var(--warm-ink);font-weight:600}
 .status.soft{background:var(--bg);color:var(--muted)}
@@ -47,10 +158,8 @@
 .list-tile .grow{flex:1}
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
 .cal-head h2{font-size:20px}
-.ev{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:flex-start}
-.ev:first-child{border-top:0}
-.ev .time{font-weight:700;color:var(--accent);min-width:64px;font-size:14px;padding-top:2px}
-.ev .grow{flex:1}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.day.today.sel{box-shadow:none}
 .code{font-family:Lora,serif;font-size:40px;letter-spacing:.18em;text-align:center;font-weight:600;color:var(--accent);margin:10px 0}
 .install{background:var(--accent-soft);color:var(--ink);border-radius:16px;padding:12px 14px;font-size:14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
 .setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;flex-wrap:wrap}
@@ -107,22 +216,30 @@
 <main id="app" class="hidden">
   <section id="tab-home" class="wrap">
     <div id="installHint" class="install hidden"><svg class="ic" style="color:var(--accent)"><use href="#i-phone"/></svg><div style="flex:1" data-t="installHint"></div><button class="icon-btn" id="installClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
-    <div class="card counter">
-      <div class="names" id="hNames"></div>
-      <div class="num" id="hDays">0</div>
-      <div class="sub" id="hDaysLabel"></div>
+    <div class="h-top">
+      <svg class="h-logo" viewBox="0 0 40 40" aria-hidden="true"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg>
+      <div class="grow"><div class="h-names" id="hNames"></div><div class="h-mood" id="hMood"></div></div>
     </div>
-    <div class="card">
-      <div class="qrow"><div class="grow"><div class="muted small"><span data-t="qotd"></span> · <span id="qDate"></span></div><div class="q" id="qText"></div></div><button class="btn sm" id="qOpen" data-t="answer"></button></div>
+    <div class="qa">
+      <button type="button" class="hot" id="qaPing"><span><svg class="ic"><use href="#i-heart"/></svg></span><em data-t="qaPing"></em></button>
+      <button type="button" id="qaMood"><span><svg class="ic"><use href="#i-smile"/></svg></span><em data-t="qaMood"></em></button>
+      <a href="movies.html"><span><svg class="ic"><use href="#i-film"/></svg></span><em data-t="qaMovies"></em></a>
+      <a href="wishes.html" data-seen="wishes"><span><svg class="ic"><use href="#i-gift"/></svg></span><em data-t="sWishes"></em></a>
+    </div>
+    <div class="pair">
+      <button type="button" class="t-days" id="tDays"></button>
+      <button type="button" class="t-next" id="tNext"></button>
+    </div>
+    <div class="card k-day">
+      <div class="kh"><h2 id="wkTitle"></h2><button class="btn link" id="wkPlan"><span data-t="plan"></span> ›</button></div>
+      <div class="wk" id="wkStrip"></div>
+      <div id="wkItems"></div>
+    </div>
+    <div class="qcard">
+      <div class="lb" data-t="qotd"></div>
+      <div class="q" id="qText"></div>
       <div id="qBody"></div>
-    </div>
-    <div class="card">
-      <div class="section-h"><h2 data-t="importantDates"></h2><button class="add-btn" id="addDateBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></div>
-      <div id="datesList"></div>
-    </div>
-    <div class="card">
-      <div class="section-h"><h2 data-t="soon"></h2><button class="btn link" data-goto="plan" data-t="open"></button></div>
-      <div id="homeEvents"></div>
+      <div class="qft" id="qFoot"><span id="qStatus"></span><button class="btn sm" id="qOpen" data-t="answer"></button></div>
     </div>
   </section>
 
@@ -133,13 +250,10 @@
       <div class="card">
         <div class="cal-head"><button class="icon-btn" id="calPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="calMonth"></h2><button class="icon-btn" id="calNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
         <div class="grid" id="calGrid"></div>
-        <div class="legend" id="calLegend"></div>
+        <div class="showchips" id="calShow"></div>
       </div>
-      <div class="chips" id="calShow" style="margin:-4px 0 14px"></div>
-      <div class="card">
-        <div class="section-h"><h2 id="selDayTitle"></h2></div>
-        <div id="dayEvents"></div>
-      </div>
+      <div class="grp" id="selDayTitle"></div>
+      <div class="card k-list"><div id="dayEvents"></div></div>
     </div>
     <div id="planLists" class="hidden">
       <div id="listsIndex"><div id="listsWrap"></div></div>
@@ -160,39 +274,32 @@
 
   <section id="tab-sections" class="wrap hidden">
     <div class="page-title"><h1 data-t="sections"></h1><button class="btn link" id="editSections" data-t="edit"></button></div>
-    <div class="tiles" id="tiles"></div>
+    <div class="card k-list" id="secList"></div>
+    <div class="grp" data-t="soonGroup"></div>
+    <div class="card k-list soon" id="secSoon"></div>
   </section>
 
   <section id="tab-me" class="wrap hidden">
-    <div class="page-title"><h1 data-t="profile"></h1></div>
-    <div class="card hidden" id="coupleCard">
-      <div class="row-item" style="padding:0"><div class="avs" id="cAvs"></div><div class="grow"><h2 style="font-size:20px" id="cNames"></h2><div class="muted small" id="cSince"></div></div></div>
-    </div>
-    <div class="card" id="codeCard">
-      <h2 style="font-size:20px" data-t="partnerCode"></h2>
-      <p class="muted small" id="partnerStatus"></p>
+    <div class="me-hero" id="meHero"></div>
+    <div class="card k-code hidden" id="codeCard">
+      <h2 data-t="partnerCode"></h2>
       <div class="code" id="inviteCode"></div>
-      <button class="btn ghost" id="shareCode"><svg class="ic"><use href="#i-share"/></svg><span data-t="sendCode"></span></button>
+      <p class="muted small" data-t="partnerInvite"></p>
+      <button class="btn" id="shareCode"><svg class="ic"><use href="#i-share"/></svg><span data-t="sendCode"></span></button>
     </div>
-    <div class="card">
-      <h2 style="font-size:20px" data-t="aboutUs"></h2>
-      <label data-t="myName"></label><input id="meName">
-      <label data-t="coupleName"></label><input id="meCouple">
-      <label data-t="startDateUs"></label><button type="button" class="field" data-date id="meStart"></button>
-      <div class="error" id="meErr"></div>
-      <button class="btn" id="meSave" data-t="save"></button>
+    <div class="grp" data-t="usGroup"></div>
+    <div class="card k-list">
+      <button type="button" class="mrow" data-edit="name"><span class="sq c1"><svg class="ic"><use href="#i-user"/></svg></span><span class="grow" data-t="myName"></span><span class="mval" id="vName"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+      <button type="button" class="mrow" data-edit="couple"><span class="sq c3"><svg class="ic"><use href="#i-heart"/></svg></span><span class="grow" data-t="coupleName"></span><span class="mval" id="vCouple"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+      <button type="button" class="mrow" data-edit="start"><span class="sq c2"><svg class="ic"><use href="#i-calendar"/></svg></span><span class="grow" data-t="startShort"></span><span class="mval" id="vStart"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
     </div>
-    <div class="card">
-      <h2 style="font-size:20px" data-t="tgNotif"></h2>
-      <p class="muted small" id="tgStatus"></p>
-      <button class="btn ghost" id="tgBtn"></button>
+    <div class="grp" data-t="appGroup"></div>
+    <div class="card k-list">
+      <button type="button" class="mrow" id="tgBtn"><span class="sq c4"><svg class="ic"><use href="#i-send"/></svg></span><span class="grow"><span data-t="tgNotif"></span><small id="tgStatus"></small></span><span class="sw" id="tgSw"></span></button>
+      <div class="mrow"><span class="sq c5"><svg class="ic"><use href="#i-globe"/></svg></span><span class="grow" data-t="language"></span><div class="seg mini"><button data-lang="ru">RU</button><button data-lang="en">EN</button></div></div>
+      <div class="mrow"><span class="sq c1"><svg class="ic"><use href="#i-moon"/></svg></span><span class="grow" data-t="theme"></span><div class="seg mini"><button data-theme-opt="auto" data-t="themeAuto"></button><button data-theme-opt="light" data-t="themeLightS"></button><button data-theme-opt="dark" data-t="themeDarkS"></button></div></div>
     </div>
-    <div class="card">
-      <h2 style="font-size:20px;margin-bottom:10px" data-t="settings"></h2>
-      <div class="setting"><span data-t="language"></span><div class="seg"><button data-lang="ru">Русский</button><button data-lang="en">English</button></div></div>
-      <div class="setting"><span data-t="theme"></span><div class="seg"><button data-theme-opt="auto" data-t="themeAuto"></button><button data-theme-opt="light" data-t="themeLight"></button><button data-theme-opt="dark" data-t="themeDark"></button></div></div>
-    </div>
-    <button class="btn link" id="logout" style="margin:0 auto"><svg class="ic"><use href="#i-logout"/></svg><span data-t="logoutAcc"></span></button>
+    <button class="btn link logout" id="logout" data-t="logoutAcc"></button>
   </section>
 
   <nav class="tabbar"><div class="in">
@@ -234,6 +341,29 @@
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
 
+<dialog id="datesSheet"><form class="sheet" method="dialog">
+  <div class="section-h"><h2 data-t="importantDates"></h2><button type="button" class="add-btn" id="addDateBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+  <div id="datesList"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" data-t="close"></button></div>
+</form></dialog>
+
+<dialog id="moodSheet"><form class="sheet" method="dialog">
+  <h2 data-t="moodTitle"></h2>
+  <p class="muted small" id="moodHint" style="margin:4px 0 12px"></p>
+  <div class="moods" id="moodPick"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" data-t="cancel"></button></div>
+</form></dialog>
+
+<dialog id="editSheet"><form class="sheet" method="dialog" id="editForm">
+  <h2 id="edTitle"></h2>
+  <input id="edInput" maxlength="60">
+  <button type="button" class="field" data-date id="edDate"></button>
+  <div class="error" id="edErr"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+</form></dialog>
+
+<div class="toast" id="toast"></div>
+
 <dialog id="ansSheet"><form class="sheet" method="dialog" id="ansForm">
   <div class="muted small" data-t="qotd"></div>
   <div class="q" id="ansQ" style="margin:4px 0 12px"></div>
@@ -244,7 +374,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=8"></script>
+<script src="common.js?v=9"></script>
 <script>
 addT({
 ru: {
@@ -273,7 +403,7 @@ ru: {
   tgConnect:'Подключить Telegram', tgDisconnect:'Отключить уведомления', confirmTgOff:'Выключить уведомления в Telegram?',
   shareText:c => `Присоединяйся ко мне в Duo\nОткрой бота: https://t.me/${BOT}\nКод пары: ${c}`, copied:'Скопировано',
   enterName:'Введите имя', codeLen:'Код состоит из 6 символов', checkEmail:'Мы отправили письмо для подтверждения. Откройте его и затем войдите.', needDate:'Выберите дату',
-  sWishes:'Желания', sMovies:'Посмотреть вместе', moviesSub:n => `${n} ${plural(n,'совпадение','совпадения','совпадений')}`, moviesEmpty:'Свайпы фильмов и сериалов', sTrips:'Поездки', sCycle:'Цикл', sLists:'Списки', sMoments:'Моменты', sBudget:'Бюджет', soonLabel:'скоро',
+  sWishes:'Желания', sMovies:'Кино', moviesSub:n => `${n} ${plural(n,'совпадение','совпадения','совпадений')}`, moviesEmpty:'Свайпы фильмов и сериалов', sTrips:'Поездки', sCycle:'Цикл', sLists:'Списки', sMoments:'Моменты', sBudget:'Бюджет', soonLabel:'скоро',
   wishesSub:(m,p) => `${m} у вас · ${p} у партнёра`, wishesEmpty:'Добавьте первое желание', tripsEmpty:'Спланируйте поездку', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} сейчас`, cycleEmpty:'Отслеживание цикла', cycleDay:(d,p) => `День ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${plural(n,'список','списка','списков')}`, hiddenN:n => `Показать скрытые (${n})`, editDone:'Готово',
@@ -286,7 +416,18 @@ ru: {
   repShort:{ daily:'каждый день', weekly:'каждую неделю', monthly:'каждый месяц', yearly:'каждый год' },
   ageN:n => `${n} ${plural(n,'год','года','лет')}`, showEvents:'События', showDates:'Важные даты', showCycle:'Цикл',
   lgEvents:'события', lgDates:'важные даты', lgCycle:'цикл', confirmDelSeries:'Удалить событие вместе со всеми повторами?',
-  togetherSince:d => `вместе с ${d}`
+  togetherSince:d => `вместе с ${d}`,
+  qaPing:'Думаю\nо тебе', wkFree:'Свободный день', qaMood:'Настроение', qaMovies:'Кино', moodTitle:'Какое у вас настроение?', moodHint:n => `${n} увидит его на главной`, moodHintSolo:'Его будет видно на главной',
+  moods:{ great:'отлично', calm:'спокойно', tired:'устало', sad:'грустно', anxious:'тревожно', tender:'нежно' },
+  moodOf:(n,m) => `${n}: ${m}`, moodNone:n => `${n}: настроение не отмечено`, moodInvite:'Пригласите партнёра в «Профиле»',
+  pingSent:'Отправлено', pingNoPartner:'Сначала пригласите партнёра', moodSaved:'Настроение сохранено',
+  together:'Вместе', daysWord:n => plural(n,'день','дня','дней'), setDateShort:'укажите дату',
+  leftN:n => n === 0 ? 'сегодня' : plural(n,'остался день','осталось дня','осталось дней'), yearsN:y => `${y} ${plural(y,'год','года','лет')}`,
+  addDateShort:'добавить', close:'Закрыть', soonGroup:'Скоро', momentsSub:'общий фотоальбом', budgetSub:'общие траты',
+  usGroup:'Мы', appGroup:'Приложение', startShort:'Начали встречаться', themeLightS:'Светлая', themeDarkS:'Тёмная',
+  tgOnShort:'подключено', tgOffShort:'выключено', waitPartner:'ждём вторую половинку',
+  statDays:n => plural(n,'день','дня','дней'), statAnswers:n => plural(n,'ответ','ответа','ответов'), statMovies:n => plural(n,'фильм','фильма','фильмов'),
+  ansReady:n => `${n}: ответ готов`, needName:'Введите имя'
 },
 en: {
   tagline:'A shared space for the two of you', tgLogin:'Sign in with Telegram', tgLoginHint:'No email or password. Notifications connect automatically.',
@@ -314,7 +455,7 @@ en: {
   tgConnect:'Connect Telegram', tgDisconnect:'Turn off notifications', confirmTgOff:'Turn off Telegram notifications?',
   shareText:c => `Join me in Duo\nOpen the bot: https://t.me/${BOT}\nCouple code: ${c}`, copied:'Copied',
   enterName:'Enter your name', codeLen:'The code has 6 characters', checkEmail:'We sent you a confirmation email. Open it, then sign in.', needDate:'Pick a date',
-  sWishes:'Wishes', sMovies:'Watch together', moviesSub:n => `${n} ${n === 1 ? 'match' : 'matches'}`, moviesEmpty:'Swipe films and series', sTrips:'Trips', sCycle:'Cycle', sLists:'Lists', sMoments:'Moments', sBudget:'Budget', soonLabel:'coming soon',
+  sWishes:'Wishes', sMovies:'Movies', moviesSub:n => `${n} ${n === 1 ? 'match' : 'matches'}`, moviesEmpty:'Swipe films and series', sTrips:'Trips', sCycle:'Cycle', sLists:'Lists', sMoments:'Moments', sBudget:'Budget', soonLabel:'coming soon',
   wishesSub:(m,p) => `${m} yours · ${p} partner's`, wishesEmpty:'Add your first wish', tripsEmpty:'Plan a trip', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} now`, cycleEmpty:'Cycle tracking', cycleDay:(d,p) => `Day ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${n === 1 ? 'list' : 'lists'}`, hiddenN:n => `Show hidden (${n})`, editDone:'Done',
@@ -327,7 +468,18 @@ en: {
   repShort:{ daily:'every day', weekly:'every week', monthly:'every month', yearly:'every year' },
   ageN:n => `${n} ${n === 1 ? 'year' : 'years'}`, showEvents:'Events', showDates:'Important dates', showCycle:'Cycle',
   lgEvents:'events', lgDates:'important dates', lgCycle:'cycle', confirmDelSeries:'Delete this event with all its repeats?',
-  togetherSince:d => `together since ${d}`
+  togetherSince:d => `together since ${d}`,
+  qaPing:'Thinking\nof you', wkFree:'A free day', qaMood:'Mood', qaMovies:'Movies', moodTitle:'How are you feeling?', moodHint:n => `${n} will see it on the home screen`, moodHintSolo:'It will show on the home screen',
+  moods:{ great:'great', calm:'calm', tired:'tired', sad:'sad', anxious:'anxious', tender:'loving' },
+  moodOf:(n,m) => `${n}: ${m}`, moodNone:n => `${n}: no mood yet`, moodInvite:'Invite your partner in Profile',
+  pingSent:'Sent', pingNoPartner:'Invite your partner first', moodSaved:'Mood saved',
+  together:'Together', daysWord:n => n === 1 ? 'day' : 'days', setDateShort:'set the date',
+  leftN:n => n === 0 ? 'today' : (n === 1 ? 'day left' : 'days left'), yearsN:y => `${y} ${y === 1 ? 'year' : 'years'}`,
+  addDateShort:'add', close:'Close', soonGroup:'Coming soon', momentsSub:'shared photo album', budgetSub:'shared spending',
+  usGroup:'Us', appGroup:'App', startShort:'Started dating', themeLightS:'Light', themeDarkS:'Dark',
+  tgOnShort:'on', tgOffShort:'off', waitPartner:'waiting for your partner',
+  statDays:n => n === 1 ? 'day' : 'days', statAnswers:n => n === 1 ? 'answer' : 'answers', statMovies:n => n === 1 ? 'film' : 'films',
+  ansReady:n => `${n} has answered`, needName:'Enter a name'
 }});
 
 // ===== State =====
@@ -455,14 +607,17 @@ async function loadAll(){
 }
 // Small summaries for the section tiles (each section has its own page)
 async function loadSummary(){
-  const [w, tr, cs, pcs, mm] = await Promise.all([
-    sb.from('wishes').select('owner_id, received'),
+  const [w, tr, cs, pcs, mm, ac, wc] = await Promise.all([
+    sb.from('wishes').select('owner_id, received, created_at'),
     sb.from('trips').select('title,start_date,end_date').order('start_date', { ascending: true, nullsFirst: false }),
     sb.rpc('cycle_status'),
     S.partner ? sb.rpc('cycle_status', { p_user: S.partner.id }) : Promise.resolve({ data: null }),
-    sb.rpc('movie_matches')
+    sb.rpc('movie_matches'),
+    sb.from('answers').select('id', { count:'exact', head:true }),
+    sb.from('movie_status').select('qid', { count:'exact', head:true }).eq('status', 'watched')
   ]);
-  S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data, movieMatches: (mm.data || []).length };
+  S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data, movieMatches: (mm.data || []).length,
+    answersCount: ac.count || 0, watchedCount: wc.count || 0 };
   // Period days (actual and forecast) to show in the Plan calendar
   const { data: per } = await sb.from('cycle_periods').select('user_id,start_date,end_date').gte('start_date', ymd(addDays(today(), -400)));
   const set = new Set();
@@ -473,7 +628,7 @@ async function loadSummary(){
     if (st.next_start) for (let c = 0; c < 4; c++) { const s0 = addDays(parseYmd(st.next_start), (st.cycle_length || 28) * c); for (let i = 0; i < plen; i++) set.add(ymd(addDays(s0, i))); }
   }
   S.cycleDays = set;
-  renderTiles(); renderCal();
+  renderTiles(); renderCal(); renderMe();
 }
 let reloadTimer;
 function scheduleReload(){ clearTimeout(reloadTimer); reloadTimer = setTimeout(() => loadAll().catch(console.error), 250); }
@@ -504,7 +659,7 @@ function upcomingDates(){
   };
   if (S.couple?.start_date) {
     const n = next(S.couple.start_date, true), yrs = n.getFullYear() - parseYmd(S.couple.start_date).getFullYear();
-    if (yrs > 0) out.push({ id:null, title:t('yearsTogether', yrs), icon:'heart', when:n });
+    if (yrs > 0) out.push({ id:null, title:t('yearsTogether', yrs), short:t('yearsN', yrs), icon:'heart', when:n });
   }
   for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= td) out.push({ id:x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), when:n }); }
   // birthdays and anniversaries added in the calendar
@@ -514,47 +669,128 @@ function upcomingDates(){
   return out.sort((a,b) => a.when - b.when);
 }
 
+const HEART_PATH = '<path d="M12 20s-7.5-4.6-9.3-9.2A4.8 4.8 0 0 1 12 7.6a4.8 4.8 0 0 1 9.3 3.2C19.5 15.4 12 20 12 20z"/>';
+const sameDay = (a, b) => a && b && ymd(a) === ymd(b);
+const coupleTitle = () => {
+  const names = [S.profile?.display_name, S.partner?.display_name].filter(Boolean).join(LANG === 'en' ? ' & ' : ' и ');
+  return S.couple?.name && S.couple.name !== 'Мы' ? S.couple.name : names;
+};
+function toast(msg){ const el = $('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800); }
+function haptic(){ try { tgApp()?.HapticFeedback?.impactOccurred('light'); } catch(_){} }
+// Everything on a given day: important dates first, then events
+function dayItems(day){
+  const dts = datesOn(day).map(x => ({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title }));
+  const evs = eventsOn(day).map(e => {
+    const s = new Date(e.starts_at), y = day.getFullYear() - s.getFullYear();
+    const time = isDayKind(e) ? (e.repeat === 'yearly' && y > 0 ? t('ageN', y) : '') : e.all_day ? t('allDayShort') : `${pad(s.getHours())}:${pad(s.getMinutes())}`;
+    const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).join(' · ');
+    return { gold:isDayKind(e), time, title:e.title, sub, id:e.id };
+  });
+  return [...dts, ...evs];
+}
+const itemRow = x => `<div class="ev"><div class="time">${esc(x.time)}</div><span class="vbar ${x.gold ? 'gold' : ''}"></span>
+  <div class="grow"><div>${esc(x.title)}</div>${x.sub ? `<div class="muted small">${esc(x.sub)}</div>` : ''}</div>
+  ${x.id ? `<button class="icon-btn" data-del-ev="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`;
+const dayTitle = d => {
+  if (sameDay(d, today())) return t('todayTitle');
+  const w = t('weekdays')[d.getDay()];
+  return `${w.charAt(0).toUpperCase() + w.slice(1)}, ${fmtDay(d)}`;
+};
+function dayDots(d){
+  const evs = eventsOn(d), ev = evs.some(e => !isDayKind(e)), dt = evs.some(isDayKind) || datesOn(d).length > 0;
+  return (ev ? '<i style="background:var(--accent)"></i>' : '') + (dt ? '<i style="background:#c99a3b"></i>' : '');
+}
+
+const shortTitle = x => LANG === 'ru' ? x.replace(/^день рождения/i, 'ДР') : x.replace(/^birthday/i, 'B-day');
 function renderHome(){
-  const names = [S.profile?.display_name, S.partner?.display_name].filter(Boolean).join(' & ');
-  $('hNames').textContent = S.couple?.name && S.couple.name !== 'Мы' ? S.couple.name : names;
+  $('hNames').textContent = coupleTitle();
+  // partner's mood (only today's counts)
+  if (S.partner) {
+    const m = S.partner.mood && sameDay(new Date(S.partner.mood_at), today()) ? t('moods')[S.partner.mood] : null;
+    $('hMood').innerHTML = `<i style="${m ? '' : 'background:var(--line)'}"></i><span>${esc(m ? t('moodOf', S.partner.display_name, m) : t('moodNone', S.partner.display_name))}</span>`;
+  } else $('hMood').innerHTML = `<i style="background:var(--line)"></i><span>${t('moodInvite')}</span>`;
+
+  // days together
+  const bgh = `<svg class="bgh" viewBox="0 0 24 24">${HEART_PATH}</svg>`;
   if (S.couple?.start_date) {
     const n = dayDiff(parseYmd(S.couple.start_date), today()) + 1;
-    $('hDays').textContent = n.toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU');
-    $('hDaysLabel').textContent = t('daysTogether', n);
-  } else { $('hDays').innerHTML = icon('heart', 'width:56px;height:56px'); $('hDaysLabel').textContent = t('setDateHint'); }
+    $('tDays').innerHTML = `${bgh}<span class="lb">${t('together')}</span><span class="n">${n.toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU')}<small>${t('daysWord', n)}</small></span>`;
+  } else $('tDays').innerHTML = `${bgh}<span class="lb">${t('together')}</span><span class="n" style="font-size:22px">${icon('calendar')}<small>${t('setDateShort')}</small></span>`;
 
-  $('qDate').textContent = fmtDay(today());
-  $('qText').textContent = S.question ? (LANG === 'en' && S.question.text_en ? S.question.text_en : S.question.text) : t('noQuestions');
+  // countdown to the nearest important date
+  const nx = upcomingDates()[0], C = 2 * Math.PI * 27;
+  if (nx) {
+    const n = Math.max(0, dayDiff(today(), nx.when)), frac = n === 0 ? 1 : Math.max(0.04, 1 - n / 365);
+    $('tNext').innerHTML = `<span class="ring"><svg viewBox="0 0 64 64"><circle class="tr" cx="32" cy="32" r="27"/><circle class="pr" cx="32" cy="32" r="27" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>
+      <b>${n === 0 ? icon('heart') : n}</b></span><span class="tt"><span>${esc(shortTitle(nx.short || nx.title))}</span><div>${t('leftN', n)}</div></span>`;
+  } else {
+    $('tNext').innerHTML = `<span class="ring"><svg viewBox="0 0 64 64"><circle class="tr" cx="32" cy="32" r="27"/></svg><b>${icon('plus')}</b></span><span class="tt"><span>${t('importantDates')}</span><div>${t('addDateShort')}</div></span>`;
+  }
+
+  // week strip + selected day
+  const td = today(), sel = S.homeDay ? parseYmd(S.homeDay) : td;
+  const mon = addDays(td, -((td.getDay() + 6) % 7));
+  $('wkStrip').innerHTML = Array.from({ length:7 }, (_, i) => {
+    const d = addDays(mon, i), k = ymd(d), dots = dayDots(d);
+    return `<button type="button" data-wk="${k}" class="${sameDay(d, sel) ? 'on' : ''} ${sameDay(d, td) ? 'td' : ''}"><small>${t('dow')[i]}</small>${d.getDate()}${dots ? `<span class="dots">${dots}</span>` : ''}</button>`;
+  }).join('');
+  $('wkTitle').textContent = dayTitle(sel);
+  const items = dayItems(sel);
+  $('wkItems').innerHTML = items.length ? items.map(x => itemRow({ ...x, id:null })).join('') : `<div class="empty" style="padding:10px 0 2px">${t('wkFree')}</div>`;
+
+  // question of the day
+  $('qText').textContent = S.question ? qTextNow() : t('noQuestions');
   const mine = S.answers.find(a => a.user_id === S.user.id), theirs = S.answers.find(a => a.user_id !== S.user.id);
   const pName = esc(S.partner?.display_name || t('partner'));
+  $('qFoot').classList.toggle('hidden', !S.question || !!mine);
   $('qOpen').classList.toggle('hidden', !S.question || !!mine);
   if (!S.question) $('qBody').innerHTML = '';
   else if (!mine) {
-    $('qBody').innerHTML = theirs ? `<div class="status warm">${icon('clock')}<span>${t('waitsYou', pName)}</span></div>`
-      : `<div class="status soft">${icon('lock')}<span>${S.partner ? t('bothOpen') : t('invitePartner')}</span></div>`;
+    $('qBody').innerHTML = '';
+    $('qStatus').className = theirs ? '' : 'soft';
+    $('qStatus').innerHTML = theirs ? `${icon('clock')}<span>${t('ansReady', pName)}</span>` : `<span>${S.partner ? t('bothOpen') : t('invitePartner')}</span>`;
   } else {
     $('qBody').innerHTML = `<div class="ans"><div class="who">${t('you')}</div>${esc(mine.answer)}</div>` +
       (theirs ? `<div class="ans"><div class="who">${pName}</div>${esc(theirs.answer)}</div>`
               : `<div class="lock">${icon('clock')}<span>${S.partner ? t('notAnswered', pName) : t('partnerNotJoined')}</span></div>`);
   }
-
+  renderDatesList();
+}
+function renderDatesList(){
   const ud = upcomingDates();
   $('datesList').innerHTML = ud.length ? ud.map(x => `<div class="row-item"><div class="bubble">${icon(x.icon)}</div>
       <div class="grow"><div>${esc(x.title)}</div><div class="muted small">${fmtDay(x.when)}</div></div>
       <span class="badge">${untilLabel(x.when)}</span>
       ${x.id ? `<button class="icon-btn" data-del-date="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`).join('')
     : `<div class="empty">${t('datesEmpty')}</div>`;
-
-  const now = new Date(), soon = [];
-  for (let i = 0; i < 90 && soon.length < 3; i++) {
-    const day = addDays(today(), i);
-    for (const e of eventsOn(day)) {
-      if (i === 0 && !e.all_day && !isDayKind(e) && occTime(e, day) < now) continue;
-      if (soon.length < 3) soon.push([e, day]);
-    }
-  }
-  $('homeEvents').innerHTML = soon.length ? soon.map(([e, d]) => evRow(e, d)).join('') : `<div class="empty">${t('eventsEmpty')}</div>`;
 }
+$('wkStrip').onclick = e => { const k = e.target.closest('[data-wk]')?.dataset.wk; if (!k) return; S.homeDay = k; renderHome(); };
+$('wkPlan').onclick = () => {
+  const d = S.homeDay ? parseYmd(S.homeDay) : today();
+  S.selDay = ymd(d); S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); setPlanView('cal'); renderCal(); goTab('plan');
+};
+$('tNext').onclick = () => { renderDatesList(); $('datesSheet').showModal(); };
+$('tDays').onclick = () => { if (!S.couple?.start_date) goTab('me'); };
+$('qaPing').onclick = async () => {
+  haptic();
+  if (!S.partner) return toast(t('pingNoPartner'));
+  const { error } = await sb.rpc('ping_partner');
+  toast(error ? errText(error) : t('pingSent'));
+};
+$('qaMood').onclick = () => {
+  const cur = S.profile.mood && sameDay(new Date(S.profile.mood_at), today()) ? S.profile.mood : null;
+  $('moodHint').textContent = S.partner ? t('moodHint', S.partner.display_name) : t('moodHintSolo');
+  $('moodPick').innerHTML = Object.entries(t('moods')).map(([k, l]) => `<button type="button" data-mood="${k}" class="${k === cur ? 'on' : ''}">${esc(l.charAt(0).toUpperCase() + l.slice(1))}</button>`).join('');
+  $('moodSheet').showModal();
+};
+$('moodPick').onclick = async e => {
+  const k = e.target.closest('[data-mood]')?.dataset.mood; if (!k) return;
+  haptic(); $('moodSheet').close();
+  const { error } = await sb.rpc('set_mood', { p_mood: k });
+  if (error) return alert(errText(error));
+  S.profile.mood = k; S.profile.mood_at = new Date().toISOString(); toast(t('moodSaved'));
+};
+document.addEventListener('click', e => { const a = e.target.closest('[data-seen]'); if (a) setPref('seen.' + a.dataset.seen, new Date().toISOString()); });
 const qTextNow = () => LANG === 'en' && S.question?.text_en ? S.question.text_en : S.question?.text;
 $('qOpen').onclick = () => {
   if (!S.question) return;
@@ -672,19 +908,12 @@ function datesOn(day){
 }
 const KIND_ICON = { event:'calendar', birthday:'cake', anniversary:'heart', date:'glass', reminder:'clock' };
 function evRow(e, day){
-  day = day || new Date(e.starts_at); const s = new Date(e.starts_at);
-  const y = day.getFullYear() - s.getFullYear();
+  day = day || new Date(e.starts_at); const s = new Date(e.starts_at), y = day.getFullYear() - s.getFullYear();
   const time = isDayKind(e) ? (e.repeat === 'yearly' && y > 0 ? t('ageN', y) : '') : e.all_day ? t('allDayShort') : `${pad(s.getHours())}:${pad(s.getMinutes())}`;
-  const isToday = ymd(day) === ymd(today());
-  const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).map(esc).join(' · ');
-  return `<div class="ev"><div class="time">${isToday ? '' : `<div>${day.getDate()} ${t('monthsShort')[day.getMonth()]}</div>`}<div class="${isToday?'':'muted small'}">${time}</div></div>
-    <div class="bubble ${isDayKind(e) ? 'gold' : ''}" style="width:30px;height:30px;border-radius:10px">${icon(KIND_ICON[e.kind] || 'calendar', 'width:16px;height:16px')}</div>
-    <div class="grow"><div>${esc(e.title)}</div>${sub ? `<div class="muted small">${sub}</div>` : ''}</div>
-    <button class="icon-btn" data-del-ev="${e.id}" aria-label="delete">${icon('x')}</button></div>`;
+  const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).join(' · ');
+  return itemRow({ gold:isDayKind(e), time, title:e.title, sub, id:e.id });
 }
-function dateRow(x){
-  return `<div class="ev"><div class="time"><div class="muted small">${x.age ? t('ageN', x.age) : ''}</div></div><div class="bubble gold" style="width:30px;height:30px;border-radius:10px">${icon(x.icon, 'width:16px;height:16px')}</div><div class="grow"><div>${esc(x.title)}</div></div></div>`;
-}
+function dateRow(x){ return itemRow({ gold:true, time:x.age ? t('ageN', x.age) : '', title:x.title }); }
 const calShow = () => { try { return Object.assign({ events:true, dates:true, cycle:true }, JSON.parse(pref('calShow', '{}'))); } catch(_) { return { events:true, dates:true, cycle:true }; } };
 function renderCal(){
   if (!S.calMonth) { const td = today(); S.calMonth = new Date(td.getFullYear(), td.getMonth(), 1); S.selDay = ymd(td); }
@@ -702,11 +931,9 @@ function renderCal(){
     html += `<button class="day ${d.getMonth()!==m.getMonth()?'other':''} ${k===todayKey?'today':''} ${show.cycle && cyc.has(k) ? 'cyc' : ''} ${k===S.selDay?'sel':''}" data-day="${k}">${d.getDate()}${dots ? `<span class="dots">${dots}</span>` : ''}</button>`;
   }
   $('calGrid').innerHTML = html;
-  $('calLegend').innerHTML = [show.events ? `<span><i class="dot-ev"></i>${t('lgEvents')}</span>` : '', show.dates ? `<span><i class="dot-dt"></i>${t('lgDates')}</span>` : '',
-    show.cycle && cyc.size ? `<span><i style="background:var(--rose)"></i>${t('lgCycle')}</span>` : ''].join('');
-  const showOpts = [['events', t('showEvents')], ['dates', t('showDates')], ['cycle', t('showCycle')]];
-  $('calShow').innerHTML = showOpts.map(([k, l]) => `<button type="button" data-show="${k}" class="${show[k] ? 'on' : ''}">${esc(l)}</button>`).join('');
-  $('selDayTitle').textContent = S.selDay === todayKey ? t('todayTitle') : fmtDay(parseYmd(S.selDay));
+  const showOpts = [['events', t('showEvents'), 'var(--accent)'], ['dates', t('showDates'), '#c99a3b'], ['cycle', t('showCycle'), 'var(--rose-ink)']];
+  $('calShow').innerHTML = showOpts.map(([k, l, c]) => `<button type="button" data-show="${k}" class="${show[k] ? '' : 'off'}"><i style="background:${c}"></i>${esc(l)}</button>`).join('');
+  $('selDayTitle').textContent = S.selDay === todayKey ? `${t('todayTitle')}, ${fmtDay(today())}` : dayTitle(parseYmd(S.selDay));
   const sd = parseYmd(S.selDay), dts = show.dates ? datesOn(sd) : [], evs = show.events || show.dates ? eventsOn(sd).filter(e => isDayKind(e) ? show.dates : show.events) : [];
   $('dayEvents').innerHTML = dts.length || evs.length ? dts.map(dateRow).join('') + evs.map(e => evRow(e, sd)).join('') : `<div class="empty">${t('freeDay')}</div>`;
 }
@@ -722,7 +949,7 @@ async function delEvent(e){
   S.events = S.events.filter(x => x.id !== id); renderCal(); renderHome();
   await sb.from('events').delete().eq('id', id);
 }
-$('dayEvents').onclick = delEvent; $('homeEvents').onclick = delEvent;
+$('dayEvents').onclick = delEvent;
 let getKind, getRepeat, getRemind;
 function syncEventSheet(){
   const k = getKind(), dayKind = k === 'birthday' || k === 'anniversary';
@@ -761,6 +988,8 @@ const hiddenTiles = () => { try { return JSON.parse(pref('hiddenSections', '[]')
 function tileDefs(){
   const sm = S.summary || {};
   const w = sm.wishes || [], mineW = w.filter(x => x.owner_id === S.user.id && !x.received).length, partW = w.filter(x => x.owner_id !== S.user.id && !x.received).length;
+  const seenW = pref('seen.wishes', '');
+  const newW = w.some(x => x.owner_id !== S.user.id && !x.received && x.created_at && (!seenW || x.created_at > seenW));
   const td = ymd(today()), trips = sm.trips || [];
   const now = trips.find(x => x.start_date && x.start_date <= td && (x.end_date || x.start_date) >= td);
   const next = trips.find(x => x.start_date && x.start_date > td);
@@ -769,55 +998,81 @@ function tileDefs(){
   if (sm.cycle?.has_data) cycleSub = t('cycleDay', sm.cycle.day, ph(sm.cycle));
   else if (sm.partnerCycle?.has_data && S.partner) cycleSub = t('partnerCycle', S.partner.display_name, ph(sm.partnerCycle));
   return [
-    { id:'wishes', icon:'gift', href:'wishes.html', title:t('sWishes'), sub: w.length ? t('wishesSub', mineW, partW) : t('wishesEmpty') },
-    { id:'trips', icon:'plane', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty') },
-    { id:'cycle', icon:'droplet', href:'cycle.html', title:t('sCycle'), sub: cycleSub },
-    { id:'movies', icon:'film', href:'movies.html', title:t('sMovies'), sub: sm.movieMatches ? t('moviesSub', sm.movieMatches) : t('moviesEmpty') },
-    { id:'lists', icon:'list', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length) },
-    { id:'moments', icon:'photo', soon:true, title:t('sMoments'), sub:t('soonLabel') },
-    { id:'budget', icon:'wallet', soon:true, title:t('sBudget'), sub:t('soonLabel') },
+    { id:'wishes', icon:'gift', c:'c2', href:'wishes.html', title:t('sWishes'), sub: w.length ? t('wishesSub', mineW, partW) : t('wishesEmpty'), dot:newW },
+    { id:'movies', icon:'film', c:'c4', href:'movies.html', title:t('sMovies'), sub: sm.movieMatches ? t('moviesSub', sm.movieMatches) : t('moviesEmpty'), cnt:sm.movieMatches || 0 },
+    { id:'trips', icon:'plane', c:'c1', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty') },
+    { id:'cycle', icon:'droplet', c:'c3', href:'cycle.html', title:t('sCycle'), sub: cycleSub },
+    { id:'lists', icon:'list', c:'c5', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length) },
   ];
 }
+const SOON = () => [{ icon:'photo', c:'c1', title:t('sMoments'), sub:t('momentsSub') }, { icon:'wallet', c:'c2', title:t('sBudget'), sub:t('budgetSub') }];
 function renderTiles(){
   if (!S.couple) return;
   const hidden = hiddenTiles();
   const defs = tileDefs().filter(d => editingTiles || !hidden.includes(d.id));
   let html = defs.map(d => {
-    const tag = d.href && !editingTiles ? 'a' : 'button';
-    const isHidden = hidden.includes(d.id);
-    return `<${tag} class="tile ${d.soon ? 'soon' : ''}" ${tag === 'a' ? `href="${d.href}"` : `type="button" data-tile="${d.id}"`} style="${isHidden ? 'opacity:.4' : ''}">
-      ${editingTiles ? `<span class="hide-x icon-btn" data-hide="${d.id}">${icon(isHidden ? 'eye' : 'x')}</span>` : ''}
-      <div class="bubble">${icon(d.icon)}</div><div><b>${esc(d.title)}</b><div class="muted">${esc(d.sub)}</div></div></${tag}>`;
+    const tag = d.href && !editingTiles ? 'a' : 'button', isHidden = hidden.includes(d.id);
+    const right = editingTiles ? `<span class="icon-btn" data-hide="${d.id}">${icon(isHidden ? 'eye' : 'x')}</span>`
+      : d.dot ? '<span class="newdot"></span>' : d.cnt ? `<span class="cnt">${d.cnt}</span>` : `<svg class="ic chev"><use href="#i-chev"/></svg>`;
+    return `<${tag} class="mrow ${isHidden ? 'hid' : ''}" ${tag === 'a' ? `href="${d.href}" data-seen="${d.id}"` : `type="button" data-tile="${d.id}"`}>
+      <span class="sq ${d.c}">${icon(d.icon)}</span><span class="grow">${esc(d.title)}<span class="sub">${esc(d.sub)}</span></span>${right}</${tag}>`;
   }).join('');
-  if (!editingTiles && hidden.length) html += `<button type="button" class="tile add" id="showHidden">${icon('eye')}<span class="small">${t('hiddenN', hidden.length)}</span></button>`;
-  $('tiles').innerHTML = html;
+  if (!editingTiles && hidden.length) html += `<button type="button" class="mrow" id="showHidden"><span class="sq" style="color:var(--muted)">${icon('eye')}</span><span class="grow sub" style="font-weight:500">${t('hiddenN', hidden.length)}</span></button>`;
+  $('secList').innerHTML = html || `<div class="empty">—</div>`;
+  $('secSoon').innerHTML = SOON().map(d => `<div class="mrow"><span class="sq ${d.c}">${icon(d.icon)}</span><span class="grow">${esc(d.title)}<span class="sub">${esc(d.sub)}</span></span></div>`).join('');
   $('editSections').textContent = editingTiles ? t('editDone') : t('edit');
 }
-$('tiles').onclick = e => {
+$('secList').onclick = e => {
   const h = e.target.closest('[data-hide]')?.dataset.hide;
   if (h) { e.preventDefault(); const hid = hiddenTiles(); const i = hid.indexOf(h); i >= 0 ? hid.splice(i,1) : hid.push(h); setPref('hiddenSections', JSON.stringify(hid)); renderTiles(); return; }
   if (e.target.closest('#showHidden')) { editingTiles = true; renderTiles(); return; }
   const tid = e.target.closest('[data-tile]')?.dataset.tile;
-  if (tid === 'lists' && !editingTiles) { goTab('plan'); setPlanView('lists'); }
+  if (editingTiles) return;
+  if (tid === 'lists') { goTab('plan'); setPlanView('lists'); }
 };
 $('editSections').onclick = () => { editingTiles = !editingTiles; renderTiles(); };
 
 // ===== Profile =====
 function renderMe(){
+  const ini = n => esc((n || '?').trim().charAt(0).toUpperCase());
+  const sm = S.summary || {}, bgh = `<svg class="bgh" viewBox="0 0 24 24">${HEART_PATH}</svg>`;
+  const days = S.couple.start_date ? dayDiff(parseYmd(S.couple.start_date), today()) + 1 : 0;
+  const stat = (n, f) => `<div><b>${n.toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU')}</b>${t(f, n)}</div>`;
+  $('meHero').innerHTML = `${bgh}<div class="avs"><div class="av">${ini(S.profile.display_name)}</div>${S.partner ? `<div class="av">${ini(S.partner.display_name)}</div>` : '<div class="av empty">+</div>'}</div>
+    <h2>${esc(S.partner ? coupleTitle() : S.profile.display_name)}</h2>
+    <div class="since">${S.partner ? (S.couple.start_date ? t('togetherSince', fmtDay(parseYmd(S.couple.start_date), true)) : '') : t('waitPartner')}</div>
+    ${S.partner ? `<div class="stats">${stat(days, 'statDays')}${stat(sm.answersCount || 0, 'statAnswers')}${stat(sm.watchedCount || 0, 'statMovies')}</div>` : ''}`;
   $('inviteCode').textContent = S.couple.invite_code;
-  $('codeCard').classList.toggle('hidden', !!S.partner); $('coupleCard').classList.toggle('hidden', !S.partner);
-  if (S.partner) {
-    const ini = n => esc((n || '?').trim().charAt(0).toUpperCase());
-    $('cAvs').innerHTML = `<div class="av">${ini(S.profile.display_name)}</div><div class="av">${ini(S.partner.display_name)}</div>`;
-    $('cNames').textContent = S.couple.name && S.couple.name !== 'Мы' ? S.couple.name : `${S.profile.display_name} & ${S.partner.display_name}`;
-    $('cSince').textContent = S.couple.start_date ? t('togetherSince', fmtDay(parseYmd(S.couple.start_date), true)) : '';
-  }
-  $('partnerStatus').textContent = S.partner ? t('partnerWith', S.partner.display_name) : t('partnerInvite');
-  $('tgStatus').textContent = S.tgLinked ? t('tgOn') : t('tgOff');
-  $('tgBtn').innerHTML = `${icon('send')}<span>${S.tgLinked ? t('tgDisconnect') : t('tgConnect')}</span>`;
-  if (document.activeElement?.closest?.('#tab-me')) return;
-  $('meName').value = S.profile.display_name; $('meCouple').value = S.couple.name; setDate($('meStart'), S.couple.start_date || '');
+  $('codeCard').classList.toggle('hidden', !!S.partner);
+  $('vName').textContent = S.profile.display_name || '';
+  $('vCouple').textContent = S.couple.name || '';
+  $('vStart').textContent = S.couple.start_date ? parseYmd(S.couple.start_date).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU') : '—';
+  $('tgStatus').textContent = S.tgLinked ? t('tgOnShort') : t('tgOffShort');
+  $('tgSw').classList.toggle('on', !!S.tgLinked);
 }
+let editKind = null;
+document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+  editKind = b.dataset.edit; $('edErr').textContent = '';
+  const isDate = editKind === 'start';
+  $('edTitle').textContent = t({ name:'myName', couple:'coupleName', start:'startDateUs' }[editKind]);
+  $('edInput').classList.toggle('hidden', isDate); $('edDate').classList.toggle('hidden', !isDate);
+  if (isDate) setDate($('edDate'), S.couple.start_date || '');
+  else $('edInput').value = editKind === 'name' ? S.profile.display_name : (S.couple.name === 'Мы' ? '' : S.couple.name);
+  $('edInput').placeholder = editKind === 'couple' ? coupleTitle() : '';
+  $('editSheet').showModal(); if (!isDate) setTimeout(() => $('edInput').focus(), 50);
+});
+$('editForm').addEventListener('submit', e => {
+  if (e.submitter?.value === 'ok' && editKind === 'name' && !$('edInput').value.trim()) { e.preventDefault(); $('edErr').textContent = t('needName'); }
+});
+$('editSheet').onclose = async () => {
+  if ($('editSheet').returnValue !== 'ok') return;
+  let r;
+  if (editKind === 'name') r = await sb.from('profiles').update({ display_name: $('edInput').value.trim() }).eq('id', S.user.id);
+  else if (editKind === 'couple') r = await sb.from('couples').update({ name: $('edInput').value.trim() || 'Мы' }).eq('id', S.couple.id);
+  else r = await sb.from('couples').update({ start_date: getDate($('edDate')) || null }).eq('id', S.couple.id);
+  if (r.error) return alert(errText(r.error));
+  await loadAll();
+};
 $('shareCode').onclick = async () => {
   const text = t('shareText', S.couple.invite_code);
   if (navigator.share) { try { await navigator.share({ text }); } catch(_){} }
@@ -833,14 +1088,6 @@ $('tgBtn').onclick = async () => {
   if (error) return alert(errText(error));
   openTg(url);
 };
-$('meSave').onclick = async () => {
-  $('meErr').textContent=''; $('meErr').classList.remove('ok-text');
-  const r1 = await sb.from('profiles').update({ display_name: $('meName').value.trim() || S.profile.display_name }).eq('id', S.user.id);
-  const r2 = await sb.from('couples').update({ name: $('meCouple').value.trim() || 'Мы', start_date: getDate($('meStart')) || null }).eq('id', S.couple.id);
-  const err = r1.error || r2.error; if (err) return $('meErr').textContent = errText(err);
-  document.activeElement?.blur(); await loadAll(); $('meErr').textContent = t('saved'); $('meErr').classList.add('ok-text');
-};
-
 // ===== Tabs =====
 function goTab(name){
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
