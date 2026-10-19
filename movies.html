@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=13">
+<link rel="stylesheet" href="common.css?v=14">
 <style>
 .pools{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -16px 12px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .pools::-webkit-scrollbar{display:none}
@@ -116,7 +116,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=13"></script>
+<script src="common.js?v=14"></script>
 <script>
 addT({
 ru: { mvTitle:'Посмотреть вместе', tPick:'Выбор', tMatch:n => n ? `Совпали · ${n}` : 'Совпали', tSeen:'Смотрели',
@@ -144,6 +144,8 @@ en: { mvTitle:'Watch together', tPick:'Pick', tMatch:n => n ? `Matches · ${n}` 
 });
 
 const M = { ctx:null, tab:'pick', pool:pref('moviePool', 'all'), queue:[], loading:false, feedErr:false, swipes:{}, matches:[], status:{}, ratings:[], movies:{}, planFor:null, rateFor:null, rateVal:null };
+const mt = m => (LANG === 'en' && m?.title_en) ? m.title_en : (m?.title || '');
+const mx = m => (LANG === 'en' && m?.title_en) ? (m.extract_en || '') : (m?.extract || '');
 const clean = s => { if (!s) return ''; let x = s.replace(/́/g, '').replace(/^«[^»]+»\s*(?:\([^)]*\)\s*)?[—–-]\s*/, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
 const metaLine = m => [m.year, m.kind === 'series' ? t('series') : t('film')].filter(Boolean).join(' · ');
 const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
@@ -154,7 +156,7 @@ const pName = () => M.ctx.partner?.display_name || t('partner');
 async function fetchFeed(){
   if (M.loading) return; M.loading = true; M.feedErr = false; renderStack();
   try {
-    const { data, error } = await sb.functions.invoke('movies', { body: { action:'feed', pool:M.pool, exclude:M.queue.map(m => m.qid) } });
+    const { data, error } = await sb.functions.invoke('movies', { body: { action:'feed', pool:M.pool, lang:LANG, exclude:M.queue.map(m => m.qid) } });
     if (error) throw error;
     let added = 0;
     (data.items || []).forEach(m => { M.movies[m.qid] = m; if (!M.queue.some(q => q.qid === m.qid) && !M.swipes[m.qid]) { M.queue.push(m); added++; } });
@@ -164,11 +166,11 @@ async function fetchFeed(){
 }
 function cardHTML(m, back){
   return `<div class="mcard ${back ? 'back' : ''}" data-q="${m.qid}">
-    <div class="ph">${esc(m.title)}</div>${m.poster ? `<img src="${esc(m.poster)}" alt="" referrerpolicy="no-referrer" style="position:absolute;inset:0" onerror="this.remove()">` : ''}
+    <div class="ph">${esc(mt(m))}</div>${m.poster ? `<img src="${esc(m.poster)}" alt="" referrerpolicy="no-referrer" style="position:absolute;inset:0" onerror="this.remove()">` : ''}
     <div class="stamp yes">${t('yes')}</div><div class="stamp no">${t('no')}</div>
-    <div class="info"><h2>${esc(m.title)}</h2><div class="meta">${esc(metaLine(m))}</div>
-      ${(m.genres || []).map(g => `<span class="tag">${esc(g)}</span>`).join('')}
-      ${m.extract ? `<div class="blurb">${esc(clean(m.extract))}</div>` : ''}</div></div>`;
+    <div class="info"><h2>${esc(mt(m))}</h2><div class="meta">${esc(metaLine(m))}</div>
+      ${(m.genres || []).map(g => `<span class="tag">${esc(trD(g))}</span>`).join('')}
+      ${mx(m) ? `<div class="blurb">${esc(clean(mx(m)))}</div>` : ''}</div></div>`;
 }
 function renderStack(){
   const st = $('stack'), q = M.queue;
@@ -229,7 +231,7 @@ async function checkMatch(m){
 }
 function showMatch(m){
   $('mPosters').innerHTML = poster(m, 'pp').replace('class="pp"', 'class="pp" style="transform:rotate(-5deg)"') ;
-  $('mTitle').textContent = m.title; $('mSub').textContent = t('matchSub', pName());
+  $('mTitle').textContent = mt(m); $('mSub').textContent = t('matchSub', pName());
   $('mPlan').onclick = () => { $('matchSheet').close(); openPlan(m); };
   $('matchSheet').showModal();
 }
@@ -254,10 +256,25 @@ async function loadMatches(){
   M.ratings = rt.data || [];
   M.swipes = {}; (sw.data || []).forEach(s => { M.swipes[s.qid] = s; if (s.movies) M.movies[s.qid] = s.movies; });
   M.matches.forEach(m => M.movies[m.qid] = m);
+  enrichEnglish();
   const evIds = Object.values(M.status).map(s => s.event_id).filter(Boolean);
   M.events = {};
   if (evIds.length) { const { data: ev } = await sb.from('events').select('id, starts_at').in('id', evIds); (ev || []).forEach(e => M.events[e.id] = e); }
   renderLists();
+}
+// English titles for movies already in the lists (fetched once, in the background)
+let enrichBusy = false;
+async function enrichEnglish(){
+  if (LANG !== 'en' || enrichBusy) return;
+  const qids = Object.values(M.movies).filter(m => m && !m.enriched_en).map(m => m.qid).slice(0, 60);
+  if (!qids.length) return;
+  enrichBusy = true;
+  try {
+    const { data } = await sb.functions.invoke('movies', { body: { action:'enrich', qids, lang:'en' } });
+    (data?.items || []).forEach(x => { const m = M.movies[x.qid]; if (m) Object.assign(m, x, { enriched_en:true }); });
+    renderLists();
+  } catch(e){ console.error(e); }
+  enrichBusy = false;
 }
 function plannedLabel(s){
   const e = s?.event_id && M.events?.[s.event_id]; if (!e) return '';
@@ -271,7 +288,7 @@ function rateBadges(qid){
 function renderLists(){
   const matches = M.matches.filter(m => M.status[m.qid]?.status !== 'watched');
   $('tabMatch').textContent = t('tMatch', matches.length);
-  $('matchList').innerHTML = matches.length ? matches.map(m => `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
+  $('matchList').innerHTML = matches.length ? matches.map(m => `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(mt(m))}</div><div class="muted small">${esc(metaLine(m))}</div>
       ${plannedLabel(M.status[m.qid]) ? `<div class="badge" style="display:inline-block;margin-top:6px">${esc(plannedLabel(M.status[m.qid]))}</div>` : ''}
       <div class="acts2"><button class="btn ghost sm" data-plan="${m.qid}">${icon('calendar')}<span>${t('plan')}</span></button><button class="btn sm" data-watched="${m.qid}">${icon('check')}<span>${t('watched')}</span></button></div></div></div>`).join('')
     : `<div class="empty">${t('matchEmpty')}</div>`;
@@ -279,12 +296,12 @@ function renderLists(){
   const likes = Object.values(M.swipes).filter(s => s.choice === 'yes' && !matchSet.has(s.qid) && M.movies[s.qid]);
   const later = Object.values(M.swipes).filter(s => s.choice === 'later' && M.movies[s.qid]);
   $('likesHead').textContent = t('likesHead', likes.length); $('likesHead').classList.toggle('hidden', !likes.length); $('likesCard').classList.toggle('hidden', !likes.length);
-  $('likesList').innerHTML = likes.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div></div><button class="icon-btn" data-set="${m.qid}" data-choice="no" aria-label="no">${icon('x')}</button></div>`; }).join('');
+  $('likesList').innerHTML = likes.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(mt(m))}</div><div class="muted small">${esc(metaLine(m))}</div></div><button class="icon-btn" data-set="${m.qid}" data-choice="no" aria-label="no">${icon('x')}</button></div>`; }).join('');
   $('laterHead').textContent = t('laterHead', later.length); $('laterHead').classList.toggle('hidden', !later.length); $('laterCard').classList.toggle('hidden', !later.length);
-  $('laterList').innerHTML = later.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
+  $('laterList').innerHTML = later.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(mt(m))}</div><div class="muted small">${esc(metaLine(m))}</div>
     <div class="acts2"><button class="btn sm" data-set="${m.qid}" data-choice="yes">${icon('heart')}<span>${t('back2pick')}</span></button><button class="btn ghost sm" data-set="${m.qid}" data-choice="no">${t('back2no')}</button></div></div></div>`; }).join('');
   const seen = Object.values(M.status).filter(s => s.status === 'watched' && M.movies[s.qid]).sort((a,b) => String(b.watched_at).localeCompare(String(a.watched_at)));
-  $('seenList').innerHTML = seen.length ? seen.map(s => { const m = M.movies[s.qid]; return `<div class="mrow" data-rate="${m.qid}" style="cursor:pointer">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div>
+  $('seenList').innerHTML = seen.length ? seen.map(s => { const m = M.movies[s.qid]; return `<div class="mrow" data-rate="${m.qid}" style="cursor:pointer">${poster(m)}<div class="grow"><div class="t">${esc(mt(m))}</div>
       <div class="muted small">${esc(metaLine(m))}${s.watched_at ? ' · ' + fmtDay(parseYmd(s.watched_at)) : ''}</div>${rateBadges(m.qid)}</div><span class="muted">${icon('edit')}</span></div>`; }).join('')
     : `<div class="empty">${t('seenEmpty')}</div>`;
 }
@@ -299,7 +316,7 @@ document.addEventListener('click', async e => {
 
 // ===== Plan a movie night =====
 function openPlan(m){
-  M.planFor = m; $('planForm').reset(); $('pMovie').textContent = m.title;
+  M.planFor = m; $('planForm').reset(); $('pMovie').textContent = mt(m);
   const fri = addDays(today(), (5 - today().getDay() + 7) % 7); setDate($('pDate'), ymd(fri));
   $('pHour').innerHTML = Array.from({length:24}, (_,i) => `<option value="${pad(i)}">${pad(i)}</option>`).join('');
   $('pMin').innerHTML = Array.from({length:12}, (_,i) => `<option value="${pad(i*5)}">${pad(i*5)}</option>`).join('');
@@ -309,7 +326,7 @@ function openPlan(m){
 $('planSheet').onclose = async () => {
   if ($('planSheet').returnValue !== 'ok' || !M.planFor || !getDate($('pDate'))) return;
   const m = M.planFor, d = parseYmd(getDate($('pDate'))); d.setHours(+$('pHour').value, +$('pMin').value);
-  const { data: ev, error } = await sb.from('events').insert({ couple_id:M.ctx.couple.id, title:t('eventTitle', m.title), starts_at:d.toISOString(), all_day:false, kind:'date', repeat:'none', remind:'same' }).select().single();
+  const { data: ev, error } = await sb.from('events').insert({ couple_id:M.ctx.couple.id, title:t('eventTitle', mt(m)), starts_at:d.toISOString(), all_day:false, kind:'date', repeat:'none', remind:'same' }).select().single();
   if (error) return alert(errText(error));
   await sb.from('movie_status').upsert({ couple_id:M.ctx.couple.id, qid:m.qid, status:'planned', event_id:ev.id });
   loadMatches();
@@ -318,7 +335,7 @@ $('planSheet').onclose = async () => {
 // ===== Rate =====
 function openRate(m){
   M.rateFor = m; const mine = M.ratings.find(r => r.qid === m.qid && r.user_id === M.ctx.user.id); M.rateVal = mine?.rating || null;
-  $('rTitle').textContent = m.title;
+  $('rTitle').textContent = mt(m);
   const draw = () => $('rGrid').innerHTML = Array.from({length:10}, (_,i) => `<button type="button" data-v="${i+1}" class="${M.rateVal === i+1 ? 'on' : ''}">${i+1}</button>`).join('');
   draw(); $('rGrid').onclick = e => { const v = e.target.closest('[data-v]')?.dataset.v; if (v) { M.rateVal = +v; draw(); } };
   $('rateSheet').showModal();
@@ -337,13 +354,13 @@ $('sInput').oninput = () => { clearTimeout(sTimer); sTimer = setTimeout(runSearc
 async function runSearch(){
   const q = $('sInput').value.trim(); if (q.length < 2) { $('sResults').innerHTML = ''; return; }
   const my = ++sSeq; $('sResults').innerHTML = `<div class="empty">${t('searching')}</div>`;
-  const { data, error } = await sb.functions.invoke('movies', { body: { action:'search', q } });
+  const { data, error } = await sb.functions.invoke('movies', { body: { action:'search', q, lang:LANG } });
   if (my !== sSeq) return;
   const items = (data?.items || []); items.forEach(m => M.movies[m.qid] = m);
   $('sResults').innerHTML = error ? `<div class="empty">${t('feedErr')}</div>` : items.length ? items.map(m => {
     const sw = M.swipes[m.qid]?.choice;
-    return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
-      ${m.extract ? `<div class="muted small" style="margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(clean(m.extract))}</div>` : ''}</div>
+    return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(mt(m))}</div><div class="muted small">${esc(metaLine(m))}</div>
+      ${mx(m) ? `<div class="muted small" style="margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(clean(mx(m)))}</div>` : ''}</div>
       ${sw === 'yes' ? `<span class="badge">${t('added')}</span>` : `<button class="add-btn" data-set="${m.qid}" data-choice="yes" aria-label="${t('addYes')}">${icon('heart')}</button>`}</div>`;
   }).join('') : `<div class="empty">${t('notFound')}</div>`;
 }
@@ -367,7 +384,7 @@ document.querySelectorAll('#tabSeg button').forEach(b => b.onclick = () => setTa
     .on('postgres_changes', { event:'*', schema:'public', table:'movie_ratings', filter:`couple_id=eq.${M.ctx.couple.id}` }, () => loadMatches())
     .subscribe();
 })().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
-langHooks.push(() => { if (M.ctx) { renderPools(); renderStack(); renderLists(); } });
+langHooks.push(() => { if (M.ctx) { renderPools(); renderStack(); renderLists(); enrichEnglish(); } });
 </script>
 </body>
 </html>

@@ -15,15 +15,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=13">
+<link rel="stylesheet" href="common.css?v=14">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
 .q{font-family:Lora,serif;font-size:18px;font-style:italic;line-height:1.35;margin:4px 0 0}
 /* Home */
-.h-top{display:flex;align-items:center;gap:10px;margin:4px 0 22px}
+.h-top{display:flex;align-items:center;gap:12px;margin:4px 0 22px}
 .h-top .grow{flex:1;min-width:0}
-.h-logo{width:46px;height:46px;flex:none;margin-left:-4px;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.h-logo{height:44px;width:auto;aspect-ratio:27.2/18.6;flex:none;fill:none;stroke:var(--accent);stroke-width:1.9;stroke-linejoin:round;overflow:visible}
 .h-names{font-family:Lora,serif;font-size:21px;font-weight:600;line-height:1.2}
 .h-mood{font-size:14px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:7px}
 .h-mood i{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
@@ -229,7 +229,7 @@
   <section id="tab-home" class="wrap">
     <div id="installHint" class="install hidden"><svg class="ic" style="color:var(--accent)"><use href="#i-phone"/></svg><div style="flex:1" data-t="installHint"></div><button class="icon-btn" id="installClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
     <div class="h-top">
-      <svg class="h-logo" viewBox="0 0 40 40" aria-hidden="true"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg>
+      <svg class="h-logo" viewBox="5.6 11.6 27.2 18.6" aria-hidden="true"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg>
       <div class="grow"><div class="h-names" id="hNames"></div><div class="h-mood" id="hMood"></div></div>
     </div>
     <div class="qa">
@@ -389,7 +389,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=13"></script>
+<script src="common.js?v=14"></script>
 <script>
 addT({
 ru: {
@@ -875,14 +875,14 @@ function renderLists(){
   $('listsWrap').innerHTML = S.lists.length ? S.lists.map(l => {
     const its = S.items.filter(i => i.list_id === l.id), left = its.filter(i => !i.done).length;
     return `<div class="card list-tile" data-list="${l.id}"><div class="bubble">${icon(safeIcon(l.emoji, LIST_ICONS, 'list'))}</div>
-      <div class="grow"><h3 style="font-size:18px">${esc(l.title)}</h3><div class="muted small">${its.length ? t('itemsLeft', left, its.length) : t('emptyList')}</div></div>
+      <div class="grow"><h3 style="font-size:18px">${esc(trD(l.title))}</h3><div class="muted small">${its.length ? t('itemsLeft', left, its.length) : t('emptyList')}</div></div>
       <span class="muted">${icon('right')}</span></div>`;
   }).join('') : `<div class="card empty">${t('listsEmpty')}</div>`;
   if (S.openList) {
     const l = S.lists.find(x => x.id === S.openList);
     if (!l) { closeList(); return; }
     $('ldIcon').innerHTML = icon(safeIcon(l.emoji, LIST_ICONS, 'list'));
-    $('ldTitle').textContent = l.title;
+    $('ldTitle').textContent = trD(l.title);
     const its = S.items.filter(i => i.list_id === l.id).sort((a,b) => (a.done - b.done) || a.created_at.localeCompare(b.created_at));
     $('ldItems').innerHTML = its.length ? its.map(i => `<div class="item ${i.done?'done':''}">
       <button class="check" data-toggle="${i.id}" aria-label="check">${i.done ? icon('check') : ''}</button>
@@ -1098,7 +1098,7 @@ function renderMe(){
   $('inviteCode').textContent = S.couple.invite_code;
   $('codeCard').classList.toggle('hidden', !!S.partner);
   $('vName').textContent = S.profile.display_name || '';
-  $('vCouple').textContent = S.couple.name || '';
+  $('vCouple').textContent = S.couple.name && S.couple.name !== 'Мы' ? S.couple.name : coupleTitle();
   $('vStart').textContent = S.couple.start_date ? parseYmd(S.couple.start_date).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU') : '—';
   $('tgStatus').textContent = S.tgLinked ? t('tgOnShort') : t('tgOffShort');
   $('tgSw').classList.toggle('on', !!S.tgLinked);

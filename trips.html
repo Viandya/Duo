@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=13">
+<link rel="stylesheet" href="common.css?v=14">
 <style>
 .trip-card{display:block;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);margin-bottom:14px;cursor:pointer;border:0;width:100%;text-align:left;padding:0;color:var(--ink)}
 .trip-card .cover{height:96px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));display:flex;align-items:flex-end;padding:14px 16px;color:#fff}
@@ -114,7 +114,7 @@ details summary::-webkit-details-marker{display:none}
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=13"></script>
+<script src="common.js?v=14"></script>
 <script>
 addT({
 ru: { trTitle:'Поездки', trEmpty:'Здесь будут ваши поездки: маршрут по дням, вещи, бюджет и брони. Нажмите +, чтобы начать.', past:n => `Прошлые поездки (${n})`,
@@ -220,7 +220,7 @@ function renderTrip(){
     const its = pack.filter(p => (p.owner_id || null) === uid).sort((a,b) => a.done - b.done);
     if (!its.length) return '';
     return `<div class="grp">${esc(label)}</div>` + its.map(p => `<div class="item ${p.done ? 'done' : ''}"><button class="check" data-pack="${p.id}" aria-label="check">${p.done ? icon('check') : ''}</button>
-      <div class="txt">${esc(p.title)}</div><button class="icon-btn" data-delitem="${p.id}" aria-label="delete">${icon('x')}</button></div>`).join('');
+      <div class="txt">${esc(trD(p.title))}</div><button class="icon-btn" data-delitem="${p.id}" aria-label="delete">${icon('x')}</button></div>`).join('');
   }).join('') : `<div class="empty">${t('packEmpty')}</div>`;
   chipPickerOwner(owners);
 
@@ -258,8 +258,8 @@ $('packForm').onsubmit = async e => {
   loadItems();
 };
 $('packTemplate').onclick = async () => {
-  const have = new Set(TR.items.filter(i => i.kind === 'pack').map(i => i.title.toLowerCase()));
-  const rows = t('packBase').filter(x => !have.has(x.toLowerCase())).map(title => ({ trip_id:TR.open, couple_id:TR.ctx.couple.id, kind:'pack', title, owner_id:null }));
+  const have = new Set(TR.items.filter(i => i.kind === 'pack').map(i => String(trD(i.title)).toLowerCase()));
+  const rows = t('packBase').filter(x => !have.has(String(trD(x)).toLowerCase())).map(title => ({ trip_id:TR.open, couple_id:TR.ctx.couple.id, kind:'pack', title, owner_id:null }));
   if (rows.length) await sb.from('trip_items').insert(rows);
   loadItems();
 };

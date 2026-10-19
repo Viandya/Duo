@@ -157,6 +157,12 @@ function tgSetup(){ const a = tgApp(); if (!a) return; try { a.ready(); a.expand
 if (inTG) { tgSetup(); window.addEventListener('load', tgSetup); }
 
 // ===== Helpers =====
+// Built-in names the app itself created (default lists, packing template): shown in the current language
+const DEFAULT_PAIRS = [['Покупки','Groceries'],['Посмотреть вместе','Watch together'],['Хотим сходить','Places to go'],
+  ['Паспорт','Passport'],['Билеты','Tickets'],['Зарядки','Chargers'],['Аптечка','First aid kit'],['Наличные и карты','Cash and cards'],['Зубные щётки','Toothbrushes'],
+  ['Пауэрбанк','Power bank'],
+  ['мультфильм','animation'],['фантастика','sci-fi'],['комедия','comedy'],['триллер','thriller'],['боевик','action'],['мелодрама','romance'],['драма','drama'],['ужасы','horror'],['сериал','series'],['Солнцезащитный крем','Sunscreen'],['Удобная обувь','Comfortable shoes'],['Адаптер для розеток','Plug adapter']];
+function trD(s){ const k = String(s ?? '').trim().toLowerCase(); const pr = DEFAULT_PAIRS.find(p => p[0].toLowerCase() === k || p[1].toLowerCase() === k); return pr ? pr[LANG === 'en' ? 1 : 0] : s; }
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad = n => String(n).padStart(2,'0');
 const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
