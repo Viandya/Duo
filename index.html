@@ -346,7 +346,7 @@ async function boot(session){
       show('auth', SCREENS); return;
     }
     S.user = session.user;
-    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }).catch(() => {}); }
+    if (inTG && !tgLinkTried) { tgLinkTried = true; try { await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }); } catch(_){} }
     const { data: profile, error } = await sb.from('profiles').select('*').eq('id', S.user.id).single();
     if (error) throw error;
     S.profile = profile;
