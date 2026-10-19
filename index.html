@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -309,12 +309,24 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const BOT = 'DuoTogeherBot';
 
 // ===== Telegram Mini App =====
-const TG = window.Telegram?.WebApp;
-const inTG = !!(TG && TG.initData);
-if (inTG) { try { TG.ready(); TG.expand(); TG.setHeaderColor('#eef3ee'); TG.setBackgroundColor('#eef3ee'); } catch(_){} }
+// Telegram passes its signed data in the page address (#tgWebAppData=...), so we read it from there
+// and don't depend on telegram.org's script loading.
+function readInitData(){
+  try {
+    const d = window.Telegram?.WebApp?.initData || new URLSearchParams(location.hash.slice(1)).get('tgWebAppData');
+    if (d) { sessionStorage.setItem('tgInit', d); return d; }
+    return sessionStorage.getItem('tgInit') || '';
+  } catch(_) { return ''; }
+}
+const TG_INIT = readInitData();
+const inTG = !!TG_INIT;
+const tgApp = () => window.Telegram?.WebApp;
+function tgSetup(){ const t = tgApp(); if (!t) return; try { t.ready(); t.expand(); t.setHeaderColor('#eef3ee'); t.setBackgroundColor('#eef3ee'); } catch(_){} }
+if (inTG) { tgSetup(); window.addEventListener('load', tgSetup); }
+function openTg(url){ const t = tgApp(); if (t?.openTelegramLink) t.openTelegramLink(url); else location.href = url; }
 async function tgAuth(mode){
   const r = await fetch(SUPABASE_URL + '/functions/v1/tg-auth', { method:'POST',
-    headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY }, body: JSON.stringify({ initData: TG.initData, mode }) });
+    headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY }, body: JSON.stringify({ initData: TG_INIT, mode }) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || 'Не получилось войти через Telegram');
   if (!j.linked) return false;
@@ -403,7 +415,7 @@ async function boot(session){
     if (error) throw error;
     S.profile = profile;
     if (!profile.couple_id) { $('obName').textContent = profile.display_name; show('onboard'); return; }
-    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG.initData }).catch(() => {}); }
+    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }).catch(() => {}); }
     await loadAll();
     subscribe();
     show('app');
@@ -674,10 +686,10 @@ $('tgBtn').onclick = async () => {
     if (!confirm('Выключить уведомления в Telegram?')) return;
     await sb.rpc('tg_unlink'); S.tgLinked = false; renderMe(); return;
   }
-  if (inTG) { const { data } = await sb.rpc('tg_link_webapp', { p_init_data: TG.initData }); if (data) { S.tgLinked = true; renderMe(); return; } }
+  if (inTG) { const { data } = await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }); if (data) { S.tgLinked = true; renderMe(); return; } }
   const { data: url, error } = await sb.rpc('tg_create_link');
   if (error) return alert(errText(error));
-  if (inTG) TG.openTelegramLink(url); else location.href = url;
+  openTg(url);
 };
 $('tgLoginBtn').onclick = async () => {
   $('tgAuthErr').textContent = ''; $('tgLoginBtn').disabled = true;
