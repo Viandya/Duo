@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Поездки</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=7">
+<style>
+.trip-card{display:block;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);margin-bottom:14px;cursor:pointer;border:0;width:100%;text-align:left;padding:0;color:var(--ink)}
+.trip-card .cover{height:96px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));display:flex;align-items:flex-end;padding:14px 16px;color:#fff}
+.trip-card .cover h2{font-size:24px}
+.trip-card .info{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;gap:10px}
+.hero-trip{border-radius:var(--radius);background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff;padding:18px;margin-bottom:14px}
+.hero-trip h1{font-size:28px}
+.hero-trip .sub{opacity:.92;margin-top:4px}
+.dayhead{font-family:Lora,serif;font-weight:600;font-size:17px;margin:4px 0 2px}
+.dayblock+.dayblock{border-top:1px solid var(--line);margin-top:10px;padding-top:12px}
+.pl{display:flex;gap:12px;padding:8px 0;align-items:flex-start}
+.pl .tm{min-width:46px;font-weight:700;color:var(--accent);font-size:14px;padding-top:1px}
+.pl .grow{flex:1;min-width:0;word-break:break-word}
+.sum{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sum b{font-family:Lora,serif;font-size:26px;font-weight:600}
+.amt{font-weight:700;white-space:nowrap}
+.grp{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 2px;text-transform:uppercase;letter-spacing:.04em}
+.grp:first-child{margin-top:0}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;padding:6px 2px;list-style:none}
+details summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <!-- List of trips -->
+  <div id="listView">
+    <div class="topbar">
+      <button class="icon-btn" id="backBtn" aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+      <h1 data-t="trTitle"></h1>
+      <button class="add-btn" id="newTrip" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
+    </div>
+    <div id="tripList"></div>
+    <details id="pastWrap" class="hidden"><summary id="pastSum"></summary><div id="pastList" style="margin-top:8px"></div></details>
+  </div>
+
+  <!-- One trip -->
+  <div id="tripView" class="hidden">
+    <div class="topbar">
+      <button class="icon-btn" id="tripBack" aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+      <h1></h1>
+      <button class="icon-btn" id="editTrip" aria-label="edit"><svg class="ic"><use href="#i-edit"/></svg></button>
+    </div>
+    <div class="hero-trip"><h1 id="tvTitle"></h1><div class="sub" id="tvDates"></div></div>
+    <div class="seg" style="margin-bottom:14px" id="tabSeg">
+      <button data-k="plan" class="on" data-t="kPlan"></button><button data-k="pack" data-t="kPack"></button><button data-k="expense" data-t="kBudget"></button><button data-k="booking" data-t="kBook"></button>
+    </div>
+
+    <div id="kv-plan" class="kv">
+      <div class="card"><div id="planList"></div><button class="btn ghost" id="addPlan" style="margin-top:12px"><svg class="ic"><use href="#i-plus"/></svg><span data-t="addPlan"></span></button></div>
+    </div>
+
+    <div id="kv-pack" class="kv hidden">
+      <div class="card">
+        <div class="sum"><span data-t="packed"></span><span class="muted" id="packCount"></span></div>
+        <div class="bar"><div id="packBar" style="width:0"></div></div>
+      </div>
+      <div class="card">
+        <div id="packList"></div>
+        <form class="add-row" id="packForm"><input id="packIn" data-tp="packPh" autocomplete="off"><button class="add-btn" type="submit" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></form>
+        <div class="chips" id="packOwner" style="margin-top:10px"></div>
+        <button class="btn link small" id="packTemplate" style="margin-top:8px" data-t="packTemplate"></button>
+      </div>
+    </div>
+
+    <div id="kv-expense" class="kv hidden">
+      <div class="card">
+        <div class="sum"><span data-t="spent"></span><b id="spentTotal"></b></div>
+        <div class="muted small" id="budgetLine"></div>
+        <div class="bar" id="budgetBarWrap"><div id="budgetBar" style="width:0"></div></div>
+      </div>
+      <div class="card"><div id="expList"></div><button class="btn ghost" id="addExp" style="margin-top:12px"><svg class="ic"><use href="#i-plus"/></svg><span data-t="addExp"></span></button></div>
+    </div>
+
+    <div id="kv-booking" class="kv hidden">
+      <div class="card"><div id="bookList"></div><button class="btn ghost" id="addBook" style="margin-top:12px"><svg class="ic"><use href="#i-plus"/></svg><span data-t="addBook"></span></button></div>
+    </div>
+  </div>
+</main>
+
+<dialog id="tripSheet"><form class="sheet" method="dialog" id="tripForm">
+  <h2 id="tsTitle"></h2>
+  <label data-t="where"></label><input id="tTitle" required data-tp="wherePh">
+  <div class="two"><div><label data-t="from"></label><button type="button" class="field" data-date id="tStart"></button></div><div><label data-t="to"></label><button type="button" class="field" data-date id="tEnd"></button></div></div>
+  <label data-t="budget"></label><input id="tBudget" inputmode="decimal" data-tp="budgetPh">
+  <label data-t="note"></label><textarea id="tNote" data-tp="optional" style="min-height:64px"></textarea>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+  <button type="button" class="btn link hidden" id="tDelete" style="margin:12px auto 0;color:#c0564f"><svg class="ic"><use href="#i-trash"/></svg><span data-t="delTrip"></span></button>
+</form></dialog>
+
+<dialog id="itemSheet"><form class="sheet" method="dialog" id="itemForm">
+  <h2 id="isTitle"></h2>
+  <label data-t="title"></label><input id="iTitle" required>
+  <div id="iDayWrap"><label data-t="iDay"></label><select id="iDay"></select></div>
+  <div id="iTimeWrap"><label data-t="iTime"></label><div class="two"><select id="iHour"></select><select id="iMin"></select></div></div>
+  <div id="iAmtWrap"><label data-t="iAmount"></label><input id="iAmount" inputmode="decimal" placeholder="0"></div>
+  <div id="iDetWrap"><label id="iDetLabel"></label><textarea id="iDetails" style="min-height:64px"></textarea></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+  <button type="button" class="btn link hidden" id="iDelete" style="margin:12px auto 0;color:#c0564f"><svg class="ic"><use href="#i-trash"/></svg><span data-t="delete"></span></button>
+</form></dialog>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=7"></script>
+<script>
+addT({
+ru: { trTitle:'Поездки', trEmpty:'Здесь будут ваши поездки: маршрут по дням, вещи, бюджет и брони. Нажмите +, чтобы начать.', past:n => `Прошлые поездки (${n})`,
+  now:'сейчас', noDates:'даты не выбраны', newTrip:'Новая поездка', editTrip:'Поездка', where:'Куда', wherePh:'Стамбул', from:'С', to:'По', budget:'Бюджет', budgetPh:'90 000',
+  delTrip:'Удалить поездку', confirmDelTrip:'Удалить поездку со всеми планами и тратами?',
+  kPlan:'План', kPack:'Вещи', kBudget:'Бюджет', kBook:'Брони', addPlan:'Добавить в план', addExp:'Добавить трату', addBook:'Добавить бронь',
+  planEmpty:'Добавьте, что хотите сделать: места, рестораны, экскурсии.', noDay:'Без даты', dayN:(n,d) => `День ${n} · ${d}`,
+  packed:'Собрано', packPh:'Паспорт', packTemplate:'Добавить базовый список вещей', ownShared:'Общее', ownMine:'Моё', packEmpty:'Список вещей пуст',
+  packBase:['Паспорт','Билеты','Зарядки','Аптечка','Наличные и карты','Зубные щётки','Пауэрбанк','Солнцезащитный крем','Удобная обувь','Адаптер для розеток'],
+  spent:'Потрачено', ofBudget:(b) => `из ${b}`, noBudget:'Бюджет не задан. Укажите его в настройках поездки.', over:n => `Перерасход ${n}`, left:n => `Осталось ${n}`,
+  expEmpty:'Пока трат нет', paidBy:n => `платил(а) ${n}`, bookEmpty:'Добавьте билеты, отель, аренду машины: номера бронирований будут под рукой.',
+  newPlan:'В план', newExp:'Трата', newBook:'Бронь', iDay:'День', iTime:'Время', iAmount:'Сумма', planDet:'Подробности', bookDet:'Номер брони, адрес, ссылка', expDet:'Комментарий',
+  noTime:'без времени', confirmDelItem:'Удалить?' },
+en: { trTitle:'Trips', trEmpty:'Your trips will live here: a day-by-day plan, packing, budget and bookings. Tap + to start.', past:n => `Past trips (${n})`,
+  now:'now', noDates:'no dates yet', newTrip:'New trip', editTrip:'Trip', where:'Where to', wherePh:'Istanbul', from:'From', to:'To', budget:'Budget', budgetPh:'1,000',
+  delTrip:'Delete trip', confirmDelTrip:'Delete this trip with all plans and expenses?',
+  kPlan:'Plan', kPack:'Packing', kBudget:'Budget', kBook:'Bookings', addPlan:'Add to plan', addExp:'Add expense', addBook:'Add booking',
+  planEmpty:'Add what you want to do: places, restaurants, tours.', noDay:'No date', dayN:(n,d) => `Day ${n} · ${d}`,
+  packed:'Packed', packPh:'Passport', packTemplate:'Add a basic packing list', ownShared:'Shared', ownMine:'Mine', packEmpty:'Packing list is empty',
+  packBase:['Passport','Tickets','Chargers','First aid kit','Cash and cards','Toothbrushes','Power bank','Sunscreen','Comfortable shoes','Plug adapter'],
+  spent:'Spent', ofBudget:(b) => `of ${b}`, noBudget:'No budget set. Add one in the trip settings.', over:n => `Over by ${n}`, left:n => `${n} left`,
+  expEmpty:'No expenses yet', paidBy:n => `paid by ${n}`, bookEmpty:'Add tickets, hotel, car rental: booking numbers will be at hand.',
+  newPlan:'Plan item', newExp:'Expense', newBook:'Booking', iDay:'Day', iTime:'Time', iAmount:'Amount', planDet:'Details', bookDet:'Booking number, address, link', expDet:'Comment',
+  noTime:'no time', confirmDelItem:'Delete?' }
+});
+const TR = { ctx:null, trips:[], items:[], open:null, tab:'plan', packOwner:'shared', editingTrip:null, editingItem:null, itemKind:'plan' };
+const nameOf = id => id === TR.ctx.user.id ? t('you') : (TR.ctx.partner?.id === id ? TR.ctx.partner.display_name : '');
+
+async function loadTrips(){
+  const { data, error } = await sb.from('trips').select('*').order('start_date', { ascending:true, nullsFirst:false });
+  if (error) throw error;
+  TR.trips = data; renderList();
+  if (TR.open) { const tr = TR.trips.find(x => x.id === TR.open); if (tr) await loadItems(); else closeTrip(); }
+}
+async function loadItems(){
+  const { data } = await sb.from('trip_items').select('*').eq('trip_id', TR.open).order('day', { nullsFirst:false }).order('time', { nullsFirst:true }).order('created_at');
+  TR.items = data || []; renderTrip();
+}
+function tripCard(tr){
+  const td = today(); let badge = '';
+  if (tr.start_date) {
+    const s = parseYmd(tr.start_date), e = parseYmd(tr.end_date || tr.start_date);
+    badge = s <= td && e >= td ? `<span class="badge">${t('now')}</span>` : s > td ? `<span class="badge">${untilLabel(s)}</span>` : '';
+  }
+  return `<button class="trip-card" data-trip="${tr.id}"><div class="cover"><h2>${esc(tr.title)}</h2></div>
+    <div class="info"><span class="muted">${tr.start_date ? fmtRange(tr.start_date, tr.end_date) : t('noDates')}</span>${badge}</div></button>`;
+}
+function renderList(){
+  const td = ymd(today());
+  const past = TR.trips.filter(x => (x.end_date || x.start_date) && (x.end_date || x.start_date) < td).reverse();
+  const cur = TR.trips.filter(x => !past.includes(x));
+  $('tripList').innerHTML = cur.length ? cur.map(tripCard).join('') : (past.length ? '' : `<div class="card empty">${t('trEmpty')}</div>`);
+  $('pastWrap').classList.toggle('hidden', !past.length);
+  $('pastSum').textContent = t('past', past.length);
+  $('pastList').innerHTML = past.map(tripCard).join('');
+}
+document.addEventListener('click', e => { const id = e.target.closest('[data-trip]')?.dataset.trip; if (id) openTrip(id); });
+
+function openTrip(id){
+  TR.open = id; TR.tab = 'plan'; $('listView').classList.add('hidden'); $('tripView').classList.remove('hidden');
+  window.scrollTo(0,0); try { history.pushState({ trip:id }, '', '#trip=' + id); } catch(_){}
+  renderTrip(); loadItems();
+}
+function closeTrip(){ TR.open = null; $('tripView').classList.add('hidden'); $('listView').classList.remove('hidden'); window.scrollTo(0,0); }
+window.addEventListener('popstate', () => { if (TR.open) closeTrip(); });
+$('tripBack').onclick = () => { if (history.state?.trip) history.back(); else closeTrip(); };
+function tripDays(tr){
+  if (!tr?.start_date) return [];
+  const out = [], s = parseYmd(tr.start_date), e = parseYmd(tr.end_date || tr.start_date);
+  for (let d = s, i = 0; d <= e && i < 60; d = addDays(d, 1), i++) out.push(ymd(d));
+  return out;
+}
+
+function renderTrip(){
+  const tr = TR.trips.find(x => x.id === TR.open); if (!tr) return;
+  $('tvTitle').textContent = tr.title;
+  $('tvDates').textContent = tr.start_date ? fmtRange(tr.start_date, tr.end_date) + (parseYmd(tr.start_date) > today() ? ' · ' + untilLabel(parseYmd(tr.start_date)) : '') : t('noDates');
+  document.querySelectorAll('#tabSeg button').forEach(b => b.classList.toggle('on', b.dataset.k === TR.tab));
+  document.querySelectorAll('.kv').forEach(v => v.classList.toggle('hidden', v.id !== 'kv-' + TR.tab));
+  const by = k => TR.items.filter(i => i.kind === k);
+
+  // Plan grouped by day
+  const plan = by('plan'), days = tripDays(tr);
+  if (!plan.length) $('planList').innerHTML = `<div class="empty">${t('planEmpty')}</div>`;
+  else {
+    const groups = {}; plan.forEach(p => (groups[p.day || ''] = groups[p.day || ''] || []).push(p));
+    const keys = Object.keys(groups).sort((a,b) => (a || '9999').localeCompare(b || '9999'));
+    $('planList').innerHTML = keys.map(k => {
+      const n = days.indexOf(k) + 1;
+      const head = k ? (n > 0 ? t('dayN', n, fmtDay(parseYmd(k))) : fmtDay(parseYmd(k))) : t('noDay');
+      return `<div class="dayblock"><div class="dayhead">${esc(head)}</div>${groups[k].map(p => `<div class="pl" data-item="${p.id}" style="cursor:pointer">
+        <div class="tm">${p.time ? esc(p.time) : '·'}</div><div class="grow"><div>${esc(p.title)}</div>${p.details ? `<div class="muted small">${esc(p.details)}</div>` : ''}</div></div>`).join('')}</div>`;
+    }).join('');
+  }
+
+  // Packing
+  const pack = by('pack'), doneN = pack.filter(p => p.done).length;
+  $('packCount').textContent = `${doneN} / ${pack.length}`;
+  $('packBar').style.width = pack.length ? (doneN / pack.length * 100) + '%' : '0';
+  const owners = [['shared', null, t('ownShared')], ['me', TR.ctx.user.id, t('ownMine')]];
+  if (TR.ctx.partner) owners.push(['partner', TR.ctx.partner.id, TR.ctx.partner.display_name]);
+  $('packList').innerHTML = pack.length ? owners.map(([key, uid, label]) => {
+    const its = pack.filter(p => (p.owner_id || null) === uid).sort((a,b) => a.done - b.done);
+    if (!its.length) return '';
+    return `<div class="grp">${esc(label)}</div>` + its.map(p => `<div class="item ${p.done ? 'done' : ''}"><button class="check" data-pack="${p.id}" aria-label="check">${p.done ? icon('check') : ''}</button>
+      <div class="txt">${esc(p.title)}</div><button class="icon-btn" data-delitem="${p.id}" aria-label="delete">${icon('x')}</button></div>`).join('');
+  }).join('') : `<div class="empty">${t('packEmpty')}</div>`;
+  chipPickerOwner(owners);
+
+  // Budget
+  const exp = by('expense'), total = exp.reduce((s, x) => s + Number(x.amount || 0), 0), budget = tr.budget ? Number(tr.budget) : null;
+  $('spentTotal').textContent = fmtMoney(total);
+  $('budgetLine').textContent = budget ? `${t('ofBudget', fmtMoney(budget))} · ${total > budget ? t('over', fmtMoney(total - budget)) : t('left', fmtMoney(budget - total))}` : t('noBudget');
+  $('budgetBarWrap').classList.toggle('hidden', !budget);
+  $('budgetBar').style.width = budget ? Math.min(100, total / budget * 100) + '%' : '0';
+  $('budgetBar').style.background = budget && total > budget ? '#c0564f' : '';
+  $('expList').innerHTML = exp.length ? exp.map(x => `<div class="row-item" data-item="${x.id}" style="cursor:pointer"><div class="bubble">${icon('coins')}</div>
+    <div class="grow"><div>${esc(x.title)}</div><div class="muted small">${[x.day ? fmtDay(parseYmd(x.day)) : '', nameOf(x.created_by) ? t('paidBy', nameOf(x.created_by)) : ''].filter(Boolean).join(' · ')}</div></div>
+    <span class="amt">${fmtMoney(x.amount)}</span></div>`).join('') : `<div class="empty">${t('expEmpty')}</div>`;
+
+  // Bookings
+  const book = by('booking');
+  $('bookList').innerHTML = book.length ? book.map(x => `<div class="row-item" data-item="${x.id}" style="cursor:pointer"><div class="bubble">${icon(/отел|hotel|кварт|apart|airbnb/i.test(x.title) ? 'bed' : 'ticket')}</div>
+    <div class="grow"><div>${esc(x.title)}</div>${x.details ? `<div class="muted small" style="white-space:pre-line">${esc(x.details)}</div>` : ''}${x.day ? `<div class="muted small">${fmtDay(parseYmd(x.day))}${x.time ? ', ' + esc(x.time) : ''}</div>` : ''}</div>
+    ${x.amount ? `<span class="amt">${fmtMoney(x.amount)}</span>` : ''}</div>`).join('') : `<div class="empty">${t('bookEmpty')}</div>`;
+}
+let getPackOwner;
+function chipPickerOwner(owners){
+  if (!owners.some(o => o[0] === TR.packOwner)) TR.packOwner = 'shared';
+  getPackOwner = chipPicker($('packOwner'), owners.map(o => [o[0], o[2]]), TR.packOwner);
+  const orig = $('packOwner').onclick; $('packOwner').onclick = ev => { orig(ev); TR.packOwner = getPackOwner(); };
+}
+const ownerId = key => key === 'me' ? TR.ctx.user.id : key === 'partner' ? TR.ctx.partner?.id : null;
+document.querySelectorAll('#tabSeg button').forEach(b => b.onclick = () => { TR.tab = b.dataset.k; renderTrip(); });
+
+// ===== Packing actions =====
+$('packForm').onsubmit = async e => {
+  e.preventDefault(); const title = $('packIn').value.trim(); if (!title) return; $('packIn').value = '';
+  TR.packOwner = getPackOwner();
+  await sb.from('trip_items').insert({ trip_id:TR.open, couple_id:TR.ctx.couple.id, kind:'pack', title, owner_id:ownerId(TR.packOwner) });
+  loadItems();
+};
+$('packTemplate').onclick = async () => {
+  const have = new Set(TR.items.filter(i => i.kind === 'pack').map(i => i.title.toLowerCase()));
+  const rows = t('packBase').filter(x => !have.has(x.toLowerCase())).map(title => ({ trip_id:TR.open, couple_id:TR.ctx.couple.id, kind:'pack', title, owner_id:null }));
+  if (rows.length) await sb.from('trip_items').insert(rows);
+  loadItems();
+};
+document.addEventListener('click', async e => {
+  const p = e.target.closest('[data-pack]')?.dataset.pack;
+  if (p) { const it = TR.items.find(i => i.id === p); it.done = !it.done; renderTrip(); await sb.from('trip_items').update({ done:it.done }).eq('id', p); return; }
+  const d = e.target.closest('[data-delitem]')?.dataset.delitem;
+  if (d) { TR.items = TR.items.filter(i => i.id !== d); renderTrip(); await sb.from('trip_items').delete().eq('id', d); return; }
+  const it = e.target.closest('[data-item]')?.dataset.item;
+  if (it) { const row = TR.items.find(i => i.id === it); if (row) openItem(row.kind, row); }
+});
+
+// ===== Trip sheet =====
+function openTripSheet(tr){
+  TR.editingTrip = tr || null; $('tripForm').reset();
+  $('tsTitle').textContent = tr ? t('editTrip') : t('newTrip');
+  $('tTitle').value = tr?.title || ''; $('tBudget').value = tr?.budget ?? ''; $('tNote').value = tr?.note || '';
+  setDate($('tStart'), tr?.start_date || ''); setDate($('tEnd'), tr?.end_date || '');
+  $('tDelete').classList.toggle('hidden', !tr);
+  $('tripSheet').showModal();
+}
+$('tStart').addEventListener('change', () => { const s = getDate($('tStart')), e = getDate($('tEnd')); $('tEnd').dataset.near = s; if (!e || e < s) setDate($('tEnd'), s); });
+$('newTrip').onclick = () => openTripSheet(null);
+$('editTrip').onclick = () => openTripSheet(TR.trips.find(x => x.id === TR.open));
+$('tripSheet').onclose = async () => {
+  if ($('tripSheet').returnValue !== 'ok') return;
+  const s = getDate($('tStart')) || null; let e = getDate($('tEnd')) || null; if (s && e && e < s) e = s;
+  const budget = $('tBudget').value.replace(/[^\d.,]/g, '').replace(',', '.');
+  const row = { title:$('tTitle').value.trim(), start_date:s, end_date:e, budget:budget ? Number(budget) : null, note:$('tNote').value.trim() || null };
+  if (TR.editingTrip) await sb.from('trips').update(row).eq('id', TR.editingTrip.id);
+  else { const { data, error } = await sb.from('trips').insert({ ...row, couple_id:TR.ctx.couple.id }).select().single(); if (error) return alert(errText(error)); await loadTrips(); return openTrip(data.id); }
+  loadTrips();
+};
+$('tDelete').onclick = async () => {
+  if (!TR.editingTrip || !confirm(t('confirmDelTrip'))) return;
+  $('tripSheet').close('cancel'); await sb.from('trips').delete().eq('id', TR.editingTrip.id);
+  if (history.state?.trip) history.back(); else closeTrip();
+  loadTrips();
+};
+
+// ===== Item sheet (plan / expense / booking) =====
+function fillTime(h, m){
+  $('iHour').innerHTML = `<option value="">—</option>` + Array.from({length:24}, (_,i) => `<option value="${pad(i)}">${pad(i)}</option>`).join('');
+  $('iMin').innerHTML = Array.from({length:12}, (_,i) => `<option value="${pad(i*5)}">${pad(i*5)}</option>`).join('');
+  $('iHour').value = h ?? ''; $('iMin').value = m ?? '00';
+}
+function openItem(kind, row){
+  TR.itemKind = kind; TR.editingItem = row || null; $('itemForm').reset();
+  const tr = TR.trips.find(x => x.id === TR.open), days = tripDays(tr);
+  $('isTitle').textContent = { plan:t('newPlan'), expense:t('newExp'), booking:t('newBook') }[kind];
+  $('iTitle').value = row?.title || ''; $('iDetails').value = row?.details || ''; $('iAmount').value = row?.amount ?? '';
+  $('iDay').innerHTML = `<option value="">${t('noDay')}</option>` + days.map((d, i) => `<option value="${d}">${kind === 'plan' ? t('dayN', i + 1, fmtDay(parseYmd(d))) : fmtDay(parseYmd(d))}</option>`).join('');
+  $('iDay').value = row?.day || (kind === 'expense' && days.includes(ymd(today())) ? ymd(today()) : '');
+  const [h, m] = (row?.time || '').split(':'); fillTime(h || '', m || '00');
+  $('iDayWrap').classList.toggle('hidden', !days.length);
+  $('iTimeWrap').classList.toggle('hidden', kind === 'expense');
+  $('iAmtWrap').classList.toggle('hidden', kind === 'plan');
+  $('iDetLabel').textContent = { plan:t('planDet'), expense:t('expDet'), booking:t('bookDet') }[kind];
+  $('iDelete').classList.toggle('hidden', !row);
+  $('itemSheet').showModal();
+}
+$('addPlan').onclick = () => openItem('plan'); $('addExp').onclick = () => openItem('expense'); $('addBook').onclick = () => openItem('booking');
+$('itemSheet').onclose = async () => {
+  if ($('itemSheet').returnValue !== 'ok') return;
+  const amt = $('iAmount').value.replace(/[^\d.,]/g, '').replace(',', '.');
+  const row = { title:$('iTitle').value.trim(), day:$('iDay').value || null, time:$('iHour').value ? `${$('iHour').value}:${$('iMin').value}` : null,
+    amount:TR.itemKind === 'plan' || !amt ? null : Number(amt), details:$('iDetails').value.trim() || null };
+  if (TR.itemKind === 'expense') row.time = null;
+  const q = TR.editingItem ? sb.from('trip_items').update(row).eq('id', TR.editingItem.id)
+    : sb.from('trip_items').insert({ ...row, kind:TR.itemKind, trip_id:TR.open, couple_id:TR.ctx.couple.id });
+  const { error } = await q; if (error) alert(errText(error));
+  loadItems();
+};
+$('iDelete').onclick = async () => {
+  if (!TR.editingItem || !confirm(t('confirmDelItem'))) return;
+  $('itemSheet').close('cancel'); await sb.from('trip_items').delete().eq('id', TR.editingItem.id); loadItems();
+};
+
+// ===== Start =====
+(async () => {
+  applyI18n();
+  const go = () => { if (TR.open) { if (history.state?.trip) history.back(); else closeTrip(); } else location.href = 'index.html#sections'; };
+  $('backBtn').onclick = go;
+  const a = tgApp(); if (inTG && a?.BackButton) { try { a.BackButton.show(); a.BackButton.onClick(go); } catch(_){} }
+  TR.ctx = await requireCouple();
+  applyI18n();
+  await loadTrips();
+  const m = location.hash.match(/trip=([0-9a-f-]{36})/); if (m && TR.trips.some(x => x.id === m[1])) { TR.open = m[1]; $('listView').classList.add('hidden'); $('tripView').classList.remove('hidden'); loadItems(); }
+  show('page', ['loading','page']);
+  sb.channel('trips-' + TR.ctx.couple.id)
+    .on('postgres_changes', { event:'*', schema:'public', table:'trips', filter:`couple_id=eq.${TR.ctx.couple.id}` }, () => loadTrips())
+    .on('postgres_changes', { event:'*', schema:'public', table:'trip_items', filter:`couple_id=eq.${TR.ctx.couple.id}` }, () => { if (TR.open) loadItems(); })
+    .subscribe();
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (TR.ctx) { renderList(); renderTrip(); } });
+</script>
+</body>
+</html>

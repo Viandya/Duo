@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Цикл</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=7">
+<style>
+.ringwrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:4px auto}
+.ring>div{width:128px;height:128px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-family:Lora,serif;font-size:34px;font-weight:600;line-height:1}
+.phase-name{font-family:Lora,serif;font-size:20px;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-block}
+.day.per{background:var(--rose);color:var(--rose-ink)}
+.day.pred{box-shadow:inset 0 0 0 1.5px var(--rose-ink);color:var(--rose-ink)}
+.day.fert{background:var(--accent-soft);color:var(--accent)}
+.day.ovu{background:var(--accent);color:var(--accent-ink)}
+.day.logged::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--warm-ink)}
+.day.sel{outline:2px solid var(--ink);outline-offset:-2px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
+.cal-head h2{font-size:20px}
+.share-opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;margin-top:8px}
+.share-opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.share-opt .grow{flex:1}
+.share-opt b{font-weight:600}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar">
+    <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+    <h1 data-t="cTitle"></h1>
+  </div>
+  <div class="seg hidden" style="margin-bottom:14px" id="whoSeg"><button data-who="me" class="on" data-t="cMine"></button><button data-who="partner" id="partnerTabBtn"></button></div>
+
+  <!-- My cycle -->
+  <div id="mine">
+    <div class="card hidden" id="intro">
+      <div class="bubble" style="margin-bottom:10px"><svg class="ic"><use href="#i-droplet"/></svg></div>
+      <h2 style="font-size:20px" data-t="cIntroTitle"></h2>
+      <p class="muted small" data-t="cIntroText"></p>
+      <label data-t="cLastStart"></label><button type="button" class="field" data-date id="introDate"></button>
+      <div class="two" style="margin-top:4px"><div><label data-t="cCycleLen"></label><input id="introLen" type="number" inputmode="numeric" min="18" max="60" value="28"></div><div><label data-t="cPeriodLen"></label><input id="introPlen" type="number" inputmode="numeric" min="1" max="14" value="5"></div></div>
+      <div class="error" id="introErr"></div>
+      <button class="btn" id="introSave" data-t="cStart"></button>
+    </div>
+    <div id="tracker" class="hidden">
+      <div class="card ringwrap">
+        <div class="ring" id="ring"><div><span class="muted small" data-t="cDay"></span><b id="rDay"></b><span class="muted small" id="rOf"></span></div></div>
+        <div class="phase-name" id="rPhase"></div>
+        <div class="muted" id="rNext"></div>
+        <div class="two" style="width:100%;margin-top:10px">
+          <button class="btn" id="periodBtn"></button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cal-head"><button class="icon-btn" id="mPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="mTitle"></h2><button class="icon-btn" id="mNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
+        <div class="grid" id="mGrid"></div>
+        <div class="legend"><span><i class="sw" style="background:var(--rose)"></i><span data-t="lPeriod"></span></span><span><i class="sw" style="box-shadow:inset 0 0 0 1.5px var(--rose-ink)"></i><span data-t="lPred"></span></span><span><i class="sw" style="background:var(--accent-soft)"></i><span data-t="lFert"></span></span><span><i class="sw" style="background:var(--accent)"></i><span data-t="lOvu"></span></span></div>
+      </div>
+      <div class="card">
+        <div class="section-h"><h2 id="logTitle"></h2></div>
+        <label data-t="cMood"></label><div class="chips" id="moodChips"></div>
+        <label data-t="cSymptoms"></label><div class="chips" id="sympChips"></div>
+        <label data-t="note"></label><textarea id="logNote" style="min-height:64px" data-tp="optional"></textarea>
+        <div class="two" style="margin-top:12px"><button class="btn ghost hidden" id="markStart"></button><button class="btn" id="logSave" data-t="save"></button></div>
+        <div class="error" id="logMsg"></div>
+      </div>
+    </div>
+    <div class="card" id="settingsCard">
+      <h2 style="font-size:20px" data-t="cShareTitle"></h2>
+      <p class="muted small" id="shareHint"></p>
+      <div id="shareOpts"></div>
+      <div class="two" style="margin-top:8px"><div><label data-t="cCycleLen"></label><input id="setLen" type="number" inputmode="numeric" min="18" max="60"></div><div><label data-t="cPeriodLen"></label><input id="setPlen" type="number" inputmode="numeric" min="1" max="14"></div></div>
+      <p class="muted small" data-t="cLenHint"></p>
+      <button class="btn ghost" id="setSave" data-t="save"></button>
+      <div class="error" id="setMsg"></div>
+    </div>
+    <p class="muted small" style="text-align:center;margin:4px 8px" data-t="cDisclaimer"></p>
+  </div>
+
+  <!-- Partner's cycle -->
+  <div id="theirs" class="hidden">
+    <div class="card ringwrap">
+      <div class="ring" id="pRing"><div><span class="muted small" data-t="cDay"></span><b id="pDay"></b><span class="muted small" id="pOf"></span></div></div>
+      <div class="phase-name" id="pPhase"></div>
+      <div class="muted" id="pNext"></div>
+      <p class="small" id="pTip" style="margin:10px 0 0"></p>
+    </div>
+    <div class="card hidden" id="pCalCard">
+      <div class="cal-head"><button class="icon-btn" id="pPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="pTitle"></h2><button class="icon-btn" id="pNextM" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
+      <div class="grid" id="pGrid"></div>
+    </div>
+  </div>
+</main>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=7"></script>
+<script>
+addT({
+ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслеживание цикла', cIntroText:'Отметьте, когда начались последние месячные. Дальше приложение посчитает средний цикл и покажет прогноз. По умолчанию данные видите только вы.',
+  cLastStart:'Начало последних месячных', cCycleLen:'Длина цикла, дней', cPeriodLen:'Месячные, дней', cStart:'Начать', cDay:'день', cOf:n => `из ${n}`,
+  ph:{ period:'Месячные', follicular:'Фолликулярная фаза', fertile:'Фертильное окно', luteal:'Лютеиновая фаза', late:'Задержка' },
+  nextIn:n => n <= 0 ? 'Месячные ожидаются сегодня' : `Месячные примерно через ${n} ${plural(n,'день','дня','дней')}`,
+  periodDay:(d,l) => `${d}-й день месячных`, lateBy:n => `Задержка ${n} ${plural(n,'день','дня','дней')}`,
+  started:'Начались месячные', ended:'Месячные закончились', lPeriod:'месячные', lPred:'прогноз', lFert:'фертильное окно', lOvu:'овуляция',
+  logFor:d => `Самочувствие, ${d}`, cMood:'Настроение', cSymptoms:'Симптомы', markStart:'Начало месячных', unmarkStart:'Убрать начало',
+  moods:[['great','Отлично'],['ok','Нормально'],['tired','Устала'],['irritable','Раздражение'],['sad','Грустно'],['anxious','Тревожно']],
+  symptoms:[['cramps','Спазмы'],['headache','Головная боль'],['bloating','Вздутие'],['acne','Высыпания'],['cravings','Тяга к сладкому'],['fatigue','Усталость'],['breast','Чувствительность груди'],['backache','Боль в спине']],
+  cShareTitle:'Что видит партнёр', shareHint:n => `Вы решаете, что увидит ${n}. Можно поменять в любой момент.`,
+  share:{ none:['Ничего','Данные видите только вы'], phase:['Только фазу','Например, «скоро месячные», без дат и симптомов'], all:['Всё','Календарь, прогноз и отметки самочувствия'] },
+  cLenHint:'Когда отметок станет больше, длина цикла будет считаться по ним автоматически.', cDisclaimer:'Прогноз примерный и не подходит для контрацепции. Если что-то беспокоит, обратитесь к врачу.',
+  pNothing:n => `${n} пока не делится данными о цикле.`, pNoData:n => `${n} ещё не отмечает цикл.`,
+  tips:{ period:'Сейчас может быть тяжелее обычного: грелка, чай и внимание будут кстати.', late:'Цикл задерживается. Лучше спросить, как дела, без давления.',
+    luteal:'Ближе к месячным бывает больше усталости и раздражения. Чуть больше заботы не помешает.', follicular:'Обычно время подъёма сил и настроения.', fertile:'Середина цикла, обычно хорошее самочувствие.' },
+  pmsSoon:'Скоро месячные', confirmUnmark:'Убрать отметку начала месячных?' },
+en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText:'Mark when your last period started. The app will work out your average cycle and show a forecast. By default only you can see this.',
+  cLastStart:'Start of last period', cCycleLen:'Cycle length, days', cPeriodLen:'Period length, days', cStart:'Start', cDay:'day', cOf:n => `of ${n}`,
+  ph:{ period:'Period', follicular:'Follicular phase', fertile:'Fertile window', luteal:'Luteal phase', late:'Late' },
+  nextIn:n => n <= 0 ? 'Period expected today' : `Period in about ${n} ${n === 1 ? 'day' : 'days'}`,
+  periodDay:(d,l) => `Period day ${d}`, lateBy:n => `${n} ${n === 1 ? 'day' : 'days'} late`,
+  started:'Period started', ended:'Period ended', lPeriod:'period', lPred:'forecast', lFert:'fertile window', lOvu:'ovulation',
+  logFor:d => `How you feel, ${d}`, cMood:'Mood', cSymptoms:'Symptoms', markStart:'Period start', unmarkStart:'Remove start',
+  moods:[['great','Great'],['ok','Okay'],['tired','Tired'],['irritable','Irritable'],['sad','Sad'],['anxious','Anxious']],
+  symptoms:[['cramps','Cramps'],['headache','Headache'],['bloating','Bloating'],['acne','Breakouts'],['cravings','Cravings'],['fatigue','Fatigue'],['breast','Breast tenderness'],['backache','Back pain']],
+  cShareTitle:'What your partner sees', shareHint:n => `You decide what ${n} can see. You can change it any time.`,
+  share:{ none:['Nothing','Only you can see your data'], phase:['Phase only','For example “period soon”, no dates or symptoms'], all:['Everything','Calendar, forecast and how you feel'] },
+  cLenHint:'Once you have more entries, cycle length is calculated from them automatically.', cDisclaimer:'The forecast is approximate and not suitable for contraception. If something worries you, see a doctor.',
+  pNothing:n => `${n} isn't sharing cycle data.`, pNoData:n => `${n} isn't tracking a cycle yet.`,
+  tips:{ period:'This can be a harder time: a heating pad, tea and attention help.', late:'The cycle is late. A gentle “how are you?” works better than pressure.',
+    luteal:'Closer to the period there can be more tiredness and irritability. A little extra care goes a long way.', follicular:'Usually a time of more energy and good mood.', fertile:'Mid-cycle, usually feeling good.' },
+  pmsSoon:'Period soon', confirmUnmark:'Remove this period start?' }
+});
+const C = { ctx:null, who:'me', status:null, pstatus:null, periods:[], ppriods:[], logs:{}, settings:null, month:null, pmonth:null, sel:null, getMood:null, getSymp:null };
+const PH_COLOR = { period:'var(--rose-ink)', follicular:'var(--accent)', fertile:'var(--accent)', luteal:'var(--warm-ink)', late:'var(--rose-ink)' };
+
+async function load(){
+  const me = C.ctx.user.id, partner = C.ctx.partner;
+  const [st, per, logs, set, pst] = await Promise.all([
+    sb.rpc('cycle_status'),
+    sb.from('cycle_periods').select('*').order('start_date', { ascending:false }).limit(60),
+    sb.from('cycle_logs').select('*').eq('user_id', me).gte('log_date', ymd(addDays(today(), -400))),
+    sb.from('cycle_settings').select('*').eq('user_id', me).maybeSingle(),
+    partner ? sb.rpc('cycle_status', { p_user: partner.id }) : Promise.resolve({ data:null })
+  ]);
+  C.status = st.data; C.pstatus = pst.data; C.settings = set.data;
+  C.periods = (per.data || []).filter(p => p.user_id === me);
+  C.ppriods = (per.data || []).filter(p => p.user_id !== me);
+  C.logs = Object.fromEntries((logs.data || []).map(l => [l.log_date, l]));
+  render();
+}
+
+// Day classification for a calendar from periods + forecast
+function dayMap(periods, status){
+  const m = {};
+  const plen = status?.period_length || 5, len = status?.cycle_length || 28;
+  for (const p of periods) {
+    const s = parseYmd(p.start_date), e = p.end_date ? parseYmd(p.end_date) : addDays(s, plen - 1);
+    for (let d = s; d <= e; d = addDays(d, 1)) m[ymd(d)] = 'per';
+  }
+  if (status?.has_data) {
+    const last = parseYmd(status.last_start);
+    for (let c = 0; c < 7; c++) {
+      const start = addDays(last, len * c), ov = addDays(start, len - 14 - 1);
+      for (let i = -4; i <= 1; i++) { const k = ymd(addDays(ov, i)); if (!m[k]) m[k] = i === 0 ? 'ovu' : 'fert'; }
+      if (c > 0) for (let i = 0; i < plen; i++) { const k = ymd(addDays(start, i)); if (!m[k] && addDays(start, i) >= today()) m[k] = 'pred'; }
+    }
+  }
+  return m;
+}
+function drawMonth(gridId, titleId, month, map, withSel){
+  $(titleId).textContent = `${t('months')[month.getMonth()]} ${month.getFullYear()}`;
+  const first = (month.getDay() + 6) % 7, start = new Date(month.getFullYear(), month.getMonth(), 1 - first), tk = ymd(today());
+  let html = t('dow').map(d => `<div class="dow">${d}</div>`).join('');
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(start, i), k = ymd(d);
+    if (i >= 35 && d.getMonth() !== month.getMonth()) break;
+    const cls = [d.getMonth() !== month.getMonth() ? 'other' : '', k === tk ? 'today' : '', map[k] || '', withSel && k === C.sel ? 'sel' : '', withSel && C.logs[k] ? 'logged' : ''].join(' ');
+    html += `<button type="button" class="day ${cls}" data-day="${k}">${d.getDate()}</button>`;
+  }
+  $(gridId).innerHTML = html;
+}
+function ringStyle(status){
+  const len = status.cycle_length, plen = status.period_length, day = Math.min(status.day, len);
+  const ov = status.ovulation_day;
+  const pct = x => (x / len * 100).toFixed(1) + '%';
+  return `background:conic-gradient(var(--rose) 0 ${pct(plen)}, var(--line) ${pct(plen)} ${pct(ov-5)}, var(--accent-soft) ${pct(ov-5)} ${pct(ov+1)}, var(--line) ${pct(ov+1)} 100%);` +
+    `box-shadow:0 0 0 0 transparent;` + `--d:${pct(day)}`;
+}
+function statusText(s){
+  if (s.phase === 'late') return t('lateBy', s.day - s.cycle_length);
+  if (s.phase === 'period') return t('periodDay', s.day, s.period_length);
+  return t('nextIn', dayDiff(today(), parseYmd(s.next_start)));
+}
+function render(){
+  const partner = C.ctx.partner, pName = partner?.display_name || t('partner');
+  const partnerShares = !!(C.pstatus);
+  $('whoSeg').classList.toggle('hidden', !partnerShares);
+  $('partnerTabBtn').textContent = pName;
+  if (!partnerShares) C.who = 'me';
+  document.querySelectorAll('#whoSeg button').forEach(b => b.classList.toggle('on', b.dataset.who === C.who));
+  $('mine').classList.toggle('hidden', C.who !== 'me'); $('theirs').classList.toggle('hidden', C.who !== 'partner');
+
+  // Mine
+  const s = C.status, has = !!s?.has_data;
+  $('intro').classList.toggle('hidden', has); $('tracker').classList.toggle('hidden', !has);
+  if (!getDate($('introDate'))) setDate($('introDate'), '');
+  if (has) {
+    $('ring').setAttribute('style', ringStyle(s));
+    $('rDay').textContent = s.day; $('rOf').textContent = t('cOf', s.cycle_length);
+    $('rPhase').textContent = t('ph')[s.phase]; $('rPhase').style.color = PH_COLOR[s.phase];
+    $('rNext').textContent = statusText(s);
+    const open = C.periods.find(p => !p.end_date && dayDiff(parseYmd(p.start_date), today()) < 14);
+    $('periodBtn').innerHTML = `${icon('droplet')}<span>${open ? t('ended') : t('started')}</span>`;
+    $('periodBtn').className = open ? 'btn ghost' : 'btn';
+    $('periodBtn').onclick = () => open ? endPeriod(open) : startPeriod(ymd(today()));
+    if (!C.month) { const d = today(); C.month = new Date(d.getFullYear(), d.getMonth(), 1); }
+    if (!C.sel) C.sel = ymd(today());
+    drawMonth('mGrid', 'mTitle', C.month, dayMap(C.periods, s), true);
+    renderLog();
+  }
+  // Settings
+  const lvl = C.settings?.share_level || 'none';
+  $('shareHint').textContent = t('shareHint', pName);
+  $('shareOpts').innerHTML = ['none','phase','all'].map(k => `<div class="share-opt ${k === lvl ? 'on' : ''}" data-share="${k}">
+    <div class="bubble">${icon(k === 'none' ? 'lock' : k === 'phase' ? 'eye' : 'calendar')}</div><div class="grow"><b>${t('share')[k][0]}</b><div class="muted small">${t('share')[k][1]}</div></div></div>`).join('');
+  if (document.activeElement?.id !== 'setLen') $('setLen').value = C.settings?.cycle_length || s?.cycle_length || 28;
+  if (document.activeElement?.id !== 'setPlen') $('setPlen').value = C.settings?.period_length || s?.period_length || 5;
+
+  // Partner's
+  const p = C.pstatus;
+  if (p) {
+    const pHas = !!p.has_data;
+    $('pRing').classList.toggle('hidden', !pHas);
+    if (pHas) {
+      $('pRing').setAttribute('style', ringStyle(p));
+      $('pDay').textContent = p.day; $('pOf').textContent = t('cOf', p.cycle_length);
+      $('pPhase').textContent = t('ph')[p.phase]; $('pPhase').style.color = PH_COLOR[p.phase];
+      const soon = p.phase === 'luteal' && dayDiff(today(), parseYmd(p.next_start)) <= 5;
+      $('pNext').textContent = soon ? t('pmsSoon') + ' · ' + statusText(p) : statusText(p);
+      $('pTip').textContent = t('tips')[p.phase] || '';
+    } else { $('pPhase').textContent = ''; $('pNext').textContent = t('pNoData', pName); $('pTip').textContent = ''; }
+    $('pCalCard').classList.toggle('hidden', !(pHas && p.share_level === 'all'));
+    if (pHas && p.share_level === 'all') {
+      if (!C.pmonth) { const d = today(); C.pmonth = new Date(d.getFullYear(), d.getMonth(), 1); }
+      drawMonth('pGrid', 'pTitle', C.pmonth, dayMap(C.ppriods, p), false);
+    }
+  }
+}
+function renderLog(){
+  const k = C.sel, d = parseYmd(k), log = C.logs[k];
+  $('logTitle').textContent = t('logFor', k === ymd(today()) ? t('today') : fmtDay(d));
+  C.getMood = chipPicker($('moodChips'), t('moods'), log?.mood || null);
+  C.getSymp = chipPicker($('sympChips'), t('symptoms'), log?.symptoms || [], true);
+  if (document.activeElement?.id !== 'logNote') $('logNote').value = log?.note || '';
+  const isStart = C.periods.some(p => p.start_date === k);
+  $('markStart').classList.toggle('hidden', d > today());
+  $('markStart').textContent = isStart ? t('unmarkStart') : t('markStart');
+  $('markStart').onclick = () => isStart ? unmarkStart(k) : startPeriod(k);
+  $('logMsg').textContent = ''; $('logMsg').classList.remove('ok-text');
+}
+
+// ===== Actions =====
+async function startPeriod(day){
+  const { error } = await sb.from('cycle_periods').upsert({ user_id:C.ctx.user.id, start_date:day }, { onConflict:'user_id,start_date' });
+  if (error) return alert(errText(error));
+  await load();
+}
+async function endPeriod(p){ await sb.from('cycle_periods').update({ end_date: ymd(today()) }).eq('id', p.id); await load(); }
+async function unmarkStart(day){
+  if (!confirm(t('confirmUnmark'))) return;
+  await sb.from('cycle_periods').delete().eq('user_id', C.ctx.user.id).eq('start_date', day); await load();
+}
+$('introSave').onclick = async () => {
+  const d = getDate($('introDate'));
+  if (!d) return $('introErr').textContent = t('pickDate');
+  await saveSettings(+$('introLen').value || 28, +$('introPlen').value || 5, C.settings?.share_level || 'none');
+  await startPeriod(d);
+};
+async function saveSettings(len, plen, level){
+  len = Math.min(60, Math.max(18, len)); plen = Math.min(14, Math.max(1, plen));
+  const { error } = await sb.from('cycle_settings').upsert({ user_id:C.ctx.user.id, cycle_length:len, period_length:plen, share_level:level, updated_at:new Date().toISOString() });
+  if (error) { alert(errText(error)); return false; }
+  return true;
+}
+$('shareOpts').onclick = async e => {
+  const k = e.target.closest('[data-share]')?.dataset.share; if (!k) return;
+  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, k)) await load();
+};
+$('setSave').onclick = async () => {
+  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, C.settings?.share_level || 'none')) { await load(); $('setMsg').textContent = t('saved'); $('setMsg').classList.add('ok-text'); }
+};
+$('logSave').onclick = async () => {
+  const row = { user_id:C.ctx.user.id, log_date:C.sel, mood:C.getMood(), symptoms:C.getSymp(), note:$('logNote').value.trim() || null };
+  const { error } = await sb.from('cycle_logs').upsert(row);
+  if (error) return alert(errText(error));
+  C.logs[C.sel] = row; render(); $('logMsg').textContent = t('saved'); $('logMsg').classList.add('ok-text');
+};
+$('mGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.day; if (!k) return; C.sel = k;
+  const d = parseYmd(k); if (d.getMonth() !== C.month.getMonth()) C.month = new Date(d.getFullYear(), d.getMonth(), 1); render(); };
+$('mPrev').onclick = () => { C.month = new Date(C.month.getFullYear(), C.month.getMonth() - 1, 1); render(); };
+$('mNext').onclick = () => { C.month = new Date(C.month.getFullYear(), C.month.getMonth() + 1, 1); render(); };
+$('pPrev').onclick = () => { C.pmonth = new Date(C.pmonth.getFullYear(), C.pmonth.getMonth() - 1, 1); render(); };
+$('pNextM').onclick = () => { C.pmonth = new Date(C.pmonth.getFullYear(), C.pmonth.getMonth() + 1, 1); render(); };
+document.querySelectorAll('#whoSeg button').forEach(b => b.onclick = () => { C.who = b.dataset.who; render(); });
+
+// ===== Start =====
+(async () => {
+  applyI18n(); setupBack();
+  C.ctx = await requireCouple();
+  applyI18n();
+  await load();
+  // Open the partner's view first if I don't track and they share
+  if (!C.status?.has_data && C.pstatus?.has_data) { C.who = 'partner'; render(); }
+  show('page', ['loading','page']);
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (C.ctx) render(); });
+</script>
+</body>
+</html>
