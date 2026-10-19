@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Duo</title>
-<meta name="theme-color" content="#f7efe9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1d1717" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef3ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161d19" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,15 +19,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
-  --bg:#f7efe9; --card:#fffaf6; --ink:#2b2121; --muted:#8a7a76; --line:#ecdcd3;
-  --accent:#d9576b; --accent-soft:#f8dde1; --accent-ink:#fff;
-  --ok:#5b9a7b; --shadow:0 6px 24px rgba(120,60,50,.08);
+  --bg:#eef3ee; --card:#fbfdfb; --ink:#1f2b24; --muted:#76887c; --line:#d8e3da;
+  --accent:#4f8a6b; --accent-2:#9cc7a6; --accent-soft:#dcebdf; --accent-ink:#fff;
+  --ok:#4f8a6b; --shadow:0 6px 24px rgba(40,70,50,.08);
   --radius:20px;
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
 }
 @media (prefers-color-scheme: dark){
-  :root{ --bg:#1d1717; --card:#2a2222; --ink:#f5e9e5; --muted:#a8958f; --line:#3b3030;
-    --accent:#ef7486; --accent-soft:#4a2a30; --accent-ink:#1d1717; --shadow:0 6px 24px rgba(0,0,0,.3); }
+  :root{ --bg:#161d19; --card:#212a25; --ink:#e8f0ea; --muted:#93a69a; --line:#2f3a34;
+    --accent:#8cc4a2; --accent-2:#4f8a6b; --accent-soft:#2c3d33; --accent-ink:#161d19; --ok:#6fae8a; --shadow:0 6px 24px rgba(0,0,0,.3); }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-size:16px}
@@ -65,7 +65,7 @@ textarea{min-height:90px;resize:vertical}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
 
 /* home */
-.counter{text-align:center;padding:26px 18px;background:linear-gradient(135deg,var(--accent),#e8907a);color:#fff}
+.counter{text-align:center;padding:26px 18px;background:linear-gradient(135deg,#4f8a6b,#9cc7a6);color:#fff}
 .counter .num{font-family:Lora,serif;font-size:64px;line-height:1;font-weight:600}
 .counter .names{font-size:15px;opacity:.95;margin-bottom:8px}
 .counter .sub{opacity:.9;margin-top:6px}
@@ -120,7 +120,7 @@ textarea{min-height:90px;resize:vertical}
 
 /* sheet */
 dialog{border:0;padding:0;background:transparent;max-width:none;width:100%;margin:0;margin-top:auto;max-height:92dvh}
-dialog::backdrop{background:rgba(30,15,15,.4)}
+dialog::backdrop{background:rgba(15,30,20,.4)}
 .sheet{background:var(--card);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + var(--safe-b));max-width:560px;margin:0 auto;max-height:92dvh;overflow:auto}
 .sheet h2{font-size:22px;margin-bottom:4px}
 .sheet .actions{display:flex;gap:10px;margin-top:18px}
@@ -142,7 +142,7 @@ dialog::backdrop{background:rgba(30,15,15,.4)}
 
 <!-- ===== AUTH ===== -->
 <section id="auth" class="wrap hidden">
-  <div class="hero"><div class="logo">💞</div><h1>Duo</h1><p class="muted">Общее пространство для двоих</p></div>
+  <div class="hero"><img src="icons/icon-192.png" alt="" width="88" height="88" style="border-radius:22px"><h1>Duo</h1><p class="muted">Общее пространство для двоих</p></div>
   <div class="card">
     <div class="seg"><button id="segIn" class="on">Вход</button><button id="segUp">Регистрация</button></div>
     <form id="authForm">
