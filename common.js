@@ -259,3 +259,40 @@ function setupBack(){
 }
 
 applyTheme();
+
+// ===== Bottom sheets: close on backdrop tap and on swipe down =====
+(function(){
+  const open = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function(){ this.returnValue = ''; const s = this.querySelector('.sheet'); if (s) { s.style.transform = ''; s.style.transition = ''; } return open.call(this); };
+  // Escape should never count as "save"
+  document.addEventListener('cancel', e => { if (e.target.tagName === 'DIALOG') e.target.returnValue = 'cancel'; }, true);
+  // A tap on the dimmed area hits the <dialog> itself, not the sheet inside it
+  let downOnBackdrop = false;
+  document.addEventListener('pointerdown', e => { downOnBackdrop = e.target.tagName === 'DIALOG'; }, true);
+  document.addEventListener('click', e => {
+    const d = e.target;
+    if (d.tagName === 'DIALOG' && d.open && downOnBackdrop) {
+      const s = d.querySelector('.sheet'), r = s?.getBoundingClientRect();
+      if (!r || e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) d.close('cancel');
+    }
+    downOnBackdrop = false;
+  });
+  // Swipe the sheet down to close it (only when it is scrolled to the top)
+  let drag = null;
+  document.addEventListener('touchstart', e => {
+    const s = e.target.closest?.('dialog[open] .sheet'); if (!s || s.scrollTop > 0) return;
+    if (e.target.closest('input,textarea,select,.mcard')) return;
+    drag = { s, y: e.touches[0].clientY, dy: 0 };
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!drag) return;
+    drag.dy = Math.max(0, e.touches[0].clientY - drag.y);
+    if (drag.dy > 0 && drag.s.scrollTop <= 0) { drag.s.style.transition = 'none'; drag.s.style.transform = `translateY(${drag.dy}px)`; }
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (!drag) return; const { s, dy } = drag; drag = null;
+    s.style.transition = 'transform .2s';
+    if (dy > 90) { s.style.transform = 'translateY(100%)'; setTimeout(() => { s.closest('dialog').close('cancel'); }, 180); }
+    else s.style.transform = '';
+  });
+})();
