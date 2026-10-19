@@ -10,37 +10,95 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=12">
+<link rel="stylesheet" href="common.css?v=13">
 <style>
 .ringwrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:4px auto}
 .ring>div{width:128px;height:128px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring b{font-family:Lora,serif;font-size:34px;font-weight:600;line-height:1}
 .phase-name{font-family:Lora,serif;font-size:20px;font-weight:600}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:12px;color:var(--muted)}
 .legend span{display:flex;align-items:center;gap:6px}
 .sw{width:12px;height:12px;border-radius:4px;display:inline-block}
 .day.per{background:var(--rose);color:var(--rose-ink)}
 .day.pred{box-shadow:inset 0 0 0 1.5px var(--rose-ink);color:var(--rose-ink)}
 .day.fert{background:var(--accent-soft);color:var(--accent)}
 .day.ovu{background:var(--accent);color:var(--accent-ink)}
-.day .idot{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#c86b6b}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.day .idot{position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:#e06b7d}
 .share-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
 .share-row:first-child{border-top:0}
 .share-row .grow{flex:1}
 .share-row b{font-weight:600}
+.share-row .muted{font-size:13px}
 .switch{width:44px;height:26px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .15s}
 .switch::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .switch.on{background:var(--accent)}
 .switch.on::after{left:21px}
-.day.logged::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--warm-ink)}
-.day.sel{outline:2px solid var(--ink);outline-offset:-2px}
+.switch.rose.on{background:#e06b7d}
+.day.logged::after{content:"";position:absolute;bottom:4px;left:50%;margin-left:-2.5px;width:5px;height:5px;border-radius:50%;background:#c99a3b}
+.day.sel{background:var(--sel-bg)!important;color:var(--sel-ink)!important;box-shadow:none}
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
 .cal-head h2{font-size:20px}
-.share-opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;margin-top:8px}
-.share-opt.on{border-color:var(--accent);background:var(--accent-soft)}
-.share-opt .grow{flex:1}
-.share-opt b{font-weight:600}
+.card.k{box-shadow:inset 0 0 0 1px var(--line);padding:16px}
+.topbar .eye{border:0;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--rose-ink);background:var(--rose);border-radius:99px;padding:7px 12px;cursor:pointer;flex:none}
+.topbar .eye .ic{width:16px;height:16px}
+.topbar .eye.off{background:var(--accent-soft);color:var(--muted)}
+.cring{position:relative;width:118px;height:118px;flex:none}
+.cring svg{width:118px;height:118px;transform:rotate(-90deg)}
+.cring circle{fill:none;stroke-width:10}
+.cring .tr{stroke:var(--line)}.cring .pr{stroke:#e89aab;stroke-linecap:round}
+.cring b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Lora,serif;font-size:36px;font-weight:600;line-height:1}
+.cring b small{font-family:Manrope,sans-serif;font-size:13px;color:var(--muted);font-weight:500;margin-top:4px}
+.chead{display:flex;align-items:center;gap:16px}
+.chead .lb{font-size:13px;color:var(--muted)}
+.chead .phn{font-family:Lora,serif;font-size:21px;font-weight:600;line-height:1.2;margin-top:3px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.facts>div{background:var(--bg);border-radius:14px;padding:10px 12px;font-size:12.5px;color:var(--muted)}
+.facts b{display:block;font-size:16px;color:var(--ink);font-weight:700;margin-bottom:2px}
+.facts .r b{color:var(--rose-ink)}
+.btn.rose{background:#e89aab;color:#2a1218}
+.btn.rose.ghost{background:var(--rose);color:var(--rose-ink)}
+.lbl{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 8px}
+.lbl:first-of-type{margin-top:4px}
+/* analysis */
+.an-hero{border-radius:22px;padding:18px 16px 14px;background:linear-gradient(150deg,#6b3846,#b9707f);color:#fff;margin-bottom:14px}
+.an-hero .sub{font-size:13px;opacity:.9}
+.an-hero .row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:4px}
+.an-hero .big{font-family:Lora,serif;font-size:44px;font-weight:600;line-height:1}
+.an-hero .big small{font-family:Manrope,sans-serif;font-size:15px;font-weight:500;margin-left:6px}
+.an-hero .rng{font-size:13px;opacity:.92;text-align:right}
+.an-grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;background:rgba(255,255,255,.15);border-radius:14px;padding:9px 0;text-align:center;font-size:11.5px}
+.an-grid b{display:block;font-family:Lora,serif;font-size:20px;font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:4px;height:120px;position:relative;margin-top:6px}
+.bars>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);min-width:0}
+.bars i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:#e89aab;opacity:.45}
+.bars i.r{opacity:.95}
+.bars .avg{position:absolute;left:0;right:0;border-top:1.5px dashed #c99a3b;pointer-events:none}
+.bars .avg span{position:absolute;right:0;top:-16px;font-size:11px;color:#c99a3b;font-weight:700}
+.ax{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.ins{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ins .ic{color:#c99a3b;flex:none;margin-top:1px}
+.ins b{color:var(--ink);font-weight:700}
+.fc{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.fc:first-of-type{border-top:0;padding-top:0}
+.fc .grow{flex:1;font-weight:600}
+.fc .grow div{font-size:13px;color:var(--muted);font-weight:500;margin-top:1px}
+.sq{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.sq.r{background:var(--rose);color:var(--rose-ink)}.sq.g{background:var(--accent-soft);color:var(--accent)}
+.hist{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.hist:first-of-type{border-top:0;padding-top:0}
+.hist .d{width:56px;color:var(--muted);font-size:13px;flex:none}
+.hist .tr{flex:1;min-width:0}
+.strip{height:11px;border-radius:6px;background:var(--line);position:relative;overflow:hidden}
+.strip .p{position:absolute;left:0;top:0;bottom:0;background:#e89aab;border-radius:6px}
+.strip .f{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.7}
+.strip .now{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(90deg,var(--card) 0 3px,transparent 3px 6px)}
+.hist b{width:46px;text-align:right;font-weight:700;flex:none}
+.warn{font-size:13px;color:var(--muted);background:var(--bg);border-radius:12px;padding:10px 12px;margin-top:12px;line-height:1.45}
+.warn b{color:var(--ink)}
+.preview{background:var(--bg);border-radius:14px;padding:11px 13px;font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.45}
+.preview b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -49,8 +107,9 @@
   <div class="topbar">
     <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
     <h1 data-t="cTitle"></h1>
+    <button class="eye hidden" id="shareBtn"></button>
   </div>
-  <div class="seg hidden" style="margin-bottom:14px" id="whoSeg"><button data-who="me" class="on" data-t="cMine"></button><button data-who="partner" id="partnerTabBtn"></button></div>
+  <div class="seg hidden" style="margin-bottom:12px" id="whoSeg"><button data-who="me" class="on" data-t="cMine"></button><button data-who="partner" id="partnerTabBtn"></button></div>
 
   <!-- My cycle -->
   <div id="mine">
@@ -64,40 +123,34 @@
       <button class="btn" id="introSave" data-t="cStart"></button>
     </div>
     <div id="tracker" class="hidden">
-      <div class="card ringwrap">
-        <div class="ring" id="ring"><div><span class="muted small" data-t="cDay"></span><b id="rDay"></b><span class="muted small" id="rOf"></span></div></div>
-        <div class="phase-name" id="rPhase"></div>
-        <div class="muted" id="rNext"></div>
-        <div class="two" style="width:100%;margin-top:10px">
-          <button class="btn" id="periodBtn"></button>
+      <div class="seg" style="margin-bottom:14px" id="viewSeg"><button data-view="today" data-t="vToday"></button><button data-view="cal" data-t="vCal"></button><button data-view="an" data-t="vAn"></button></div>
+      <div id="vToday" class="card k">
+        <div class="chead">
+          <div class="cring"><svg viewBox="0 0 118 118"><circle class="tr" cx="59" cy="59" r="50"/><circle class="pr" id="rArc" cx="59" cy="59" r="50"/></svg><b><span id="rDay"></span><small id="rOf"></small></b></div>
+          <div><div class="lb" data-t="cDayOf"></div><div class="phn" id="rPhase"></div></div>
         </div>
+        <div class="facts" id="rFacts"></div>
+        <button class="btn" id="periodBtn" style="margin-top:12px"></button>
       </div>
-      <div class="card">
+      <div id="vCal" class="card k">
         <div class="cal-head"><button class="icon-btn" id="mPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="mTitle"></h2><button class="icon-btn" id="mNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
         <div class="grid" id="mGrid"></div>
-        <div class="legend"><span><i class="sw" style="background:var(--rose)"></i><span data-t="lPeriod"></span></span><span><i class="sw" style="box-shadow:inset 0 0 0 1.5px var(--rose-ink)"></i><span data-t="lPred"></span></span><span><i class="sw" style="background:var(--accent-soft)"></i><span data-t="lFert"></span></span><span><i class="sw" style="background:var(--accent)"></i><span data-t="lOvu"></span></span><span><i class="sw" style="background:#c86b6b;border-radius:50%"></i><span data-t="lIntim"></span></span></div>
+        <div class="legend"><span><i class="sw" style="background:var(--rose)"></i><span data-t="lPeriod"></span></span><span><i class="sw" style="box-shadow:inset 0 0 0 1.5px var(--rose-ink)"></i><span data-t="lPred"></span></span><span><i class="sw" style="background:var(--accent-soft)"></i><span data-t="lFert"></span></span><span><i class="sw" style="background:var(--accent)"></i><span data-t="lOvu"></span></span><span><i class="sw" style="background:#c99a3b;border-radius:50%;width:8px;height:8px"></i><span data-t="lLogged"></span></span><span><i class="sw" style="background:#e06b7d;border-radius:50%;width:8px;height:8px"></i><span data-t="lIntim"></span></span></div>
       </div>
-      <div class="card">
-        <div class="section-h"><h2 id="logTitle"></h2></div>
-        <label data-t="cMood"></label><div class="chips" id="moodChips"></div>
-        <label data-t="cSymptoms"></label><div class="chips" id="sympChips"></div>
-        <div class="share-row" id="intimRow" style="margin-top:8px"><div class="bubble" style="color:#c86b6b"><svg class="ic"><use href="#i-heart"/></svg></div><div class="grow"><b data-t="cIntimacy"></b></div><span class="switch" id="intimSw"></span></div>
+      <div id="logCard" class="card k">
+        <div class="section-h"><h2 id="logTitle"></h2><span class="muted small" id="logSub"></span></div>
+        <div class="lbl" data-t="cMood"></div><div class="chips" id="moodChips"></div>
+        <div class="lbl" data-t="cSymptoms"></div><div class="chips" id="sympChips"></div>
+        <div class="lbl" data-t="cIntimacy"></div>
+        <div class="share-row" id="intimRow" style="border:0;padding:0"><div class="sq r" style="color:#e06b7d"><svg class="ic"><use href="#i-heart"/></svg></div><div class="grow"><b data-t="cIntimacyQ"></b></div><span class="switch rose" id="intimSw"></span></div>
         <div id="protWrap" class="hidden"><label data-t="cProtection"></label><div class="chips" id="protChips"></div></div>
-        <label data-t="note"></label><textarea id="logNote" style="min-height:64px" data-tp="optional"></textarea>
+        <div class="lbl" data-t="note"></div><textarea id="logNote" style="min-height:64px" data-tp="optional"></textarea>
         <div class="two" style="margin-top:12px"><button class="btn ghost hidden" id="markStart"></button><button class="btn" id="logSave" data-t="save"></button></div>
         <div class="error" id="logMsg"></div>
       </div>
+      <div id="vAn"></div>
     </div>
-    <div class="card" id="settingsCard">
-      <h2 style="font-size:20px" data-t="cShareTitle"></h2>
-      <p class="muted small" id="shareHint"></p>
-      <div id="shareOpts"></div>
-      <div class="two" style="margin-top:8px"><div><label data-t="cCycleLen"></label><input id="setLen" type="number" inputmode="numeric" min="18" max="60"></div><div><label data-t="cPeriodLen"></label><input id="setPlen" type="number" inputmode="numeric" min="1" max="14"></div></div>
-      <p class="muted small" data-t="cLenHint"></p>
-      <button class="btn ghost" id="setSave" data-t="save"></button>
-      <div class="error" id="setMsg"></div>
-    </div>
-    <p class="muted small" style="text-align:center;margin:4px 8px" data-t="cDisclaimer"></p>
+    <p class="muted small" style="text-align:center;margin:10px 8px" data-t="cDisclaimer"></p>
   </div>
 
   <!-- Partner's cycle -->
@@ -113,12 +166,24 @@
       <div class="grid" id="pGrid"></div>
       <div id="pDayInfo" style="margin-top:12px"></div>
     </div>
+    <div id="pAn"></div>
   </div>
 </main>
 
+<dialog id="shareSheet"><form class="sheet" method="dialog">
+  <h2 id="shTitle"></h2>
+  <p class="muted small" data-t="shOnlyYou" style="margin:2px 0 8px"></p>
+  <div id="shareOpts"></div>
+  <div class="preview" id="shPreview"></div>
+  <div class="lbl" style="margin-top:18px" data-t="cDefaults"></div>
+  <div class="two"><div><label style="margin-top:0" data-t="cCycleLen"></label><input id="setLen" type="number" inputmode="numeric" min="18" max="60"></div><div><label style="margin-top:0" data-t="cPeriodLen"></label><input id="setPlen" type="number" inputmode="numeric" min="1" max="14"></div></div>
+  <p class="muted small" data-t="cLenHint"></p>
+  <div class="actions"><button class="btn" value="ok" data-t="done"></button></div>
+</form></dialog>
+
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=12"></script>
+<script src="common.js?v=13"></script>
 <script>
 addT({
 ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслеживание цикла', cIntroText:'Отметьте, когда начались последние месячные. Дальше приложение посчитает средний цикл и покажет прогноз. По умолчанию данные видите только вы.',
@@ -127,7 +192,7 @@ ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслежив�
   nextIn:n => n <= 0 ? 'Месячные ожидаются сегодня' : `Месячные примерно через ${n} ${plural(n,'день','дня','дней')}`,
   periodDay:(d,l) => `${d}-й день месячных`, lateBy:n => `Задержка ${n} ${plural(n,'день','дня','дней')}`,
   started:'Начались месячные', ended:'Месячные закончились', lPeriod:'месячные', lPred:'прогноз', lFert:'фертильное окно', lOvu:'овуляция',
-  logFor:d => `Самочувствие, ${d}`, cMood:'Настроение', cSymptoms:'Симптомы', markStart:'Начало месячных', unmarkStart:'Убрать начало',
+  logFor:d => `Самочувствие, ${d}`, logToday:'Как вы сегодня', cycleDayN:n => `${n}-й день цикла`, cMood:'Настроение', cSymptoms:'Симптомы', markStart:'Начало месячных', unmarkStart:'Убрать начало',
   moods:[['great','Отлично'],['ok','Нормально'],['tired','Устала'],['irritable','Раздражение'],['sad','Грустно'],['anxious','Тревожно']],
   symptoms:[['cramps','Спазмы'],['headache','Головная боль'],['bloating','Вздутие'],['acne','Высыпания'],['cravings','Тяга к сладкому'],['fatigue','Усталость'],['breast','Чувствительность груди'],['backache','Боль в спине']],
   cShareTitle:'Что видит партнёр', shareHint:n => `Вы решаете, что увидит ${n}. Можно поменять в любой момент.`,
@@ -138,15 +203,31 @@ ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслежив�
     luteal:'Ближе к месячным бывает больше усталости и раздражения. Чуть больше заботы не помешает.', follicular:'Обычно время подъёма сил и настроения.', fertile:'Середина цикла, обычно хорошее самочувствие.' },
   pmsSoon:'Скоро месячные', confirmUnmark:'Убрать отметку начала месячных?',
   cIntimacy:'Близость', cProtection:'Защита', prot:[['protected','С защитой'],['unprotected','Без защиты']], lIntim:'близость',
-  shareItems:[['phase','Фаза и прогноз','День цикла, фаза и когда ждать месячные'],['periods','Дни месячных в календаре','Отмеченные и ожидаемые дни'],['feelings','Самочувствие и симптомы','Настроение и симптомы по дням'],['intimacy','Близость','Отметки близости и защиты'],['notes','Заметки','Ваши заметки к дням']],
-  shareNone:n => `Сейчас ${n} не видит ничего.`, pNothingDay:'В этот день отметок нет.' },
+  shareItems:[['phase','Фаза и прогноз','День цикла, фаза и когда ждать месячные'],['analysis','Анализ','Средний цикл и график, без дат'],['periods','Дни месячных в календаре','Отмеченные и ожидаемые дни'],['feelings','Самочувствие и симптомы','Настроение и симптомы по дням'],['intimacy','Близость','Отметки близости и защиты'],['notes','Заметки','Ваши заметки к дням']],
+  shareNone:n => `Сейчас ${n} не видит ничего.`, pNothingDay:'В этот день отметок нет.',
+  vToday:'Сегодня', vCal:'Календарь', vAn:'Анализ', cDayOf:'День цикла', lLogged:'есть запись', cIntimacyQ:'Был секс', cDefaults:'Если данных мало',
+  seesN:n => `Видит ${n}`, hidden:'Скрыто', access:'Доступ', shTitleN:n => `Что видит ${n}`, shTitle:'Что увидит партнёр', shOnlyYou:'Остальное видно только вам',
+  pvSees:n => `${n} увидит:`, pvNothing:n => `${n} ничего не видит.`, pvNoPartner:'Партнёр ещё не присоединился. Когда присоединится, увидит только то, что включено здесь.',
+  pv:{ periods:'дни месячных в календаре', feelings:'самочувствие и симптомы', intimacy:'отметки близости', notes:'заметки', analysis:'средний цикл и график' },
+  inDaysF:n => n === 0 ? 'сегодня' : n === 1 ? 'завтра' : `через ${n} ${plural(n,'день','дня','дней')}`, fPeriod:'месячные', fLikely:d => `скорее всего ${d}-го`,
+  fPeriodDay:d => `${d}-й день`, fPeriodNow:'месячные', fEndsL:'закончатся примерно', fLate:n => `задержка ${n} ${plural(n,'день','дня','дней')}`, fExpectedL:'ожидались',
+  anAvg:n => `Средний цикл · ${n} ${plural(n,'цикл','цикла','циклов')}`, anUsual:(a,b) => `обычно<br>${a}–${b} дней`, daysW:n => plural(Math.round(n),'день','дня','дней'),
+  anMin:'самый короткий', anMax:'самый длинный', anSd:'разброс', anLens:'Длина циклов', anLastN:n => `последние ${n}`,
+  anLonger:(a,b) => `<b>Последние полгода циклы стали длиннее:</b> в среднем ${a} дня, а до этого ${b}. Прогноз уже учитывает это.`,
+  anShorter:(a,b) => `<b>Последние полгода циклы стали короче:</b> в среднем ${a} дня, а до этого ${b}. Прогноз уже учитывает это.`,
+  anStable:d => `<b>Цикл стабильный.</b> Обычно длина отличается не больше чем на ${d} ${plural(d,'день','дня','дней')}, поэтому прогноз довольно точный.`,
+  anVaries:'<b>Длина цикла заметно меняется,</b> поэтому прогноз примерный. Чем больше отметок, тем он точнее.',
+  anForecast:'Прогноз', anPeriodRange:r => `Месячные ${r}`, anOvu:d => `Овуляция ~${d}`, anFert:r => `фертильные дни ${r}`,
+  anHist:'История', anHistSub:'месячные · фертильные', anNow:'идёт', anAll:n => `Показать все ${n}`, anLess:'Свернуть',
+  anPlen:n => `месячные в среднем ${n} ${plural(n,'день','дня','дней')}`, anNoPlen:'<b>Длина месячных пока не считается:</b> у циклов не отмечен конец. Нажимайте «Месячные закончились», и здесь появится средняя длина.',
+  anNeed:'Для анализа нужно хотя бы два отмеченных начала месячных.', pAnTitle:n => `Цикл: ${n}` },
 en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText:'Mark when your last period started. The app will work out your average cycle and show a forecast. By default only you can see this.',
   cLastStart:'Start of last period', cCycleLen:'Cycle length, days', cPeriodLen:'Period length, days', cStart:'Start', cDay:'day', cOf:n => `of ${n}`,
   ph:{ period:'Period', follicular:'Follicular phase', fertile:'Fertile window', luteal:'Luteal phase', late:'Late' },
   nextIn:n => n <= 0 ? 'Period expected today' : `Period in about ${n} ${n === 1 ? 'day' : 'days'}`,
   periodDay:(d,l) => `Period day ${d}`, lateBy:n => `${n} ${n === 1 ? 'day' : 'days'} late`,
   started:'Period started', ended:'Period ended', lPeriod:'period', lPred:'forecast', lFert:'fertile window', lOvu:'ovulation',
-  logFor:d => `How you feel, ${d}`, cMood:'Mood', cSymptoms:'Symptoms', markStart:'Period start', unmarkStart:'Remove start',
+  logFor:d => `How you feel, ${d}`, logToday:'How are you today', cycleDayN:n => `cycle day ${n}`, cMood:'Mood', cSymptoms:'Symptoms', markStart:'Period start', unmarkStart:'Remove start',
   moods:[['great','Great'],['ok','Okay'],['tired','Tired'],['irritable','Irritable'],['sad','Sad'],['anxious','Anxious']],
   symptoms:[['cramps','Cramps'],['headache','Headache'],['bloating','Bloating'],['acne','Breakouts'],['cravings','Cravings'],['fatigue','Fatigue'],['breast','Breast tenderness'],['backache','Back pain']],
   cShareTitle:'What your partner sees', shareHint:n => `You decide what ${n} can see. You can change it any time.`,
@@ -157,10 +238,26 @@ en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText
     luteal:'Closer to the period there can be more tiredness and irritability. A little extra care goes a long way.', follicular:'Usually a time of more energy and good mood.', fertile:'Mid-cycle, usually feeling good.' },
   pmsSoon:'Period soon', confirmUnmark:'Remove this period start?',
   cIntimacy:'Intimacy', cProtection:'Protection', prot:[['protected','Protected'],['unprotected','Unprotected']], lIntim:'intimacy',
-  shareItems:[['phase','Phase and forecast','Cycle day, phase and when to expect the period'],['periods','Period days in the calendar','Marked and expected days'],['feelings','Mood and symptoms','Mood and symptoms by day'],['intimacy','Intimacy','Intimacy and protection marks'],['notes','Notes','Your notes for each day']],
-  shareNone:n => `Right now ${n} can't see anything.`, pNothingDay:'No entries for this day.' }
+  shareItems:[['phase','Phase and forecast','Cycle day, phase and when to expect the period'],['analysis','Insights','Average cycle and chart, no dates'],['periods','Period days in the calendar','Marked and expected days'],['feelings','Mood and symptoms','Mood and symptoms by day'],['intimacy','Intimacy','Intimacy and protection marks'],['notes','Notes','Your notes for each day']],
+  shareNone:n => `Right now ${n} can't see anything.`, pNothingDay:'No entries for this day.',
+  vToday:'Today', vCal:'Calendar', vAn:'Insights', cDayOf:'Cycle day', lLogged:'entry', cIntimacyQ:'We had sex', cDefaults:'When there is little data',
+  seesN:n => `${n} sees`, hidden:'Hidden', access:'Sharing', shTitleN:n => `What ${n} sees`, shTitle:'What your partner will see', shOnlyYou:'Everything else is only for you',
+  pvSees:n => `${n} will see:`, pvNothing:n => `${n} can't see anything.`, pvNoPartner:'Your partner hasn\'t joined yet. They will only see what is switched on here.',
+  pv:{ periods:'period days in the calendar', feelings:'mood and symptoms', intimacy:'intimacy marks', notes:'notes', analysis:'average cycle and chart' },
+  inDaysF:n => n === 0 ? 'today' : n === 1 ? 'tomorrow' : `in ${n} days`, fPeriod:'period', fLikely:d => `most likely on the ${d}th`,
+  fPeriodDay:d => `day ${d}`, fPeriodNow:'of period', fEndsL:'expected to end', fLate:n => `${n} ${n === 1 ? 'day' : 'days'} late`, fExpectedL:'was expected',
+  anAvg:n => `Average cycle · ${n} ${n === 1 ? 'cycle' : 'cycles'}`, anUsual:(a,b) => `usually<br>${a}–${b} days`, daysW:n => 'days',
+  anMin:'shortest', anMax:'longest', anSd:'variation', anLens:'Cycle length', anLastN:n => `last ${n}`,
+  anLonger:(a,b) => `<b>Cycles got longer over the last half year:</b> ${a} days on average, ${b} before. The forecast already accounts for it.`,
+  anShorter:(a,b) => `<b>Cycles got shorter over the last half year:</b> ${a} days on average, ${b} before. The forecast already accounts for it.`,
+  anStable:d => `<b>Your cycle is regular.</b> Length usually differs by no more than ${d} ${d === 1 ? 'day' : 'days'}, so the forecast is fairly accurate.`,
+  anVaries:'<b>Cycle length varies noticeably,</b> so the forecast is approximate. More entries make it more accurate.',
+  anForecast:'Forecast', anPeriodRange:r => `Period ${r}`, anOvu:d => `Ovulation ~${d}`, anFert:r => `fertile days ${r}`,
+  anHist:'History', anHistSub:'period · fertile', anNow:'now', anAll:n => `Show all ${n}`, anLess:'Show less',
+  anPlen:n => `period ${n} ${n === 1 ? 'day' : 'days'} on average`, anNoPlen:'<b>Period length isn\'t calculated yet:</b> no cycle has an end marked. Tap “Period ended” and the average will appear here.',
+  anNeed:'Insights need at least two marked period starts.', pAnTitle:n => `${n}'s cycle` }
 });
-const C = { plogs:{}, psel:null, intim:false, getProt:null, ctx:null, who:'me', status:null, pstatus:null, periods:[], ppriods:[], logs:{}, settings:null, month:null, pmonth:null, sel:null, getMood:null, getSymp:null };
+const C = { view: pref('cycleView', 'today'), histAll:false, pstats:null, plogs:{}, psel:null, intim:false, getProt:null, ctx:null, who:'me', status:null, pstatus:null, periods:[], ppriods:[], logs:{}, settings:null, month:null, pmonth:null, sel:null, getMood:null, getSymp:null };
 const PH_COLOR = { period:'var(--rose-ink)', follicular:'var(--accent)', fertile:'var(--accent)', luteal:'var(--warm-ink)', late:'var(--rose-ink)' };
 
 async function load(){
@@ -180,6 +277,8 @@ async function load(){
   if (partner && C.pstatus) {
     const { data: pl } = await sb.rpc('cycle_partner_logs', { p_user: partner.id, p_from: ymd(addDays(today(), -400)), p_to: ymd(addDays(today(), 60)) });
     C.plogs = Object.fromEntries((pl || []).map(l => [l.log_date, l]));
+    const { data: ps } = await sb.rpc('cycle_partner_stats', { p_user: partner.id });
+    C.pstats = ps;
   }
   render();
 }
@@ -227,6 +326,89 @@ function statusText(s){
   if (s.phase === 'period') return t('periodDay', s.day, s.period_length);
   return t('nextIn', dayDiff(today(), parseYmd(s.next_start)));
 }
+// ===== Analysis =====
+const num1 = x => (Math.round(x * 10) / 10).toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU');
+const mean = a => a.reduce((x, y) => x + y, 0) / (a.length || 1);
+const sdev = a => { const m = mean(a); return Math.sqrt(mean(a.map(x => (x - m) ** 2))); };
+const shortD = d => `${d.getDate()} ${t('monthsShort')[d.getMonth()]}`;
+const rangeD = (a, b) => a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${t('monthsShort')[a.getMonth()]}` : `${shortD(a)} – ${shortD(b)}`;
+function myCycles(){
+  const ps = C.periods.slice().sort((a, b) => a.start_date.localeCompare(b.start_date)), out = [];
+  for (let i = 0; i < ps.length - 1; i++) {
+    const s0 = parseYmd(ps[i].start_date), len = dayDiff(s0, parseYmd(ps[i + 1].start_date));
+    if (len < 18 || len > 60) continue;
+    out.push({ start:s0, len, plen: ps[i].end_date ? dayDiff(s0, parseYmd(ps[i].end_date)) + 1 : null });
+  }
+  return out;
+}
+// How wide the forecast window is: depends on how much recent cycles vary
+function windowDays(){ const l = myCycles().slice(-12).map(c => c.len); return l.length < 3 ? 2 : Math.min(3, Math.max(1, Math.round(sdev(l)))); }
+function factsHTML(s){
+  if (s.phase === 'late') {
+    return `<div class="r"><b>${t('fLate', s.day - s.cycle_length)}</b>${t('fPeriod')}</div><div><b>${shortD(addDays(parseYmd(s.last_start), s.cycle_length))}</b>${t('fExpectedL')}</div>`;
+  }
+  if (s.phase === 'period') {
+    const end = addDays(parseYmd(s.last_start), (s.period_length || 5) - 1);
+    return `<div class="r"><b>${t('fPeriodDay', s.day)}</b>${t('fPeriodNow')}</div><div><b>${shortD(end)}</b>${t('fEndsL')}</div>`;
+  }
+  const nx = parseYmd(s.next_start), n = dayDiff(today(), nx), w = windowDays();
+  return `<div class="r"><b>${t('inDaysF', n)}</b>${t('fPeriod')}</div><div><b>${rangeD(addDays(nx, -w), addDays(nx, w))}</b>${t('fLikely', nx.getDate())}</div>`;
+}
+function previewText(sh, partner, pName, s){
+  if (!partner) return t('pvNoPartner');
+  const parts = [];
+  if (sh.phase && s?.has_data) parts.push(`«${t('ph')[s.phase]}${s.phase === 'period' || s.phase === 'late' ? '' : ', ' + t('fPeriod') + ' ' + t('inDaysF', dayDiff(today(), parseYmd(s.next_start)))}»`);
+  for (const k of ['periods','feelings','intimacy','notes','analysis']) if (sh[k]) parts.push(t('pv')[k]);
+  return parts.length ? `<b>${esc(t('pvSees', pName))}</b> ${esc(parts.join(', '))}` : esc(t('pvNothing', pName));
+}
+function analysisHTML(cyc, o){
+  if (cyc.length < 1) return `<div class="card k empty">${t('anNeed')}</div>`;
+  const lens = cyc.map(c => c.len), m = mean(lens), sd = sdev(lens), plens = cyc.map(c => c.plen).filter(Boolean);
+  const lo = Math.round(m - sd), hi = Math.round(m + sd);
+  let h = o.title ? `<div class="lbl" style="margin-top:6px">${esc(o.title)}</div>` : '';
+  h += `<div class="an-hero"><div class="sub">${t('anAvg', cyc.length)}${plens.length ? ' · ' + t('anPlen', Math.round(mean(plens))) : ''}</div>
+    <div class="row"><div class="big">${num1(m)}<small>${t('daysW', m)}</small></div><div class="rng">${t('anUsual', lo, hi)}</div></div>
+    <div class="an-grid"><div><b>${Math.min(...lens)}</b>${t('anMin')}</div><div><b>${Math.max(...lens)}</b>${t('anMax')}</div><div><b>±${num1(sd)}</b>${t('anSd')}</div></div></div>`;
+  // bars
+  const last = cyc.slice(-12), lmin = Math.min(...last.map(c => c.len), Math.floor(m)) - 2, lmax = Math.max(...last.map(c => c.len), Math.ceil(m)) + 1;
+  const H = 96, hy = v => 10 + (v - lmin) / (lmax - lmin) * (H - 10);
+  const recent = last.length >= 8 ? last.length - 6 : 0;
+  h += `<div class="card k"><div class="section-h"><h2 style="font-size:18px">${t('anLens')}</h2><span class="muted small">${t('anLastN', last.length)}</span></div>
+    <div class="bars"><div class="avg" style="bottom:${hy(m) + 14}px"><span>${num1(m)}</span></div>
+    ${last.map((c, i) => `<div><i class="${i >= recent ? 'r' : ''}" style="height:${hy(c.len)}px"></i>${c.len}</div>`).join('')}</div>
+    ${o.dates ? `<div class="ax"><span>${t('monthsShort')[last[0].start.getMonth()]} ${last[0].start.getFullYear()}</span><span>${t('monthsShort')[last[last.length - 1].start.getMonth()]} ${last[last.length - 1].start.getFullYear()}</span></div>` : ''}`;
+  let ins;
+  if (cyc.length >= 12) {
+    const a6 = mean(lens.slice(-6)), b6 = mean(lens.slice(-12, -6));
+    if (a6 - b6 >= 1.5) ins = t('anLonger', num1(a6), num1(b6)); else if (b6 - a6 >= 1.5) ins = t('anShorter', num1(a6), num1(b6));
+  }
+  if (!ins && cyc.length >= 3) ins = sd <= 3 ? t('anStable', Math.max(1, Math.round(sd * 2))) : t('anVaries');
+  if (ins) h += `<div class="ins">${icon('sparkle')}<span>${ins}</span></div>`;
+  h += `</div>`;
+  // forecast (own data only)
+  const s = o.status;
+  if (s && s.phase !== 'late') {
+    const nx = parseYmd(s.next_start), w = windowDays(), len = s.cycle_length;
+    let ov = addDays(parseYmd(s.last_start), len - 15); if (ov < today()) ov = addDays(nx, len - 15);
+    h += `<div class="card k"><div class="section-h"><h2 style="font-size:18px">${t('anForecast')}</h2></div>
+      <div class="fc"><span class="sq r">${icon('droplet')}</span><div class="grow">${t('anPeriodRange', rangeD(addDays(nx, -w), addDays(nx, w)))}<div>${t('fLikely', nx.getDate())} · ${t('inDaysF', dayDiff(today(), nx))}</div></div></div>
+      <div class="fc"><span class="sq g">${icon('leaf')}</span><div class="grow">${t('anOvu', shortD(ov))}<div>${t('anFert', rangeD(addDays(ov, -4), addDays(ov, 1)))}</div></div></div></div>`;
+  }
+  // history (own data only)
+  if (o.dates) {
+    const maxL = Math.max(...lens, s ? Math.max(s.day, s.cycle_length) : 0), dflt = s?.period_length || 5;
+    const strip = (len, plen, width, cur) => { const ovs = len - 14 - 4; return `<div class="strip" style="width:${width}%"><span class="p" style="width:${plen / len * 100}%"></span><span class="f" style="left:${ovs / len * 100}%;width:${6 / len * 100}%"></span>${cur ? `<span class="now" style="width:${cur}%"></span>` : ''}</div>`; };
+    const rows = [];
+    if (s) { const len = s.cycle_length; rows.push(`<div class="hist"><span class="d">${shortD(parseYmd(s.last_start))}</span><div class="tr">${strip(len, dflt, len / maxL * 100, Math.max(0, (1 - Math.min(s.day, len) / len) * 100))}</div><b>${t('anNow')}</b></div>`); }
+    const list = cyc.slice().reverse(), shown = C.histAll ? list : list.slice(0, 5);
+    shown.forEach(c => rows.push(`<div class="hist"><span class="d">${shortD(c.start)}${c.start.getFullYear() !== today().getFullYear() ? ` <span style="font-size:11px">${String(c.start.getFullYear()).slice(2)}</span>` : ''}</span><div class="tr">${strip(c.len, c.plen || dflt, c.len / maxL * 100)}</div><b>${c.len}</b></div>`));
+    h += `<div class="card k"><div class="section-h"><h2 style="font-size:18px">${t('anHist')}</h2><span class="muted small">${t('anHistSub')}</span></div>${rows.join('')}
+      ${list.length > 5 ? `<button type="button" class="btn link" data-hist style="margin:8px auto 0">${C.histAll ? t('anLess') : t('anAll', list.length)}</button>` : ''}
+      ${plens.length ? '' : `<div class="warn">${t('anNoPlen')}</div>`}</div>`;
+  }
+  return h;
+}
+
 function render(){
   const partner = C.ctx.partner, pName = partner?.display_name || t('partner');
   const partnerShares = !!(C.pstatus);
@@ -240,31 +422,43 @@ function render(){
   const s = C.status, has = !!s?.has_data;
   $('intro').classList.toggle('hidden', has); $('tracker').classList.toggle('hidden', !has);
   if (!getDate($('introDate'))) setDate($('introDate'), '');
+  $('shareBtn').classList.toggle('hidden', !has && !C.settings);
   if (has) {
-    $('ring').setAttribute('style', ringStyle(s));
-    $('rDay').textContent = s.day; $('rOf').textContent = t('cOf', s.cycle_length);
+    document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.view === C.view));
+    $('vToday').classList.toggle('hidden', C.view !== 'today'); $('vCal').classList.toggle('hidden', C.view !== 'cal');
+    $('logCard').classList.toggle('hidden', C.view === 'an'); $('vAn').classList.toggle('hidden', C.view !== 'an');
+    if (C.view === 'today') C.sel = ymd(today());
+    // ring
+    const len = s.cycle_length, arc = 2 * Math.PI * 50, dd = Math.min(s.day, len);
+    $('rArc').setAttribute('stroke-dasharray', `${arc * dd / len} ${arc}`);
+    $('rDay').textContent = s.day; $('rOf').textContent = t('cOf', len);
     $('rPhase').textContent = t('ph')[s.phase]; $('rPhase').style.color = PH_COLOR[s.phase];
-    $('rNext').textContent = statusText(s);
+    $('rFacts').innerHTML = factsHTML(s);
     const open = C.periods.find(p => !p.end_date && dayDiff(parseYmd(p.start_date), today()) < 14);
     $('periodBtn').innerHTML = `${icon('droplet')}<span>${open ? t('ended') : t('started')}</span>`;
-    $('periodBtn').className = open ? 'btn ghost' : 'btn';
+    $('periodBtn').className = open ? 'btn rose ghost' : 'btn rose';
     $('periodBtn').onclick = () => open ? endPeriod(open) : startPeriod(ymd(today()));
     if (!C.month) { const d = today(); C.month = new Date(d.getFullYear(), d.getMonth(), 1); }
     if (!C.sel) C.sel = ymd(today());
     drawMonth('mGrid', 'mTitle', C.month, dayMap(C.periods, s), true, C.logs);
     renderLog();
+    if (C.view === 'an') $('vAn').innerHTML = analysisHTML(myCycles(), { dates:true, status:s });
   }
-  // Settings
+  // Sharing
   const sh = C.settings?.share || {}, anyOn = Object.values(sh).some(Boolean);
-  $('shareHint').textContent = t('shareHint', pName) + (anyOn ? '' : ' ' + t('shareNone', pName));
+  $('shareBtn').className = 'eye' + (anyOn && partner ? '' : ' off') + ($('shareBtn').classList.contains('hidden') ? ' hidden' : '');
+  $('shareBtn').innerHTML = `${icon(anyOn && partner ? 'eye' : 'lock')}<span>${partner ? (anyOn ? t('seesN', pName) : t('hidden')) : t('access')}</span>`;
+  $('shTitle').textContent = partner ? t('shTitleN', pName) : t('shTitle');
   $('shareOpts').innerHTML = t('shareItems').map(([k, title, sub]) => `<div class="share-row" data-share="${k}">
-    <div class="bubble">${icon({ phase:'eye', periods:'calendar', feelings:'sparkle', intimacy:'heart', notes:'edit' }[k])}</div>
-    <div class="grow"><b>${title}</b><div class="muted small">${sub}</div></div><span class="switch ${sh[k] ? 'on' : ''}"></span></div>`).join('');
+    <div class="bubble">${icon({ phase:'eye', periods:'calendar', feelings:'sparkle', intimacy:'heart', notes:'edit', analysis:'grid' }[k])}</div>
+    <div class="grow"><b>${title}</b><div class="muted">${sub}</div></div><span class="switch ${sh[k] ? 'on' : ''}"></span></div>`).join('');
+  $('shPreview').innerHTML = previewText(sh, partner, pName, s);
   if (document.activeElement?.id !== 'setLen') $('setLen').value = C.settings?.cycle_length || s?.cycle_length || 28;
   if (document.activeElement?.id !== 'setPlen') $('setPlen').value = C.settings?.period_length || s?.period_length || 5;
 
   // Partner's
   const p = C.pstatus;
+  $('pAn').innerHTML = p && C.pstats && C.pstats.length ? analysisHTML(C.pstats.map(x => ({ len:x.len, plen:x.plen })), { dates:false, title:t('pAnTitle', pName) }) : '';
   if (p) {
     const pHas = !!p.has_data;
     if (pHas && p.phase) {
@@ -294,7 +488,9 @@ function render(){
 }
 function renderLog(){
   const k = C.sel, d = parseYmd(k), log = C.logs[k];
-  $('logTitle').textContent = t('logFor', k === ymd(today()) ? t('today') : fmtDay(d));
+  $('logTitle').textContent = k === ymd(today()) ? t('logToday') : fmtDay(d);
+  const cd = C.status?.has_data ? dayDiff(parseYmd(C.status.last_start), d) + 1 : null;
+  $('logSub').textContent = cd > 0 && cd <= 60 ? t('cycleDayN', cd) : (k === ymd(today()) ? fmtDay(d) : '');
   C.getMood = chipPicker($('moodChips'), t('moods'), log?.mood || null);
   C.getSymp = chipPicker($('sympChips'), t('symptoms'), log?.symptoms || [], true);
   if (document.activeElement?.id !== 'logNote') $('logNote').value = log?.note || '';
@@ -338,9 +534,13 @@ $('shareOpts').onclick = async e => {
   e.target.closest('[data-share]').querySelector('.switch').classList.toggle('on', share[k]);
   if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, share)) await load();
 };
-$('setSave').onclick = async () => {
-  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5)) { await load(); $('setMsg').textContent = t('saved'); $('setMsg').classList.add('ok-text'); }
+$('shareBtn').onclick = () => $('shareSheet').showModal();
+$('shareSheet').onclose = async () => {
+  const len = +$('setLen').value || 28, plen = +$('setPlen').value || 5;
+  if (len !== (C.settings?.cycle_length || 28) || plen !== (C.settings?.period_length || 5)) { if (await saveSettings(len, plen)) await load(); }
 };
+document.querySelectorAll('#viewSeg button').forEach(b => b.onclick = () => { C.view = b.dataset.view; setPref('cycleView', C.view); render(); window.scrollTo(0, 0); });
+$('vAn').onclick = e => { if (e.target.closest('[data-hist]')) { C.histAll = !C.histAll; render(); } };
 $('intimRow').onclick = () => { C.intim = !C.intim; $('intimSw').classList.toggle('on', C.intim); $('protWrap').classList.toggle('hidden', !C.intim); };
 $('logSave').onclick = async () => {
   const row = { user_id:C.ctx.user.id, log_date:C.sel, mood:C.getMood(), symptoms:C.getSymp(), note:$('logNote').value.trim() || null,
