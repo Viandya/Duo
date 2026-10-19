@@ -23,7 +23,23 @@
 .counter .num{font-family:Lora,serif;font-size:64px;line-height:1;font-weight:600;display:flex;justify-content:center}
 .counter .names{font-size:15px;opacity:.95;margin-bottom:8px}
 .counter .sub{opacity:.9;margin-top:6px}
-.q{font-family:Lora,serif;font-size:20px;font-style:italic;line-height:1.35;margin:4px 0 14px}
+.q{font-family:Lora,serif;font-size:18px;font-style:italic;line-height:1.35;margin:4px 0 0}
+.qrow{display:flex;gap:12px;align-items:center}
+.qrow .grow{flex:1;min-width:0}
+.status{display:flex;gap:8px;align-items:center;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px}
+.status.warm{background:var(--warm);color:var(--warm-ink);font-weight:600}
+.status.soft{background:var(--bg);color:var(--muted)}
+.day.cyc{background:var(--rose);color:var(--rose-ink)}
+.day.cyc.sel{background:var(--sel-bg);color:var(--sel-ink)}
+.day .dots{position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:3px}
+.day .dots i{width:5px;height:5px;border-radius:50%;display:block}
+.dot-ev{background:var(--accent)}.dot-dt{background:#c99a3b}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.bubble.gold{background:var(--warm);color:var(--warm-ink)}
+.avs{display:flex}.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;border:3px solid var(--card);background:var(--grad-b)}
+.av+.av{margin-left:-14px;background:var(--grad-a)}
 .ans{background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:10px}
 .ans .who{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px;letter-spacing:.02em}
 .lock{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:10px;color:var(--muted)}
@@ -97,8 +113,7 @@
       <div class="sub" id="hDaysLabel"></div>
     </div>
     <div class="card">
-      <div class="section-h"><h2 data-t="qotd"></h2><span class="muted small" id="qDate"></span></div>
-      <div class="q" id="qText"></div>
+      <div class="qrow"><div class="grow"><div class="muted small"><span data-t="qotd"></span> · <span id="qDate"></span></div><div class="q" id="qText"></div></div><button class="btn sm" id="qOpen" data-t="answer"></button></div>
       <div id="qBody"></div>
     </div>
     <div class="card">
@@ -118,7 +133,9 @@
       <div class="card">
         <div class="cal-head"><button class="icon-btn" id="calPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="calMonth"></h2><button class="icon-btn" id="calNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
         <div class="grid" id="calGrid"></div>
+        <div class="legend" id="calLegend"></div>
       </div>
+      <div class="chips" id="calShow" style="margin:-4px 0 14px"></div>
       <div class="card">
         <div class="section-h"><h2 id="selDayTitle"></h2></div>
         <div id="dayEvents"></div>
@@ -148,7 +165,10 @@
 
   <section id="tab-me" class="wrap hidden">
     <div class="page-title"><h1 data-t="profile"></h1></div>
-    <div class="card">
+    <div class="card hidden" id="coupleCard">
+      <div class="row-item" style="padding:0"><div class="avs" id="cAvs"></div><div class="grow"><h2 style="font-size:20px" id="cNames"></h2><div class="muted small" id="cSince"></div></div></div>
+    </div>
+    <div class="card" id="codeCard">
       <h2 style="font-size:20px" data-t="partnerCode"></h2>
       <p class="muted small" id="partnerStatus"></p>
       <div class="code" id="inviteCode"></div>
@@ -203,12 +223,23 @@
 
 <dialog id="eventSheet"><form class="sheet" method="dialog" id="eventForm">
   <h2 data-t="event"></h2>
+  <label data-t="evKind"></label><div class="chips" id="eKind"></div>
   <label data-t="what"></label><input id="eTitle" required data-tp="eventPh">
   <label data-t="day"></label><button type="button" class="field" data-date id="eDate"></button>
-  <label class="toggle"><input type="checkbox" id="eAllDay"><span data-t="allDay"></span></label>
+  <div id="eAllDayWrap"><label class="toggle"><input type="checkbox" id="eAllDay"><span data-t="allDay"></span></label></div>
   <div id="eTimeWrap"><label data-t="time"></label><div class="two"><select id="eHour"></select><select id="eMin"></select></div></div>
-  <label data-t="note"></label><textarea id="eNote" data-tp="optional"></textarea>
+  <label data-t="evRepeat"></label><div class="chips" id="eRepeat"></div>
+  <label data-t="evRemind"></label><div class="chips" id="eRemind"></div>
+  <label data-t="note"></label><textarea id="eNote" data-tp="optional" style="min-height:64px"></textarea>
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+</form></dialog>
+
+<dialog id="ansSheet"><form class="sheet" method="dialog" id="ansForm">
+  <div class="muted small" data-t="qotd"></div>
+  <div class="q" id="ansQ" style="margin:4px 0 12px"></div>
+  <textarea id="qAnswer" data-tp="answerPh" required></textarea>
+  <p class="muted small" id="ansHint"></p>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="sendAnswer"></button></div>
 </form></dialog>
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -231,7 +262,7 @@ ru: {
   allDay:'Весь день', time:'Время',
   daysTogether:n => plural(n,'день','дня','дней') + ' вместе', setDateHint:'укажите дату во вкладке «Профиль»',
   noQuestions:'Вопросов пока нет', answerPh:'Ваш ответ…', answer:'Ответить', bothOpen:'Ответы откроются, когда ответите вы оба', invitePartner:'Пригласите партнёра во вкладке «Профиль»',
-  notAnswered:n => `${n} пока не ответил(а)`, partnerNotJoined:'Партнёр ещё не присоединился',
+  notAnswered:n => `${n}: ответа пока нет`, partnerNotJoined:'Партнёр ещё не присоединился',
   datesEmpty:'Добавьте дни рождения, годовщины и другие важные даты', eventsEmpty:'Пока ничего не запланировано', yearsTogether:y => `${y} ${plural(y,'год','года','лет')} вместе`,
   todayTitle:'Сегодня', allDayShort:'весь день',
   listsEmpty:'Создайте первый список', itemsLeft:(l,n) => `${l} из ${n} осталось`, emptyList:'пусто', listEmptyItems:'Пока пусто',
@@ -246,7 +277,16 @@ ru: {
   wishesSub:(m,p) => `${m} у вас · ${p} у партнёра`, wishesEmpty:'Добавьте первое желание', tripsEmpty:'Спланируйте поездку', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} сейчас`, cycleEmpty:'Отслеживание цикла', cycleDay:(d,p) => `День ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${plural(n,'список','списка','списков')}`, hiddenN:n => `Показать скрытые (${n})`, editDone:'Готово',
-  phase:{ period:'месячные', follicular:'фолликулярная фаза', fertile:'фертильное окно', luteal:'лютеиновая фаза', late:'задержка' }
+  phase:{ period:'месячные', follicular:'фолликулярная фаза', fertile:'фертильное окно', luteal:'лютеиновая фаза', late:'задержка' },
+  sendAnswer:'Отправить ответ', waitsYou:n => `${n}: ответ готов, ждём ваш`, youAnswered:'Ваш ответ сохранён',
+  evKind:'Тип', evRepeat:'Повторять', evRemind:'Напомнить в Telegram',
+  kinds:[['event','Событие'],['birthday','День рождения'],['anniversary','Годовщина'],['date','Свидание'],['reminder','Напоминание']],
+  repeats:[['none','Не повторять'],['daily','Каждый день'],['weekly','Каждую неделю'],['monthly','Каждый месяц'],['yearly','Каждый год']],
+  reminds:[['none','Не напоминать'],['same','В тот же день'],['day','За день'],['week','За неделю']],
+  repShort:{ daily:'каждый день', weekly:'каждую неделю', monthly:'каждый месяц', yearly:'каждый год' },
+  ageN:n => `${n} ${plural(n,'год','года','лет')}`, showEvents:'События', showDates:'Важные даты', showCycle:'Цикл',
+  lgEvents:'события', lgDates:'важные даты', lgCycle:'цикл', confirmDelSeries:'Удалить событие вместе со всеми повторами?',
+  togetherSince:d => `вместе с ${d}`
 },
 en: {
   tagline:'A shared space for the two of you', tgLogin:'Sign in with Telegram', tgLoginHint:'No email or password. Notifications connect automatically.',
@@ -278,7 +318,16 @@ en: {
   wishesSub:(m,p) => `${m} yours · ${p} partner's`, wishesEmpty:'Add your first wish', tripsEmpty:'Plan a trip', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} now`, cycleEmpty:'Cycle tracking', cycleDay:(d,p) => `Day ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${n === 1 ? 'list' : 'lists'}`, hiddenN:n => `Show hidden (${n})`, editDone:'Done',
-  phase:{ period:'period', follicular:'follicular phase', fertile:'fertile window', luteal:'luteal phase', late:'late' }
+  phase:{ period:'period', follicular:'follicular phase', fertile:'fertile window', luteal:'luteal phase', late:'late' },
+  sendAnswer:'Send answer', waitsYou:n => `${n} answered and is waiting for you`, youAnswered:'Your answer is saved',
+  evKind:'Type', evRepeat:'Repeat', evRemind:'Remind in Telegram',
+  kinds:[['event','Event'],['birthday','Birthday'],['anniversary','Anniversary'],['date','Date'],['reminder','Reminder']],
+  repeats:[['none','Don\'t repeat'],['daily','Every day'],['weekly','Every week'],['monthly','Every month'],['yearly','Every year']],
+  reminds:[['none','No reminder'],['same','Same day'],['day','A day before'],['week','A week before']],
+  repShort:{ daily:'every day', weekly:'every week', monthly:'every month', yearly:'every year' },
+  ageN:n => `${n} ${n === 1 ? 'year' : 'years'}`, showEvents:'Events', showDates:'Important dates', showCycle:'Cycle',
+  lgEvents:'events', lgDates:'important dates', lgCycle:'cycle', confirmDelSeries:'Delete this event with all its repeats?',
+  togetherSince:d => `together since ${d}`
 }});
 
 // ===== State =====
@@ -413,7 +462,17 @@ async function loadSummary(){
     S.partner ? sb.rpc('cycle_status', { p_user: S.partner.id }) : Promise.resolve({ data: null })
   ]);
   S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data };
-  renderTiles();
+  // Period days (actual and forecast) to show in the Plan calendar
+  const { data: per } = await sb.from('cycle_periods').select('user_id,start_date,end_date').gte('start_date', ymd(addDays(today(), -400)));
+  const set = new Set();
+  for (const [uid, st] of [[S.user.id, cs.data], [S.partner?.id, pcs.data]]) {
+    if (!uid || !st?.has_data) continue;
+    const plen = st.period_length || 5;
+    (per || []).filter(p => p.user_id === uid).forEach(p => { const s0 = parseYmd(p.start_date), e0 = p.end_date ? parseYmd(p.end_date) : addDays(s0, plen - 1); for (let d = s0; d <= e0; d = addDays(d, 1)) set.add(ymd(d)); });
+    if (st.next_start) for (let c = 0; c < 4; c++) { const s0 = addDays(parseYmd(st.next_start), (st.cycle_length || 28) * c); for (let i = 0; i < plen; i++) set.add(ymd(addDays(s0, i))); }
+  }
+  S.cycleDays = set;
+  renderTiles(); renderCal();
 }
 let reloadTimer;
 function scheduleReload(){ clearTimeout(reloadTimer); reloadTimer = setTimeout(() => loadAll().catch(console.error), 250); }
@@ -447,6 +506,10 @@ function upcomingDates(){
     if (yrs > 0) out.push({ id:null, title:t('yearsTogether', yrs), icon:'heart', when:n });
   }
   for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= td) out.push({ id:x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), when:n }); }
+  // birthdays and anniversaries added in the calendar
+  for (const e of S.events.filter(e => (e.kind === 'birthday' || e.kind === 'anniversary'))) {
+    const n = next(ymd(new Date(e.starts_at)), e.repeat === 'yearly'); if (n >= td) out.push({ id:null, title:e.title, icon:e.kind === 'birthday' ? 'cake' : 'heart', when:n });
+  }
   return out.sort((a,b) => a.when - b.when);
 }
 
@@ -463,12 +526,11 @@ function renderHome(){
   $('qText').textContent = S.question ? (LANG === 'en' && S.question.text_en ? S.question.text_en : S.question.text) : t('noQuestions');
   const mine = S.answers.find(a => a.user_id === S.user.id), theirs = S.answers.find(a => a.user_id !== S.user.id);
   const pName = esc(S.partner?.display_name || t('partner'));
+  $('qOpen').classList.toggle('hidden', !S.question || !!mine);
   if (!S.question) $('qBody').innerHTML = '';
   else if (!mine) {
-    $('qBody').innerHTML = `<textarea id="qAnswer" placeholder="${esc(t('answerPh'))}"></textarea>
-      <p class="muted small">${S.partner ? t('bothOpen') : t('invitePartner')}</p>
-      <button class="btn" id="qSend">${t('answer')}</button>`;
-    $('qSend').onclick = sendAnswer;
+    $('qBody').innerHTML = theirs ? `<div class="status warm">${icon('clock')}<span>${t('waitsYou', pName)}</span></div>`
+      : `<div class="status soft">${icon('lock')}<span>${S.partner ? t('bothOpen') : t('invitePartner')}</span></div>`;
   } else {
     $('qBody').innerHTML = `<div class="ans"><div class="who">${t('you')}</div>${esc(mine.answer)}</div>` +
       (theirs ? `<div class="ans"><div class="who">${pName}</div>${esc(theirs.answer)}</div>`
@@ -482,17 +544,31 @@ function renderHome(){
       ${x.id ? `<button class="icon-btn" data-del-date="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`).join('')
     : `<div class="empty">${t('datesEmpty')}</div>`;
 
-  const now = new Date();
-  const soon = S.events.filter(e => new Date(e.starts_at) >= (e.all_day ? today() : now)).slice(0,3);
-  $('homeEvents').innerHTML = soon.length ? soon.map(evRow).join('') : `<div class="empty">${t('eventsEmpty')}</div>`;
+  const now = new Date(), soon = [];
+  for (let i = 0; i < 90 && soon.length < 3; i++) {
+    const day = addDays(today(), i);
+    for (const e of eventsOn(day)) {
+      if (i === 0 && !e.all_day && !isDayKind(e) && occTime(e, day) < now) continue;
+      if (soon.length < 3) soon.push([e, day]);
+    }
+  }
+  $('homeEvents').innerHTML = soon.length ? soon.map(([e, d]) => evRow(e, d)).join('') : `<div class="empty">${t('eventsEmpty')}</div>`;
 }
-async function sendAnswer(){
+const qTextNow = () => LANG === 'en' && S.question?.text_en ? S.question.text_en : S.question?.text;
+$('qOpen').onclick = () => {
+  if (!S.question) return;
+  $('ansForm').reset(); $('ansQ').textContent = qTextNow();
+  const theirs = S.answers.find(a => a.user_id !== S.user.id), pName = S.partner?.display_name || t('partner');
+  $('ansHint').textContent = theirs ? t('waitsYou', pName) : (S.partner ? t('bothOpen') : '');
+  $('ansSheet').showModal(); setTimeout(() => $('qAnswer').focus(), 50);
+};
+$('ansSheet').onclose = async () => {
+  if ($('ansSheet').returnValue !== 'ok') return;
   const text = $('qAnswer').value.trim(); if (!text) return;
-  $('qSend').disabled = true;
   const { error } = await sb.from('answers').insert({ couple_id:S.couple.id, question_id:S.question.id, answer_date:ymd(today()), answer:text });
-  if (error) { alert(errText(error)); $('qSend').disabled = false; return; }
+  if (error) return alert(errText(error));
   await loadAll();
-}
+};
 $('datesList').onclick = async e => {
   const id = e.target.closest('[data-del-date]')?.dataset.delDate; if (!id) return;
   if (!confirm(t('confirmDelDate'))) return;
@@ -571,53 +647,111 @@ $('listSheet').onclose = async () => {
   if (!S.lists.some(l => l.id === data.id)) S.lists.push(data); openList(data.id);
 };
 
-const evDayKey = e => ymd(new Date(e.starts_at));
-function evRow(e){
-  const d = new Date(e.starts_at);
-  const time = e.all_day ? t('allDayShort') : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  const isToday = ymd(d) === ymd(new Date());
-  return `<div class="ev"><div class="time">${isToday ? '' : `<div>${d.getDate()} ${t('monthsShort')[d.getMonth()]}</div>`}<div class="${isToday?'':'muted small'}">${time}</div></div>
-    <div class="grow"><div>${esc(e.title)}</div>${e.note ? `<div class="muted small">${esc(e.note)}</div>` : ''}</div>
+// Repeating events: does event e happen on local day `day`?
+const isDayKind = e => e.kind === 'birthday' || e.kind === 'anniversary';
+function evOn(e, day){
+  const d0 = new Date(e.starts_at); d0.setHours(0,0,0,0);
+  if (day < d0) return false;
+  switch (e.repeat) {
+    case 'daily': return true;
+    case 'weekly': return dayDiff(d0, day) % 7 === 0;
+    case 'monthly': return day.getDate() === d0.getDate();
+    case 'yearly': return day.getDate() === d0.getDate() && day.getMonth() === d0.getMonth();
+    default: return ymd(day) === ymd(d0);
+  }
+}
+const eventsOn = day => S.events.filter(e => evOn(e, day)).sort((a,b) => (isDayKind(b) - isDayKind(a)) || (a.all_day === b.all_day ? new Date(a.starts_at).toTimeString().localeCompare(new Date(b.starts_at).toTimeString()) : a.all_day ? -1 : 1));
+function occTime(e, day){ const s = new Date(e.starts_at); const d = new Date(day); d.setHours(s.getHours(), s.getMinutes(), 0, 0); return d; }
+function datesOn(day){
+  const out = S.dates.filter(x => { const d = parseYmd(x.date); return x.repeats_yearly ? (d.getDate() === day.getDate() && d.getMonth() === day.getMonth() && day >= new Date(d.getFullYear(),0,1)) : ymd(d) === ymd(day); })
+    .map(x => ({ title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), age: x.repeats_yearly && x.emoji === 'cake' ? day.getFullYear() - parseYmd(x.date).getFullYear() : null }));
+  if (S.couple?.start_date) { const s = parseYmd(S.couple.start_date), y = day.getFullYear() - s.getFullYear();
+    if (y > 0 && s.getDate() === day.getDate() && s.getMonth() === day.getMonth()) out.unshift({ title:t('yearsTogether', y), icon:'heart', age:null }); }
+  return out;
+}
+const KIND_ICON = { event:'calendar', birthday:'cake', anniversary:'heart', date:'glass', reminder:'clock' };
+function evRow(e, day){
+  day = day || new Date(e.starts_at); const s = new Date(e.starts_at);
+  const y = day.getFullYear() - s.getFullYear();
+  const time = isDayKind(e) ? (e.repeat === 'yearly' && y > 0 ? t('ageN', y) : '') : e.all_day ? t('allDayShort') : `${pad(s.getHours())}:${pad(s.getMinutes())}`;
+  const isToday = ymd(day) === ymd(today());
+  const sub = [e.repeat && e.repeat !== 'none' ? t('repShort')[e.repeat] : '', e.note || ''].filter(Boolean).map(esc).join(' · ');
+  return `<div class="ev"><div class="time">${isToday ? '' : `<div>${day.getDate()} ${t('monthsShort')[day.getMonth()]}</div>`}<div class="${isToday?'':'muted small'}">${time}</div></div>
+    <div class="bubble ${isDayKind(e) ? 'gold' : ''}" style="width:30px;height:30px;border-radius:10px">${icon(KIND_ICON[e.kind] || 'calendar', 'width:16px;height:16px')}</div>
+    <div class="grow"><div>${esc(e.title)}</div>${sub ? `<div class="muted small">${sub}</div>` : ''}</div>
     <button class="icon-btn" data-del-ev="${e.id}" aria-label="delete">${icon('x')}</button></div>`;
 }
+function dateRow(x){
+  return `<div class="ev"><div class="time"><div class="muted small">${x.age ? t('ageN', x.age) : ''}</div></div><div class="bubble gold" style="width:30px;height:30px;border-radius:10px">${icon(x.icon, 'width:16px;height:16px')}</div><div class="grow"><div>${esc(x.title)}</div></div></div>`;
+}
+const calShow = () => { try { return Object.assign({ events:true, dates:true, cycle:true }, JSON.parse(pref('calShow', '{}'))); } catch(_) { return { events:true, dates:true, cycle:true }; } };
 function renderCal(){
   if (!S.calMonth) { const td = today(); S.calMonth = new Date(td.getFullYear(), td.getMonth(), 1); S.selDay = ymd(td); }
   const m = S.calMonth;
   $('calMonth').textContent = `${t('months')[m.getMonth()]} ${m.getFullYear()}`;
   const first = (m.getDay() + 6) % 7, start = new Date(m.getFullYear(), m.getMonth(), 1 - first);
-  const withEv = new Set(S.events.map(evDayKey)), todayKey = ymd(today());
+  const todayKey = ymd(today()), show = calShow(), cyc = S.cycleDays || new Set();
   let html = t('dow').map(d => `<div class="dow">${d}</div>`).join('');
   for (let i = 0; i < 42; i++) {
     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), k = ymd(d);
     if (i >= 35 && d.getMonth() !== m.getMonth()) break;
-    html += `<button class="day ${d.getMonth()!==m.getMonth()?'other':''} ${k===todayKey?'today':''} ${k===S.selDay?'sel':''}" data-day="${k}">${d.getDate()}${withEv.has(k)?'<span class="dot"></span>':''}</button>`;
+    const evs = show.events ? eventsOn(d) : [], hasDayKind = evs.some(isDayKind), hasEv = evs.some(e => !isDayKind(e));
+    const hasDate = show.dates && (hasDayKind || datesOn(d).length > 0);
+    const dots = (hasEv ? '<i class="dot-ev"></i>' : '') + (hasDate ? '<i class="dot-dt"></i>' : '');
+    html += `<button class="day ${d.getMonth()!==m.getMonth()?'other':''} ${k===todayKey?'today':''} ${show.cycle && cyc.has(k) ? 'cyc' : ''} ${k===S.selDay?'sel':''}" data-day="${k}">${d.getDate()}${dots ? `<span class="dots">${dots}</span>` : ''}</button>`;
   }
   $('calGrid').innerHTML = html;
+  $('calLegend').innerHTML = [show.events ? `<span><i class="dot-ev"></i>${t('lgEvents')}</span>` : '', show.dates ? `<span><i class="dot-dt"></i>${t('lgDates')}</span>` : '',
+    show.cycle && cyc.size ? `<span><i style="background:var(--rose)"></i>${t('lgCycle')}</span>` : ''].join('');
+  const showOpts = [['events', t('showEvents')], ['dates', t('showDates')], ['cycle', t('showCycle')]];
+  $('calShow').innerHTML = showOpts.map(([k, l]) => `<button type="button" data-show="${k}" class="${show[k] ? 'on' : ''}">${esc(l)}</button>`).join('');
   $('selDayTitle').textContent = S.selDay === todayKey ? t('todayTitle') : fmtDay(parseYmd(S.selDay));
-  const evs = S.events.filter(e => evDayKey(e) === S.selDay);
-  $('dayEvents').innerHTML = evs.length ? evs.map(evRow).join('') : `<div class="empty">${t('freeDay')}</div>`;
+  const sd = parseYmd(S.selDay), dts = show.dates ? datesOn(sd) : [], evs = show.events || show.dates ? eventsOn(sd).filter(e => isDayKind(e) ? show.dates : show.events) : [];
+  $('dayEvents').innerHTML = dts.length || evs.length ? dts.map(dateRow).join('') + evs.map(e => evRow(e, sd)).join('') : `<div class="empty">${t('freeDay')}</div>`;
 }
 $('calPrev').onclick = () => { S.calMonth = new Date(S.calMonth.getFullYear(), S.calMonth.getMonth()-1, 1); renderCal(); };
 $('calNext').onclick = () => { S.calMonth = new Date(S.calMonth.getFullYear(), S.calMonth.getMonth()+1, 1); renderCal(); };
 $('calGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.day; if (!k) return; S.selDay = k;
   const d = parseYmd(k); if (d.getMonth() !== S.calMonth.getMonth()) S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); };
+$('calShow').onclick = e => { const k = e.target.closest('[data-show]')?.dataset.show; if (!k) return; const s = calShow(); s[k] = !s[k]; setPref('calShow', JSON.stringify(s)); renderCal(); };
 async function delEvent(e){
   const id = e.target.closest('[data-del-ev]')?.dataset.delEv; if (!id) return;
-  if (!confirm(t('confirmDelEvent'))) return;
+  const ev = S.events.find(x => x.id === id);
+  if (!confirm(ev && ev.repeat !== 'none' ? t('confirmDelSeries') : t('confirmDelEvent'))) return;
   S.events = S.events.filter(x => x.id !== id); renderCal(); renderHome();
   await sb.from('events').delete().eq('id', id);
 }
 $('dayEvents').onclick = delEvent; $('homeEvents').onclick = delEvent;
-$('eAllDay').onchange = () => $('eTimeWrap').classList.toggle('hidden', $('eAllDay').checked);
-function openEventSheet(){ $('eventForm').reset(); fillTimeSelects(); $('eHour').value = '19'; $('eMin').value = '00'; $('eTimeWrap').classList.remove('hidden'); setDate($('eDate'), S.selDay || ymd(today())); $('eventSheet').showModal(); }
+let getKind, getRepeat, getRemind;
+function syncEventSheet(){
+  const k = getKind(), dayKind = k === 'birthday' || k === 'anniversary';
+  $('eAllDayWrap').classList.toggle('hidden', dayKind);
+  $('eTimeWrap').classList.toggle('hidden', dayKind || $('eAllDay').checked);
+}
+$('eAllDay').onchange = syncEventSheet;
+function wrapChips(el, after){ const orig = el.onclick; el.onclick = ev => { orig(ev); after(); }; }
+function openEventSheet(){
+  $('eventForm').reset(); fillTimeSelects(); $('eHour').value = '19'; $('eMin').value = '00';
+  setDate($('eDate'), S.selDay || ymd(today()));
+  getKind = chipPicker($('eKind'), t('kinds'), 'event');
+  getRepeat = chipPicker($('eRepeat'), t('repeats'), 'none');
+  getRemind = chipPicker($('eRemind'), t('reminds'), 'none');
+  wrapChips($('eKind'), () => {
+    const k = getKind();
+    if (k === 'birthday' || k === 'anniversary') { getRepeat = chipPicker($('eRepeat'), t('repeats'), 'yearly'); getRemind = chipPicker($('eRemind'), t('reminds'), 'day'); }
+    syncEventSheet();
+  });
+  syncEventSheet(); $('eventSheet').showModal();
+}
 $('eventSheet').onclose = async () => {
   if ($('eventSheet').returnValue !== 'ok' || !getDate($('eDate'))) return;
-  const allDay = $('eAllDay').checked;
-  const d = parseYmd(getDate($('eDate'))); if (!allDay) d.setHours(+$('eHour').value, +$('eMin').value);
-  const { data, error } = await sb.from('events').insert({ couple_id:S.couple.id, title:$('eTitle').value.trim(), starts_at:d.toISOString(), all_day:allDay, note:$('eNote').value.trim() || null }).select().single();
+  const kind = getKind(), dayKind = kind === 'birthday' || kind === 'anniversary', allDay = dayKind || $('eAllDay').checked;
+  const d = parseYmd(getDate($('eDate'))); if (allDay) d.setHours(12, 0); else d.setHours(+$('eHour').value, +$('eMin').value);
+  const { data, error } = await sb.from('events').insert({ couple_id:S.couple.id, title:$('eTitle').value.trim(), starts_at:d.toISOString(), all_day:allDay,
+    kind, repeat:getRepeat(), remind:getRemind(), note:$('eNote').value.trim() || null }).select().single();
   if (error) return alert(errText(error));
   if (!S.events.some(x => x.id === data.id)) { S.events.push(data); S.events.sort((a,b) => a.starts_at.localeCompare(b.starts_at)); }
-  S.selDay = ymd(d); S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); renderHome();
+  d.setHours(0,0,0,0); S.selDay = ymd(d); S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); renderHome();
 };
 
 // ===== Sections =====
@@ -669,6 +803,13 @@ $('editSections').onclick = () => { editingTiles = !editingTiles; renderTiles();
 // ===== Profile =====
 function renderMe(){
   $('inviteCode').textContent = S.couple.invite_code;
+  $('codeCard').classList.toggle('hidden', !!S.partner); $('coupleCard').classList.toggle('hidden', !S.partner);
+  if (S.partner) {
+    const ini = n => esc((n || '?').trim().charAt(0).toUpperCase());
+    $('cAvs').innerHTML = `<div class="av">${ini(S.profile.display_name)}</div><div class="av">${ini(S.partner.display_name)}</div>`;
+    $('cNames').textContent = S.couple.name && S.couple.name !== 'Мы' ? S.couple.name : `${S.profile.display_name} & ${S.partner.display_name}`;
+    $('cSince').textContent = S.couple.start_date ? t('togetherSince', fmtDay(parseYmd(S.couple.start_date), true)) : '';
+  }
   $('partnerStatus').textContent = S.partner ? t('partnerWith', S.partner.display_name) : t('partnerInvite');
   $('tgStatus').textContent = S.tgLinked ? t('tgOn') : t('tgOff');
   $('tgBtn').innerHTML = `${icon('send')}<span>${S.tgLinked ? t('tgDisconnect') : t('tgConnect')}</span>`;

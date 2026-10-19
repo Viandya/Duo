@@ -24,6 +24,15 @@
 .day.pred{box-shadow:inset 0 0 0 1.5px var(--rose-ink);color:var(--rose-ink)}
 .day.fert{background:var(--accent-soft);color:var(--accent)}
 .day.ovu{background:var(--accent);color:var(--accent-ink)}
+.day .idot{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#c86b6b}
+.share-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.share-row:first-child{border-top:0}
+.share-row .grow{flex:1}
+.share-row b{font-weight:600}
+.switch{width:44px;height:26px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--accent)}
+.switch.on::after{left:21px}
 .day.logged::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--warm-ink)}
 .day.sel{outline:2px solid var(--ink);outline-offset:-2px}
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
@@ -66,12 +75,14 @@
       <div class="card">
         <div class="cal-head"><button class="icon-btn" id="mPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="mTitle"></h2><button class="icon-btn" id="mNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
         <div class="grid" id="mGrid"></div>
-        <div class="legend"><span><i class="sw" style="background:var(--rose)"></i><span data-t="lPeriod"></span></span><span><i class="sw" style="box-shadow:inset 0 0 0 1.5px var(--rose-ink)"></i><span data-t="lPred"></span></span><span><i class="sw" style="background:var(--accent-soft)"></i><span data-t="lFert"></span></span><span><i class="sw" style="background:var(--accent)"></i><span data-t="lOvu"></span></span></div>
+        <div class="legend"><span><i class="sw" style="background:var(--rose)"></i><span data-t="lPeriod"></span></span><span><i class="sw" style="box-shadow:inset 0 0 0 1.5px var(--rose-ink)"></i><span data-t="lPred"></span></span><span><i class="sw" style="background:var(--accent-soft)"></i><span data-t="lFert"></span></span><span><i class="sw" style="background:var(--accent)"></i><span data-t="lOvu"></span></span><span><i class="sw" style="background:#c86b6b;border-radius:50%"></i><span data-t="lIntim"></span></span></div>
       </div>
       <div class="card">
         <div class="section-h"><h2 id="logTitle"></h2></div>
         <label data-t="cMood"></label><div class="chips" id="moodChips"></div>
         <label data-t="cSymptoms"></label><div class="chips" id="sympChips"></div>
+        <div class="share-row" id="intimRow" style="margin-top:8px"><div class="bubble" style="color:#c86b6b"><svg class="ic"><use href="#i-heart"/></svg></div><div class="grow"><b data-t="cIntimacy"></b></div><span class="switch" id="intimSw"></span></div>
+        <div id="protWrap" class="hidden"><label data-t="cProtection"></label><div class="chips" id="protChips"></div></div>
         <label data-t="note"></label><textarea id="logNote" style="min-height:64px" data-tp="optional"></textarea>
         <div class="two" style="margin-top:12px"><button class="btn ghost hidden" id="markStart"></button><button class="btn" id="logSave" data-t="save"></button></div>
         <div class="error" id="logMsg"></div>
@@ -91,7 +102,7 @@
 
   <!-- Partner's cycle -->
   <div id="theirs" class="hidden">
-    <div class="card ringwrap">
+    <div class="card ringwrap" id="pTopCard">
       <div class="ring" id="pRing"><div><span class="muted small" data-t="cDay"></span><b id="pDay"></b><span class="muted small" id="pOf"></span></div></div>
       <div class="phase-name" id="pPhase"></div>
       <div class="muted" id="pNext"></div>
@@ -100,6 +111,7 @@
     <div class="card hidden" id="pCalCard">
       <div class="cal-head"><button class="icon-btn" id="pPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="pTitle"></h2><button class="icon-btn" id="pNextM" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
       <div class="grid" id="pGrid"></div>
+      <div id="pDayInfo" style="margin-top:12px"></div>
     </div>
   </div>
 </main>
@@ -124,7 +136,10 @@ ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслежив�
   pNothing:n => `${n} пока не делится данными о цикле.`, pNoData:n => `${n} ещё не отмечает цикл.`,
   tips:{ period:'Сейчас может быть тяжелее обычного: грелка, чай и внимание будут кстати.', late:'Цикл задерживается. Лучше спросить, как дела, без давления.',
     luteal:'Ближе к месячным бывает больше усталости и раздражения. Чуть больше заботы не помешает.', follicular:'Обычно время подъёма сил и настроения.', fertile:'Середина цикла, обычно хорошее самочувствие.' },
-  pmsSoon:'Скоро месячные', confirmUnmark:'Убрать отметку начала месячных?' },
+  pmsSoon:'Скоро месячные', confirmUnmark:'Убрать отметку начала месячных?',
+  cIntimacy:'Близость', cProtection:'Защита', prot:[['protected','С защитой'],['unprotected','Без защиты']], lIntim:'близость',
+  shareItems:[['phase','Фаза и прогноз','День цикла, фаза и когда ждать месячные'],['periods','Дни месячных в календаре','Отмеченные и ожидаемые дни'],['feelings','Самочувствие и симптомы','Настроение и симптомы по дням'],['intimacy','Близость','Отметки близости и защиты'],['notes','Заметки','Ваши заметки к дням']],
+  shareNone:n => `Сейчас ${n} не видит ничего.`, pNothingDay:'В этот день отметок нет.' },
 en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText:'Mark when your last period started. The app will work out your average cycle and show a forecast. By default only you can see this.',
   cLastStart:'Start of last period', cCycleLen:'Cycle length, days', cPeriodLen:'Period length, days', cStart:'Start', cDay:'day', cOf:n => `of ${n}`,
   ph:{ period:'Period', follicular:'Follicular phase', fertile:'Fertile window', luteal:'Luteal phase', late:'Late' },
@@ -140,9 +155,12 @@ en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText
   pNothing:n => `${n} isn't sharing cycle data.`, pNoData:n => `${n} isn't tracking a cycle yet.`,
   tips:{ period:'This can be a harder time: a heating pad, tea and attention help.', late:'The cycle is late. A gentle “how are you?” works better than pressure.',
     luteal:'Closer to the period there can be more tiredness and irritability. A little extra care goes a long way.', follicular:'Usually a time of more energy and good mood.', fertile:'Mid-cycle, usually feeling good.' },
-  pmsSoon:'Period soon', confirmUnmark:'Remove this period start?' }
+  pmsSoon:'Period soon', confirmUnmark:'Remove this period start?',
+  cIntimacy:'Intimacy', cProtection:'Protection', prot:[['protected','Protected'],['unprotected','Unprotected']], lIntim:'intimacy',
+  shareItems:[['phase','Phase and forecast','Cycle day, phase and when to expect the period'],['periods','Period days in the calendar','Marked and expected days'],['feelings','Mood and symptoms','Mood and symptoms by day'],['intimacy','Intimacy','Intimacy and protection marks'],['notes','Notes','Your notes for each day']],
+  shareNone:n => `Right now ${n} can't see anything.`, pNothingDay:'No entries for this day.' }
 });
-const C = { ctx:null, who:'me', status:null, pstatus:null, periods:[], ppriods:[], logs:{}, settings:null, month:null, pmonth:null, sel:null, getMood:null, getSymp:null };
+const C = { plogs:{}, psel:null, intim:false, getProt:null, ctx:null, who:'me', status:null, pstatus:null, periods:[], ppriods:[], logs:{}, settings:null, month:null, pmonth:null, sel:null, getMood:null, getSymp:null };
 const PH_COLOR = { period:'var(--rose-ink)', follicular:'var(--accent)', fertile:'var(--accent)', luteal:'var(--warm-ink)', late:'var(--rose-ink)' };
 
 async function load(){
@@ -158,6 +176,11 @@ async function load(){
   C.periods = (per.data || []).filter(p => p.user_id === me);
   C.ppriods = (per.data || []).filter(p => p.user_id !== me);
   C.logs = Object.fromEntries((logs.data || []).map(l => [l.log_date, l]));
+  C.plogs = {};
+  if (partner && C.pstatus) {
+    const { data: pl } = await sb.rpc('cycle_partner_logs', { p_user: partner.id, p_from: ymd(addDays(today(), -400)), p_to: ymd(addDays(today(), 60)) });
+    C.plogs = Object.fromEntries((pl || []).map(l => [l.log_date, l]));
+  }
   render();
 }
 
@@ -179,15 +202,16 @@ function dayMap(periods, status){
   }
   return m;
 }
-function drawMonth(gridId, titleId, month, map, withSel){
+function drawMonth(gridId, titleId, month, map, withSel, logs){
   $(titleId).textContent = `${t('months')[month.getMonth()]} ${month.getFullYear()}`;
   const first = (month.getDay() + 6) % 7, start = new Date(month.getFullYear(), month.getMonth(), 1 - first), tk = ymd(today());
   let html = t('dow').map(d => `<div class="dow">${d}</div>`).join('');
   for (let i = 0; i < 42; i++) {
     const d = addDays(start, i), k = ymd(d);
     if (i >= 35 && d.getMonth() !== month.getMonth()) break;
-    const cls = [d.getMonth() !== month.getMonth() ? 'other' : '', k === tk ? 'today' : '', map[k] || '', withSel && k === C.sel ? 'sel' : '', withSel && C.logs[k] ? 'logged' : ''].join(' ');
-    html += `<button type="button" class="day ${cls}" data-day="${k}">${d.getDate()}</button>`;
+    const lg = (logs || {})[k], sel = withSel ? C.sel : C.psel;
+    const cls = [d.getMonth() !== month.getMonth() ? 'other' : '', k === tk ? 'today' : '', map[k] || '', k === sel ? 'sel' : '', lg && (lg.mood || (lg.symptoms || []).length || lg.note) ? 'logged' : ''].join(' ');
+    html += `<button type="button" class="day ${cls}" data-day="${k}">${d.getDate()}${lg?.intimacy ? '<span class="idot"></span>' : ''}</button>`;
   }
   $(gridId).innerHTML = html;
 }
@@ -227,14 +251,15 @@ function render(){
     $('periodBtn').onclick = () => open ? endPeriod(open) : startPeriod(ymd(today()));
     if (!C.month) { const d = today(); C.month = new Date(d.getFullYear(), d.getMonth(), 1); }
     if (!C.sel) C.sel = ymd(today());
-    drawMonth('mGrid', 'mTitle', C.month, dayMap(C.periods, s), true);
+    drawMonth('mGrid', 'mTitle', C.month, dayMap(C.periods, s), true, C.logs);
     renderLog();
   }
   // Settings
-  const lvl = C.settings?.share_level || 'none';
-  $('shareHint').textContent = t('shareHint', pName);
-  $('shareOpts').innerHTML = ['none','phase','all'].map(k => `<div class="share-opt ${k === lvl ? 'on' : ''}" data-share="${k}">
-    <div class="bubble">${icon(k === 'none' ? 'lock' : k === 'phase' ? 'eye' : 'calendar')}</div><div class="grow"><b>${t('share')[k][0]}</b><div class="muted small">${t('share')[k][1]}</div></div></div>`).join('');
+  const sh = C.settings?.share || {}, anyOn = Object.values(sh).some(Boolean);
+  $('shareHint').textContent = t('shareHint', pName) + (anyOn ? '' : ' ' + t('shareNone', pName));
+  $('shareOpts').innerHTML = t('shareItems').map(([k, title, sub]) => `<div class="share-row" data-share="${k}">
+    <div class="bubble">${icon({ phase:'eye', periods:'calendar', feelings:'sparkle', intimacy:'heart', notes:'edit' }[k])}</div>
+    <div class="grow"><b>${title}</b><div class="muted small">${sub}</div></div><span class="switch ${sh[k] ? 'on' : ''}"></span></div>`).join('');
   if (document.activeElement?.id !== 'setLen') $('setLen').value = C.settings?.cycle_length || s?.cycle_length || 28;
   if (document.activeElement?.id !== 'setPlen') $('setPlen').value = C.settings?.period_length || s?.period_length || 5;
 
@@ -242,19 +267,28 @@ function render(){
   const p = C.pstatus;
   if (p) {
     const pHas = !!p.has_data;
-    $('pRing').classList.toggle('hidden', !pHas);
-    if (pHas) {
+    if (pHas && p.phase) {
       $('pRing').setAttribute('style', ringStyle(p));
       $('pDay').textContent = p.day; $('pOf').textContent = t('cOf', p.cycle_length);
       $('pPhase').textContent = t('ph')[p.phase]; $('pPhase').style.color = PH_COLOR[p.phase];
       const soon = p.phase === 'luteal' && dayDiff(today(), parseYmd(p.next_start)) <= 5;
       $('pNext').textContent = soon ? t('pmsSoon') + ' · ' + statusText(p) : statusText(p);
       $('pTip').textContent = t('tips')[p.phase] || '';
-    } else { $('pPhase').textContent = ''; $('pNext').textContent = t('pNoData', pName); $('pTip').textContent = ''; }
-    $('pCalCard').classList.toggle('hidden', !(pHas && p.share_level === 'all'));
-    if (pHas && p.share_level === 'all') {
+    } else { $('pPhase').textContent = ''; $('pNext').textContent = pHas ? '' : t('pNoData', pName); $('pTip').textContent = ''; }
+    const ps = p.share || {}, pcal = ps.periods || ps.feelings || ps.intimacy || ps.notes;
+    $('pTopCard').classList.toggle('hidden', pHas && !p.phase);
+    $('pRing').classList.toggle('hidden', !(pHas && p.phase));
+    $('pCalCard').classList.toggle('hidden', !pcal);
+    if (pcal) {
       if (!C.pmonth) { const d = today(); C.pmonth = new Date(d.getFullYear(), d.getMonth(), 1); }
-      drawMonth('pGrid', 'pTitle', C.pmonth, dayMap(C.ppriods, p), false);
+      if (!C.psel) C.psel = ymd(today());
+      drawMonth('pGrid', 'pTitle', C.pmonth, ps.periods ? dayMap(C.ppriods, p.phase ? p : { ...p, has_data:false }) : {}, false, C.plogs);
+      const l = C.plogs[C.psel], parts = [];
+      if (l?.mood) parts.push(`<span class="badge">${esc((t('moods').find(m => m[0] === l.mood) || [,l.mood])[1])}</span>`);
+      (l?.symptoms || []).forEach(x => parts.push(`<span class="badge warm">${esc((t('symptoms').find(m => m[0] === x) || [,x])[1])}</span>`));
+      if (l?.intimacy) parts.push(`<span class="badge rose">${t('cIntimacy')}${l.protection ? ' · ' + esc((t('prot').find(m => m[0] === l.protection) || [,''])[1]) : ''}</span>`);
+      $('pDayInfo').innerHTML = `<div class="muted small" style="margin-bottom:6px">${fmtDay(parseYmd(C.psel))}</div>` +
+        (parts.length || l?.note ? `<div class="chips">${parts.join('')}</div>${l?.note ? `<div class="small" style="margin-top:6px">${esc(l.note)}</div>` : ''}` : `<div class="muted small">${t('pNothingDay')}</div>`);
     }
   }
 }
@@ -264,6 +298,8 @@ function renderLog(){
   C.getMood = chipPicker($('moodChips'), t('moods'), log?.mood || null);
   C.getSymp = chipPicker($('sympChips'), t('symptoms'), log?.symptoms || [], true);
   if (document.activeElement?.id !== 'logNote') $('logNote').value = log?.note || '';
+  C.intim = !!log?.intimacy; $('intimSw').classList.toggle('on', C.intim); $('protWrap').classList.toggle('hidden', !C.intim);
+  C.getProt = chipPicker($('protChips'), t('prot'), log?.protection || null);
   const isStart = C.periods.some(p => p.start_date === k);
   $('markStart').classList.toggle('hidden', d > today());
   $('markStart').textContent = isStart ? t('unmarkStart') : t('markStart');
@@ -285,24 +321,30 @@ async function unmarkStart(day){
 $('introSave').onclick = async () => {
   const d = getDate($('introDate'));
   if (!d) return $('introErr').textContent = t('pickDate');
-  await saveSettings(+$('introLen').value || 28, +$('introPlen').value || 5, C.settings?.share_level || 'none');
+  await saveSettings(+$('introLen').value || 28, +$('introPlen').value || 5);
   await startPeriod(d);
 };
-async function saveSettings(len, plen, level){
+async function saveSettings(len, plen, share){
   len = Math.min(60, Math.max(18, len)); plen = Math.min(14, Math.max(1, plen));
-  const { error } = await sb.from('cycle_settings').upsert({ user_id:C.ctx.user.id, cycle_length:len, period_length:plen, share_level:level, updated_at:new Date().toISOString() });
+  share = share || C.settings?.share || {};
+  const level = !Object.values(share).some(Boolean) ? 'none' : (share.feelings || share.intimacy || share.notes || share.periods) ? 'all' : 'phase';
+  const { error } = await sb.from('cycle_settings').upsert({ user_id:C.ctx.user.id, cycle_length:len, period_length:plen, share, share_level:level, updated_at:new Date().toISOString() });
   if (error) { alert(errText(error)); return false; }
   return true;
 }
 $('shareOpts').onclick = async e => {
   const k = e.target.closest('[data-share]')?.dataset.share; if (!k) return;
-  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, k)) await load();
+  const share = { ...(C.settings?.share || {}) }; share[k] = !share[k];
+  e.target.closest('[data-share]').querySelector('.switch').classList.toggle('on', share[k]);
+  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, share)) await load();
 };
 $('setSave').onclick = async () => {
-  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5, C.settings?.share_level || 'none')) { await load(); $('setMsg').textContent = t('saved'); $('setMsg').classList.add('ok-text'); }
+  if (await saveSettings(+$('setLen').value || 28, +$('setPlen').value || 5)) { await load(); $('setMsg').textContent = t('saved'); $('setMsg').classList.add('ok-text'); }
 };
+$('intimRow').onclick = () => { C.intim = !C.intim; $('intimSw').classList.toggle('on', C.intim); $('protWrap').classList.toggle('hidden', !C.intim); };
 $('logSave').onclick = async () => {
-  const row = { user_id:C.ctx.user.id, log_date:C.sel, mood:C.getMood(), symptoms:C.getSymp(), note:$('logNote').value.trim() || null };
+  const row = { user_id:C.ctx.user.id, log_date:C.sel, mood:C.getMood(), symptoms:C.getSymp(), note:$('logNote').value.trim() || null,
+    intimacy:C.intim, protection:C.intim ? C.getProt() : null };
   const { error } = await sb.from('cycle_logs').upsert(row);
   if (error) return alert(errText(error));
   C.logs[C.sel] = row; render(); $('logMsg').textContent = t('saved'); $('logMsg').classList.add('ok-text');
@@ -311,6 +353,8 @@ $('mGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.da
   const d = parseYmd(k); if (d.getMonth() !== C.month.getMonth()) C.month = new Date(d.getFullYear(), d.getMonth(), 1); render(); };
 $('mPrev').onclick = () => { C.month = new Date(C.month.getFullYear(), C.month.getMonth() - 1, 1); render(); };
 $('mNext').onclick = () => { C.month = new Date(C.month.getFullYear(), C.month.getMonth() + 1, 1); render(); };
+$('pGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.day; if (!k) return; C.psel = k;
+  const d = parseYmd(k); if (d.getMonth() !== C.pmonth.getMonth()) C.pmonth = new Date(d.getFullYear(), d.getMonth(), 1); render(); };
 $('pPrev').onclick = () => { C.pmonth = new Date(C.pmonth.getFullYear(), C.pmonth.getMonth() - 1, 1); render(); };
 $('pNextM').onclick = () => { C.pmonth = new Date(C.pmonth.getFullYear(), C.pmonth.getMonth() + 1, 1); render(); };
 document.querySelectorAll('#whoSeg button').forEach(b => b.onclick = () => { C.who = b.dataset.who; render(); });
