@@ -266,17 +266,20 @@ applyTheme();
   HTMLDialogElement.prototype.showModal = function(){ this.returnValue = ''; const s = this.querySelector('.sheet'); if (s) { s.style.transform = ''; s.style.transition = ''; } return open.call(this); };
   // Escape should never count as "save"
   document.addEventListener('cancel', e => { if (e.target.tagName === 'DIALOG') e.target.returnValue = 'cancel'; }, true);
-  // A tap on the dimmed area hits the <dialog> itself, not the sheet inside it
-  let downOnBackdrop = false;
-  document.addEventListener('pointerdown', e => { downOnBackdrop = e.target.tagName === 'DIALOG'; }, true);
-  document.addEventListener('click', e => {
-    const d = e.target;
-    if (d.tagName === 'DIALOG' && d.open && downOnBackdrop) {
-      const s = d.querySelector('.sheet'), r = s?.getBoundingClientRect();
-      if (!r || e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) d.close('cancel');
-    }
-    downOnBackdrop = false;
-  });
+  // A tap on the dimmed area: works with pointer events (iOS doesn't send click to non-clickable elements)
+  const outside = (d, x, y) => { const s = d.querySelector('.sheet') || d.firstElementChild; if (!s) return true;
+    const r = s.getBoundingClientRect(); return y < r.top || y > r.bottom || x < r.left || x > r.right; };
+  const topDialog = () => [...document.querySelectorAll('dialog[open]')].pop();
+  let down = null;
+  document.addEventListener('pointerdown', e => { const d = topDialog(); down = d && outside(d, e.clientX, e.clientY) ? { d, x:e.clientX, y:e.clientY } : null; }, true);
+  document.addEventListener('pointerup', e => {
+    const dn = down; down = null;
+    if (!dn || !dn.d.open || Math.abs(e.clientX - dn.x) > 12 || Math.abs(e.clientY - dn.y) > 12) return;
+    if (outside(dn.d, e.clientX, e.clientY)) { e.preventDefault(); dn.d.close('cancel'); swallowUntil = Date.now() + 500; }
+  }, true);
+  // the tap must not fall through to whatever is under the closed sheet
+  let swallowUntil = 0;
+  document.addEventListener('click', e => { if (Date.now() < swallowUntil) { swallowUntil = 0; e.preventDefault(); e.stopPropagation(); } }, true);
   // Swipe the sheet down to close it (only when it is scrolled to the top)
   let drag = null;
   document.addEventListener('touchstart', e => {
