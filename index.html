@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Duo</title>
-<meta name="theme-color" content="#eef3ee" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#161d19" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef3ee" id="themeColor">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -16,91 +15,96 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+// Set the theme before first paint to avoid a flash
+(function(){ try {
+  var p = localStorage.getItem('duo.theme') || 'auto';
+  var dark = p === 'dark' || (p === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+} catch(e) { document.documentElement.dataset.theme = 'light'; } })();
+</script>
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
   --bg:#eef3ee; --card:#fbfdfb; --ink:#1f2b24; --muted:#76887c; --line:#d8e3da;
-  --accent:#4f8a6b; --accent-2:#9cc7a6; --accent-soft:#dcebdf; --accent-ink:#fff;
-  --ok:#4f8a6b; --shadow:0 6px 24px rgba(40,70,50,.08);
-  --radius:20px;
-  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  --accent:#4f8a6b; --accent-soft:#dcebdf; --accent-ink:#fff; --ok:#4f8a6b;
+  --grad-a:#4f8a6b; --grad-b:#9cc7a6; --shadow:0 6px 24px rgba(40,70,50,.08); --backdrop:rgba(15,30,20,.4);
+  --radius:20px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  color-scheme: light;
 }
-@media (prefers-color-scheme: dark){
-  :root{ --bg:#161d19; --card:#212a25; --ink:#e8f0ea; --muted:#93a69a; --line:#2f3a34;
-    --accent:#8cc4a2; --accent-2:#4f8a6b; --accent-soft:#2c3d33; --accent-ink:#161d19; --ok:#6fae8a; --shadow:0 6px 24px rgba(0,0,0,.3); }
+:root[data-theme="dark"]{
+  --bg:#141b17; --card:#1f2823; --ink:#e8f0ea; --muted:#93a69a; --line:#2f3a34;
+  --accent:#8cc4a2; --accent-soft:#2a3b31; --accent-ink:#141b17; --ok:#6fae8a;
+  --grad-a:#3d6f55; --grad-b:#6fa384; --shadow:0 6px 24px rgba(0,0,0,.3); --backdrop:rgba(0,0,0,.55);
+  color-scheme: dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-size:16px}
 body{min-height:100dvh}
 button,input,textarea,select{font:inherit;color:inherit}
 h1,h2,h3{font-family:Lora,Georgia,serif;font-weight:600;margin:0}
+.ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wrap{max-width:560px;margin:0 auto;padding:calc(16px + var(--safe-t)) 16px calc(96px + var(--safe-b))}
 .hidden{display:none!important}
 .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
 .muted{color:var(--muted)}
 .small{font-size:13px}
-.row{display:flex;align-items:center;gap:10px}
-.between{justify-content:space-between}
-.btn{border:0;border-radius:14px;padding:13px 18px;background:var(--accent);color:var(--accent-ink);font-weight:700;cursor:pointer;width:100%}
+.btn{border:0;border-radius:14px;padding:13px 18px;background:var(--accent);color:var(--accent-ink);font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn.ghost{background:var(--accent-soft);color:var(--accent)}
 .btn.link{background:none;color:var(--accent);padding:6px;width:auto;font-weight:600}
 .btn:disabled{opacity:.5}
-.icon-btn{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:6px 8px;border-radius:10px}
+.icon-btn{border:0;background:none;color:var(--muted);cursor:pointer;padding:8px;border-radius:10px;display:grid;place-items:center}
 .icon-btn:hover{background:var(--accent-soft)}
-.add-btn{border:0;background:var(--accent);color:var(--accent-ink);width:36px;height:36px;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;flex:none}
+.add-btn{border:0;background:var(--accent);color:var(--accent-ink);width:36px;height:36px;border-radius:50%;cursor:pointer;flex:none;display:grid;place-items:center}
 label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
-input,textarea,select{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;outline:none}
-input:focus,textarea:focus{border-color:var(--accent)}
+input,textarea,select,.field{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;outline:none;text-align:left}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+.field{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.field .ic{color:var(--muted)}
+.field.placeholder{color:var(--muted)}
+select{appearance:none;-webkit-appearance:none}
 textarea{min-height:90px;resize:vertical}
-.error{color:var(--accent);font-size:14px;margin-top:10px;min-height:1em}
+.error{color:#c0564f;font-size:14px;margin-top:10px;min-height:1em}
+.error.ok-text{color:var(--accent)}
 .page-title{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 16px}
 .page-title h1{font-size:28px}
-
-/* auth */
 .hero{text-align:center;padding:40px 10px 20px}
-.hero .logo{font-size:56px}
-.hero h1{font-size:34px;margin-top:8px}
-.seg{display:flex;background:var(--accent-soft);border-radius:14px;padding:4px;margin-bottom:6px}
-.seg button{flex:1;border:0;background:none;padding:10px;border-radius:11px;font-weight:600;color:var(--accent);cursor:pointer}
+.hero h1{font-size:34px;margin-top:10px}
+.seg{display:flex;background:var(--accent-soft);border-radius:14px;padding:4px}
+.seg button{flex:1;border:0;background:none;padding:10px 6px;border-radius:11px;font-weight:600;color:var(--accent);cursor:pointer}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
-
-/* home */
-.counter{text-align:center;padding:26px 18px;background:linear-gradient(135deg,#4f8a6b,#9cc7a6);color:#fff}
-.counter .num{font-family:Lora,serif;font-size:64px;line-height:1;font-weight:600}
+.counter{text-align:center;padding:26px 18px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff}
+.counter .num{font-family:Lora,serif;font-size:64px;line-height:1;font-weight:600;display:flex;justify-content:center}
 .counter .names{font-size:15px;opacity:.95;margin-bottom:8px}
 .counter .sub{opacity:.9;margin-top:6px}
-.section-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
 .section-h h2{font-size:20px}
-.date-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.date-item:first-of-type{border-top:0}
-.date-item .em{font-size:24px;width:32px;text-align:center}
-.date-item .grow{flex:1;min-width:0}
+.row-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row-item:first-child{border-top:0}
+.row-item .grow{flex:1;min-width:0}
+.bubble{width:38px;height:38px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
 .badge{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:700;white-space:nowrap}
 .q{font-family:Lora,serif;font-size:20px;font-style:italic;line-height:1.35;margin:4px 0 14px}
 .ans{background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:10px}
-.ans .who{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.ans .who{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px;letter-spacing:.02em}
 .lock{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:10px;color:var(--muted)}
-
-/* lists */
 .list-tile{display:flex;align-items:center;gap:14px;cursor:pointer}
-.list-tile .em{font-size:28px}
 .list-tile .grow{flex:1}
 .item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
 .item:first-child{border-top:0}
 .item .txt{flex:1;word-break:break-word}
 .item.done .txt{text-decoration:line-through;color:var(--muted)}
-.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;cursor:pointer;display:grid;place-items:center;color:#fff;font-size:14px}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:none;flex:none;cursor:pointer;display:grid;place-items:center;color:#fff;padding:0}
+.check .ic{width:14px;height:14px;stroke-width:3}
 .item.done .check{background:var(--ok);border-color:var(--ok)}
-.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row{display:flex;gap:8px;margin-top:10px;align-items:center}
 .add-row input{flex:1}
-
-/* calendar */
-.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.cal-head h2{font-size:20px;text-transform:capitalize}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
+.cal-head h2{font-size:20px}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .grid .dow{font-size:12px;color:var(--muted);padding:4px 0}
-.day{aspect-ratio:1;border:0;background:none;border-radius:12px;cursor:pointer;position:relative;font-weight:500}
+.day{aspect-ratio:1;border:0;background:none;border-radius:12px;cursor:pointer;position:relative;font-weight:500;padding:0}
 .day.other{color:var(--muted);opacity:.45}
 .day.today{color:var(--accent);font-weight:800}
 .day.sel{background:var(--accent);color:var(--accent-ink)}
@@ -108,132 +112,163 @@ textarea{min-height:90px;resize:vertical}
 .day.sel .dot{background:var(--accent-ink)}
 .ev{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:flex-start}
 .ev:first-child{border-top:0}
-.ev .time{font-weight:700;color:var(--accent);min-width:54px;font-size:14px;padding-top:2px}
+.ev .time{font-weight:700;color:var(--accent);min-width:64px;font-size:14px;padding-top:2px}
 .ev .grow{flex:1}
-
-/* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + var(--safe-b));z-index:10}
 .tabbar .in{display:flex;max-width:560px;width:100%}
-.tab{flex:1;border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
-.tab .ic{font-size:22px;filter:grayscale(1);opacity:.6}
+.tab{flex:1;border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+.tab .ic{width:24px;height:24px;stroke-width:1.8}
 .tab.on{color:var(--accent)}
-.tab.on .ic{filter:none;opacity:1}
-
-/* sheet */
-dialog{border:0;padding:0;background:transparent;max-width:none;width:100%;margin:0;margin-top:auto;max-height:92dvh}
-dialog::backdrop{background:rgba(15,30,20,.4)}
+dialog{border:0;padding:0;background:transparent;max-width:none;width:100%;margin:0;margin-top:auto;max-height:92dvh;color:var(--ink)}
+dialog::backdrop{background:var(--backdrop)}
 .sheet{background:var(--card);border-radius:24px 24px 0 0;padding:20px 18px calc(20px + var(--safe-b));max-width:560px;margin:0 auto;max-height:92dvh;overflow:auto}
 .sheet h2{font-size:22px;margin-bottom:4px}
 .sheet .actions{display:flex;gap:10px;margin-top:18px}
-.emoji-pick{display:flex;flex-wrap:wrap;gap:6px}
-.emoji-pick button{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;width:42px;height:42px;font-size:20px;cursor:pointer}
-.emoji-pick button.on{border-color:var(--accent);background:var(--accent-soft)}
+.icon-pick{display:flex;flex-wrap:wrap;gap:8px}
+.icon-pick button{border:1.5px solid var(--line);background:var(--bg);color:var(--muted);border-radius:12px;width:44px;height:44px;cursor:pointer;display:grid;place-items:center;padding:0}
+.icon-pick button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .code{font-family:Lora,serif;font-size:40px;letter-spacing:.18em;text-align:center;font-weight:600;color:var(--accent);margin:10px 0}
 .install{background:var(--accent-soft);color:var(--ink);border-radius:16px;padding:12px 14px;font-size:14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
 .empty{color:var(--muted);text-align:center;padding:14px 0;font-size:14px}
-.toggle{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:15px}
-.toggle input{width:auto}
-.spinner{display:grid;place-items:center;min-height:60dvh;font-size:40px;animation:pulse 1.2s infinite}
-@keyframes pulse{50%{transform:scale(1.15)}}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px;cursor:pointer;color:var(--ink)}
+.toggle input{width:auto;margin:0}
+.two{display:flex;gap:10px}
+.two>*{flex:1}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;flex-wrap:wrap}
+.setting+.setting{border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
+.setting .seg{min-width:200px;flex:1;max-width:290px}
+.dp-head{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.dp-head select{padding:10px 12px;text-align:center;font-weight:600}
+.spinner{display:grid;place-items:center;min-height:60dvh}
+.spinner img{width:72px;height:72px;border-radius:18px;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
 </style>
 </head>
 <body>
 
-<div id="loading" class="spinner">💞</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9.3-9.2A4.8 4.8 0 0 1 12 7.6a4.8 4.8 0 0 1 9.3 3.2C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 4 3 11.5l6.5 2L12 20l3-4.5 4.5 3.5zM9.5 13.5 21 4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></symbol>
+  <symbol id="i-cake" viewBox="0 0 24 24"><path d="M4 21h16v-8H4zM4 16.5c2.7 1.6 5.3-1.6 8 0s5.3 1.6 8 0M8 13V9.5M12 13V9.5M16 13V9.5M8 6.5v.01M12 6.5v.01M16 6.5v.01"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-3.5-5.5-4-5.5-1.5S9.5 8 12 8zm0 0c1.5-3.5 5.5-4 5.5-1.5S14.5 8 12 8z"/></symbol>
+  <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="15" r="6"/><path d="M9 4h6l2 3-5 3-5-3z"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M10.5 13.5 3 11l1.5-1.5 8 .5 4.5-5.5a2 2 0 0 1 2.5 2.5L14 11.5l.5 8L13 21l-2.5-7.5z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5l-5.3 2.9 1.2-6-4.5-4.1 6-.7z"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 20 4c-1 10-6 15-15 15zM5 19l8-8"/></symbol>
+  <symbol id="i-glass" viewBox="0 0 24 24"><path d="M8 3h8l-.8 6.5a3.2 3.2 0 0 1-6.4 0zM12 13v7M8.5 21h7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11L21 7.5H6.3"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7.5 4v16M16.5 4v16M3 9h4.5M3 15h4.5M16.5 9H21M16.5 15H21"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6"/></symbol>
+  <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7a2 2 0 0 0 4 0V3M9 12v9M17 3c-2 0-3 3-3 6.5S15 13 17 13v8"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7 12.5h4M9 10.5v4M15 11.5h.01M17.5 13.5h.01"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></symbol>
+</svg>
+
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
 
 <!-- ===== AUTH ===== -->
 <section id="auth" class="wrap hidden">
-  <div class="hero"><img src="icons/icon-192.png" alt="" width="88" height="88" style="border-radius:22px"><h1>Duo</h1><p class="muted">Общее пространство для двоих</p></div>
+  <div class="hero"><img src="icons/icon-192.png" alt="" width="88" height="88" style="border-radius:22px"><h1>Duo</h1><p class="muted" data-t="tagline"></p></div>
   <div class="card hidden" id="tgAuthCard">
-    <button class="btn" id="tgLoginBtn">Войти через Telegram</button>
-    <p class="muted small" style="text-align:center;margin:12px 0 0">Без почты и пароля. Уведомления подключатся сами.</p>
+    <button class="btn" id="tgLoginBtn"><svg class="ic"><use href="#i-send"/></svg><span data-t="tgLogin"></span></button>
+    <p class="muted small" style="text-align:center;margin:12px 0 0" data-t="tgLoginHint"></p>
     <div class="error" id="tgAuthErr"></div>
   </div>
-  <p class="muted small hidden" id="tgOrEmail" style="text-align:center;margin:4px 0 12px">Уже есть аккаунт с почтой? Войдите ниже, и Telegram привяжется к нему.</p>
+  <p class="muted small hidden" id="tgOrEmail" style="text-align:center;margin:4px 0 12px" data-t="tgOrEmail"></p>
   <div class="card">
-    <div class="seg"><button id="segIn" class="on">Вход</button><button id="segUp">Регистрация</button></div>
+    <div class="seg" style="margin-bottom:6px"><button id="segIn" class="on" data-t="signIn"></button><button id="segUp" data-t="signUp"></button></div>
     <form id="authForm">
-      <div id="nameField" class="hidden"><label>Как вас зовут</label><input id="authName" autocomplete="given-name" placeholder="Например, Аня"></div>
-      <label>Email</label><input id="authEmail" type="email" autocomplete="email" required>
-      <label>Пароль</label><input id="authPass" type="password" autocomplete="current-password" minlength="6" required>
+      <div id="nameField" class="hidden"><label data-t="yourName"></label><input id="authName" autocomplete="given-name" data-tp="namePh"></div>
+      <label>Email</label><input id="authEmail" type="email" autocomplete="email" autocapitalize="none" required>
+      <label data-t="password"></label><input id="authPass" type="password" autocomplete="current-password" minlength="6" required>
       <div class="error" id="authErr"></div>
-      <button class="btn" id="authBtn" type="submit">Войти</button>
+      <button class="btn" id="authBtn" type="submit"></button>
     </form>
   </div>
+  <div class="seg" style="max-width:220px;margin:8px auto"><button data-lang="ru">Русский</button><button data-lang="en">English</button></div>
 </section>
 
 <!-- ===== ONBOARDING ===== -->
 <section id="onboard" class="wrap hidden">
-  <div class="hero"><div class="logo">🫶</div><h1>Привет, <span id="obName"></span>!</h1><p class="muted">Создайте пространство пары или присоединитесь по коду партнёра</p></div>
+  <div class="hero"><img src="icons/icon-192.png" alt="" width="72" height="72" style="border-radius:18px"><h1><span data-t="hi"></span>, <span id="obName"></span></h1><p class="muted" data-t="obHint"></p></div>
   <div class="card">
-    <h2 style="font-size:20px">Создать пару</h2>
-    <label>Название</label><input id="obCoupleName" placeholder="Например, Аня и Борис">
-    <label>Когда вы начали встречаться</label><input id="obStart" type="date">
+    <h2 style="font-size:20px" data-t="createCouple"></h2>
+    <label data-t="coupleName"></label><input id="obCoupleName" data-tp="coupleNamePh">
+    <label data-t="startDate"></label><button type="button" class="field" id="obStart"></button>
     <div class="error" id="obErr1"></div>
-    <button class="btn" id="obCreate">Создать</button>
+    <button class="btn" id="obCreate" data-t="create"></button>
   </div>
   <div class="card">
-    <h2 style="font-size:20px">У партнёра уже есть код</h2>
-    <label>Код приглашения</label><input id="obCode" placeholder="ABC123" autocapitalize="characters" maxlength="6" style="text-transform:uppercase;letter-spacing:.15em">
+    <h2 style="font-size:20px" data-t="haveCode"></h2>
+    <label data-t="inviteCode"></label><input id="obCode" placeholder="ABC123" autocapitalize="characters" maxlength="6" style="text-transform:uppercase;letter-spacing:.15em">
     <div class="error" id="obErr2"></div>
-    <button class="btn ghost" id="obJoin">Присоединиться</button>
+    <button class="btn ghost" id="obJoin" data-t="join"></button>
   </div>
-  <button class="btn link" id="obLogout" style="display:block;margin:0 auto">Выйти</button>
+  <button class="btn link" id="obLogout" style="margin:0 auto" data-t="logout"></button>
 </section>
 
 <!-- ===== APP ===== -->
 <main id="app" class="hidden">
-  <!-- HOME -->
   <section id="tab-home" class="wrap">
-    <div id="installHint" class="install hidden"><span>📲</span><div>Чтобы приложение было на экране айфона: нажмите <b>Поделиться</b> в Safari и выберите <b>«На экран „Домой“»</b>.</div><button class="icon-btn" id="installClose">✕</button></div>
+    <div id="installHint" class="install hidden"><svg class="ic" style="color:var(--accent)"><use href="#i-phone"/></svg><div style="flex:1" data-t="installHint"></div><button class="icon-btn" id="installClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
     <div class="card counter">
       <div class="names" id="hNames"></div>
       <div class="num" id="hDays">0</div>
-      <div class="sub" id="hDaysLabel">дней вместе</div>
+      <div class="sub" id="hDaysLabel"></div>
     </div>
-
     <div class="card">
-      <div class="section-h"><h2>Вопрос дня</h2><span class="muted small" id="qDate"></span></div>
-      <div class="q" id="qText">…</div>
+      <div class="section-h"><h2 data-t="qotd"></h2><span class="muted small" id="qDate"></span></div>
+      <div class="q" id="qText"></div>
       <div id="qBody"></div>
     </div>
-
     <div class="card">
-      <div class="section-h"><h2>Важные даты</h2><button class="add-btn" id="addDateBtn" aria-label="Добавить дату">+</button></div>
+      <div class="section-h"><h2 data-t="importantDates"></h2><button class="add-btn" id="addDateBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></div>
       <div id="datesList"></div>
     </div>
-
     <div class="card">
-      <div class="section-h"><h2>Скоро в календаре</h2><button class="btn link" data-goto="cal">Открыть</button></div>
+      <div class="section-h"><h2 data-t="soon"></h2><button class="btn link" data-goto="cal" data-t="open"></button></div>
       <div id="homeEvents"></div>
     </div>
   </section>
 
-  <!-- LISTS -->
   <section id="tab-lists" class="wrap hidden">
     <div id="listsIndex">
-      <div class="page-title"><h1>Списки</h1><button class="add-btn" id="addListBtn" aria-label="Новый список">+</button></div>
+      <div class="page-title"><h1 data-t="lists"></h1><button class="add-btn" id="addListBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></div>
       <div id="listsWrap"></div>
     </div>
     <div id="listDetail" class="hidden">
       <div class="page-title">
-        <button class="btn link" id="backToLists">‹ Списки</button>
-        <button class="icon-btn" id="delListBtn" aria-label="Удалить список">🗑</button>
+        <button class="btn link" id="backToLists" style="padding-left:0"><svg class="ic"><use href="#i-left"/></svg><span data-t="lists"></span></button>
+        <button class="icon-btn" id="delListBtn" aria-label="delete"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div>
       <div class="card">
-        <h1 id="ldTitle" style="font-size:26px;margin-bottom:12px"></h1>
+        <div class="row-item" style="padding-top:0"><div class="bubble" id="ldIcon"></div><h1 id="ldTitle" style="font-size:24px"></h1></div>
         <div id="ldItems"></div>
-        <form class="add-row" id="addItemForm"><input id="newItem" placeholder="Добавить пункт…" autocomplete="off"><button class="add-btn" type="submit">+</button></form>
-        <button class="btn link small" id="clearDone" style="margin-top:8px">Убрать отмеченные</button>
+        <form class="add-row" id="addItemForm"><input id="newItem" data-tp="addItem" autocomplete="off"><button class="add-btn" type="submit" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></form>
+        <button class="btn link small" id="clearDone" style="margin-top:8px" data-t="clearDone"></button>
       </div>
     </div>
   </section>
 
-  <!-- CALENDAR -->
   <section id="tab-cal" class="wrap hidden">
-    <div class="page-title"><h1>Календарь</h1><button class="add-btn" id="addEventBtn" aria-label="Новое событие">+</button></div>
+    <div class="page-title"><h1 data-t="calendar"></h1><button class="add-btn" id="addEventBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button></div>
     <div class="card">
-      <div class="cal-head"><button class="icon-btn" id="calPrev">‹</button><h2 id="calMonth"></h2><button class="icon-btn" id="calNext">›</button></div>
+      <div class="cal-head"><button class="icon-btn" id="calPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button><h2 id="calMonth"></h2><button class="icon-btn" id="calNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button></div>
       <div class="grid" id="calGrid"></div>
     </div>
     <div class="card">
@@ -242,64 +277,80 @@ dialog::backdrop{background:rgba(15,30,20,.4)}
     </div>
   </section>
 
-  <!-- PROFILE -->
   <section id="tab-me" class="wrap hidden">
-    <div class="page-title"><h1>Мы</h1></div>
+    <div class="page-title"><h1 data-t="profile"></h1></div>
     <div class="card">
-      <h2 style="font-size:20px">Код для партнёра</h2>
+      <h2 style="font-size:20px" data-t="partnerCode"></h2>
       <p class="muted small" id="partnerStatus"></p>
       <div class="code" id="inviteCode"></div>
-      <button class="btn ghost" id="shareCode">Отправить код</button>
+      <button class="btn ghost" id="shareCode"><svg class="ic"><use href="#i-share"/></svg><span data-t="sendCode"></span></button>
     </div>
     <div class="card">
-      <label>Моё имя</label><input id="meName">
-      <label>Название пары</label><input id="meCouple">
-      <label>Когда мы начали встречаться</label><input id="meStart" type="date">
+      <h2 style="font-size:20px" data-t="aboutUs"></h2>
+      <label data-t="myName"></label><input id="meName">
+      <label data-t="coupleName"></label><input id="meCouple">
+      <label data-t="startDateUs"></label><button type="button" class="field" id="meStart"></button>
       <div class="error" id="meErr"></div>
-      <button class="btn" id="meSave">Сохранить</button>
+      <button class="btn" id="meSave" data-t="save"></button>
     </div>
     <div class="card">
-      <h2 style="font-size:20px">Уведомления в Telegram</h2>
+      <h2 style="font-size:20px" data-t="tgNotif"></h2>
       <p class="muted small" id="tgStatus"></p>
       <button class="btn ghost" id="tgBtn"></button>
     </div>
-    <button class="btn link" id="logout" style="display:block;margin:0 auto">Выйти из аккаунта</button>
+    <div class="card">
+      <h2 style="font-size:20px;margin-bottom:10px" data-t="settings"></h2>
+      <div class="setting"><span data-t="language"></span><div class="seg"><button data-lang="ru">Русский</button><button data-lang="en">English</button></div></div>
+      <div class="setting"><span data-t="theme"></span><div class="seg" id="setTheme"><button data-theme-opt="auto" data-t="themeAuto"></button><button data-theme-opt="light" data-t="themeLight"></button><button data-theme-opt="dark" data-t="themeDark"></button></div></div>
+    </div>
+    <button class="btn link" id="logout" style="margin:0 auto"><svg class="ic"><use href="#i-logout"/></svg><span data-t="logoutAcc"></span></button>
   </section>
 
   <nav class="tabbar"><div class="in">
-    <button class="tab on" data-tab="home"><span class="ic">🏡</span>Главная</button>
-    <button class="tab" data-tab="lists"><span class="ic">📝</span>Списки</button>
-    <button class="tab" data-tab="cal"><span class="ic">📅</span>Календарь</button>
-    <button class="tab" data-tab="me"><span class="ic">💞</span>Мы</button>
+    <button class="tab on" data-tab="home"><svg class="ic"><use href="#i-home"/></svg><span data-t="tabHome"></span></button>
+    <button class="tab" data-tab="lists"><svg class="ic"><use href="#i-list"/></svg><span data-t="lists"></span></button>
+    <button class="tab" data-tab="cal"><svg class="ic"><use href="#i-calendar"/></svg><span data-t="calendar"></span></button>
+    <button class="tab" data-tab="me"><svg class="ic"><use href="#i-user"/></svg><span data-t="profile"></span></button>
   </div></nav>
 </main>
 
 <!-- ===== SHEETS ===== -->
 <dialog id="dateSheet"><form class="sheet" method="dialog" id="dateForm">
-  <h2>Важная дата</h2>
-  <label>Что за дата</label><input id="dTitle" required placeholder="День рождения Ани">
-  <label>Дата</label><input id="dDate" type="date" required>
-  <label>Значок</label><div class="emoji-pick" id="dEmoji"></div>
-  <div class="toggle"><input type="checkbox" id="dYearly" checked><span>Повторять каждый год</span></div>
-  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Отмена</button><button class="btn" value="ok">Сохранить</button></div>
+  <h2 data-t="importantDate"></h2>
+  <label data-t="whatDate"></label><input id="dTitle" required data-tp="whatDatePh">
+  <label data-t="date"></label><button type="button" class="field" id="dDate"></button>
+  <label data-t="icon"></label><div class="icon-pick" id="dIcon"></div>
+  <label class="toggle"><input type="checkbox" id="dYearly" checked><span data-t="yearly"></span></label>
+  <div class="error" id="dErr"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
 
 <dialog id="listSheet"><form class="sheet" method="dialog" id="listForm">
-  <h2>Новый список</h2>
-  <label>Название</label><input id="lTitle" required placeholder="Подарки на Новый год">
-  <label>Значок</label><div class="emoji-pick" id="lEmoji"></div>
-  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Отмена</button><button class="btn" value="ok">Создать</button></div>
+  <h2 data-t="newList"></h2>
+  <label data-t="title"></label><input id="lTitle" required data-tp="listPh">
+  <label data-t="icon"></label><div class="icon-pick" id="lIcon"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="create"></button></div>
 </form></dialog>
 
 <dialog id="eventSheet"><form class="sheet" method="dialog" id="eventForm">
-  <h2>Событие</h2>
-  <label>Что</label><input id="eTitle" required placeholder="Ужин в любимом ресторане">
-  <label>День</label><input id="eDate" type="date" required>
-  <div class="toggle"><input type="checkbox" id="eAllDay"><span>Весь день</span></div>
-  <div id="eTimeWrap"><label>Время</label><input id="eTime" type="time" value="19:00"></div>
-  <label>Заметка</label><textarea id="eNote" placeholder="Необязательно"></textarea>
-  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Отмена</button><button class="btn" value="ok">Сохранить</button></div>
+  <h2 data-t="event"></h2>
+  <label data-t="what"></label><input id="eTitle" required data-tp="eventPh">
+  <label data-t="day"></label><button type="button" class="field" id="eDate"></button>
+  <label class="toggle"><input type="checkbox" id="eAllDay"><span data-t="allDay"></span></label>
+  <div id="eTimeWrap"><label data-t="time"></label><div class="two"><select id="eHour"></select><select id="eMin"></select></div></div>
+  <label data-t="note"></label><textarea id="eNote" data-tp="optional"></textarea>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
+
+<dialog id="dpSheet"><div class="sheet">
+  <div class="dp-head">
+    <button type="button" class="icon-btn" id="dpPrev" aria-label="prev"><svg class="ic"><use href="#i-left"/></svg></button>
+    <select id="dpMonth" style="flex:1.4"></select><select id="dpYear" style="flex:1"></select>
+    <button type="button" class="icon-btn" id="dpNext" aria-label="next"><svg class="ic"><use href="#i-right"/></svg></button>
+  </div>
+  <div class="grid" id="dpGrid"></div>
+  <div class="actions" style="margin-top:14px"><button type="button" class="btn ghost" id="dpCancel" data-t="cancel"></button><button type="button" class="btn" id="dpOk" data-t="done"></button></div>
+</div></dialog>
 
 <script>
 // ===== Config =====
@@ -307,6 +358,9 @@ const SUPABASE_URL = 'https://fuisujbwjwbddtfstkbh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_BOWxBrtsNsIaUQJYgqEXbQ_vZm6jwLl';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const BOT = 'DuoTogeherBot';
+const $ = id => document.getElementById(id);
+const pref = (k, d) => { try { return localStorage.getItem('duo.' + k) ?? d; } catch(_) { return d; } };
+const setPref = (k, v) => { try { localStorage.setItem('duo.' + k, v); } catch(_){} };
 
 // ===== Telegram Mini App =====
 // Telegram passes its signed data in the page address (#tgWebAppData=...), so we read it from there
@@ -321,73 +375,216 @@ function readInitData(){
 const TG_INIT = readInitData();
 const inTG = !!TG_INIT;
 const tgApp = () => window.Telegram?.WebApp;
-function tgSetup(){ const t = tgApp(); if (!t) return; try { t.ready(); t.expand(); t.setHeaderColor('#eef3ee'); t.setBackgroundColor('#eef3ee'); } catch(_){} }
+function tgLangCode(){ try { return JSON.parse(new URLSearchParams(TG_INIT).get('user') || '{}').language_code || ''; } catch(_) { return ''; } }
+function openTg(url){ const a = tgApp(); if (a?.openTelegramLink) a.openTelegramLink(url); else location.href = url; }
+
+// ===== i18n =====
+function plural(n, one, few, many){ const a=Math.abs(n)%100, b=a%10; if(a>10&&a<20) return many; if(b>1&&b<5) return few; if(b===1) return one; return many; }
+const T = {
+ru: {
+  tagline:'Общее пространство для двоих', tgLogin:'Войти через Telegram', tgLoginHint:'Без почты и пароля. Уведомления подключатся сами.',
+  tgOrEmail:'Уже есть аккаунт с почтой? Войдите ниже, и Telegram привяжется к нему.',
+  signIn:'Вход', signUp:'Регистрация', yourName:'Как вас зовут', namePh:'Например, Аня', password:'Пароль', signInBtn:'Войти', signUpBtn:'Создать аккаунт',
+  hi:'Привет', obHint:'Создайте пространство пары или присоединитесь по коду партнёра', createCouple:'Создать пару', coupleName:'Название пары', coupleNamePh:'Например, Аня и Борис',
+  startDate:'Когда вы начали встречаться', startDateUs:'Когда мы начали встречаться', create:'Создать', haveCode:'У партнёра уже есть код', inviteCode:'Код приглашения', join:'Присоединиться', logout:'Выйти',
+  installHint:'Чтобы приложение было на экране телефона: нажмите «Поделиться» в Safari и выберите «На экран „Домой“».',
+  qotd:'Вопрос дня', importantDates:'Важные даты', soon:'Скоро в календаре', open:'Открыть', lists:'Списки', addItem:'Добавить пункт', clearDone:'Убрать отмеченные',
+  calendar:'Календарь', profile:'Профиль', partnerCode:'Код для партнёра', sendCode:'Отправить код', aboutUs:'О нас', myName:'Моё имя', save:'Сохранить', saved:'Сохранено',
+  tgNotif:'Уведомления в Telegram', settings:'Настройки', language:'Язык', theme:'Тема', themeAuto:'Авто', themeLight:'Светлая', themeDark:'Тёмная', logoutAcc:'Выйти из аккаунта',
+  tabHome:'Главная', importantDate:'Важная дата', whatDate:'Что за дата', whatDatePh:'День рождения Ани', date:'Дата', icon:'Значок', yearly:'Повторять каждый год',
+  cancel:'Отмена', newList:'Новый список', title:'Название', listPh:'Подарки на Новый год', event:'Событие', what:'Что', eventPh:'Ужин в любимом ресторане', day:'День',
+  allDay:'Весь день', time:'Время', note:'Заметка', optional:'Необязательно', done:'Готово', pickDate:'Выберите дату',
+  daysTogether:n => plural(n,'день','дня','дней') + ' вместе', setDateHint:'укажите дату во вкладке «Профиль»',
+  noQuestions:'Вопросов пока нет', answerPh:'Ваш ответ…', answer:'Ответить', bothOpen:'Ответы откроются, когда ответите вы оба', invitePartner:'Пригласите партнёра во вкладке «Профиль»',
+  you:'Вы', partner:'Партнёр', notAnswered:n => `${n} пока не ответил(а)`, partnerNotJoined:'Партнёр ещё не присоединился',
+  datesEmpty:'Добавьте дни рождения, годовщины и другие важные даты', eventsEmpty:'Пока ничего не запланировано', yearsTogether:y => `${y} ${plural(y,'год','года','лет')} вместе`,
+  today:'сегодня', tomorrow:'завтра', inDays:n => `через ${n} ${plural(n,'день','дня','дней')}`, todayTitle:'Сегодня', allDayShort:'весь день',
+  listsEmpty:'Создайте первый список', itemsLeft:(l,n) => `${l} из ${n} осталось`, emptyList:'пусто', listEmptyItems:'Пока пусто',
+  freeDay:'Свободный день. Нажмите +, чтобы что-то запланировать', confirmDelDate:'Удалить эту дату?', confirmDelList:'Удалить список со всеми пунктами?', confirmDelEvent:'Удалить событие?',
+  partnerWith:n => `${n} уже с вами`, partnerInvite:'Отправьте этот код партнёру: он откроет бота, войдёт и введёт код.',
+  tgOn:`Подключено. Бот @${BOT} пишет, когда партнёр что-то добавил, и напоминает о вопросе дня и важных датах.`,
+  tgOff:'Бот будет писать, когда партнёр ответил на вопрос дня или что-то добавил, и напоминать о важных датах.',
+  tgConnect:'Подключить Telegram', tgDisconnect:'Отключить уведомления', confirmTgOff:'Выключить уведомления в Telegram?',
+  shareText:c => `Присоединяйся ко мне в Duo\nОткрой бота: https://t.me/${BOT}\nКод пары: ${c}`, copied:'Скопировано',
+  enterName:'Введите имя', codeLen:'Код состоит из 6 символов', checkEmail:'Мы отправили письмо для подтверждения. Откройте его и затем войдите.', loadErr:'Ошибка загрузки: ',
+  tgErr:'Не получилось войти через Telegram', needDate:'Выберите дату',
+  err:{ 'Invalid login credentials':'Неверный email или пароль', 'User already registered':'Такой email уже зарегистрирован', 'code not found':'Код не найден, проверьте его',
+        'couple is full':'В этой паре уже двое', 'already in a couple':'Вы уже состоите в паре' },
+  months:['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+  monthsGen:['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],
+  monthsShort:['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'],
+  dow:['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
+},
+en: {
+  tagline:'A shared space for the two of you', tgLogin:'Sign in with Telegram', tgLoginHint:'No email or password. Notifications connect automatically.',
+  tgOrEmail:'Already have an email account? Sign in below and Telegram will be linked to it.',
+  signIn:'Sign in', signUp:'Sign up', yourName:'Your name', namePh:'For example, Anna', password:'Password', signInBtn:'Sign in', signUpBtn:'Create account',
+  hi:'Hi', obHint:'Create a space for your couple or join with your partner\'s code', createCouple:'Create a couple', coupleName:'Couple name', coupleNamePh:'For example, Anna and Ben',
+  startDate:'When did you start dating', startDateUs:'When we started dating', create:'Create', haveCode:'My partner already has a code', inviteCode:'Invite code', join:'Join', logout:'Sign out',
+  installHint:'To add the app to your phone: tap Share in Safari and choose “Add to Home Screen”.',
+  qotd:'Question of the day', importantDates:'Important dates', soon:'Coming up', open:'Open', lists:'Lists', addItem:'Add an item', clearDone:'Remove checked items',
+  calendar:'Calendar', profile:'Profile', partnerCode:'Code for your partner', sendCode:'Send code', aboutUs:'About us', myName:'My name', save:'Save', saved:'Saved',
+  tgNotif:'Telegram notifications', settings:'Settings', language:'Language', theme:'Theme', themeAuto:'Auto', themeLight:'Light', themeDark:'Dark', logoutAcc:'Sign out',
+  tabHome:'Home', importantDate:'Important date', whatDate:'What is it', whatDatePh:'Anna\'s birthday', date:'Date', icon:'Icon', yearly:'Repeat every year',
+  cancel:'Cancel', newList:'New list', title:'Title', listPh:'Holiday gifts', event:'Event', what:'What', eventPh:'Dinner at our favorite place', day:'Day',
+  allDay:'All day', time:'Time', note:'Note', optional:'Optional', done:'Done', pickDate:'Pick a date',
+  daysTogether:n => (n === 1 ? 'day' : 'days') + ' together', setDateHint:'set the date on the Profile tab',
+  noQuestions:'No questions yet', answerPh:'Your answer…', answer:'Answer', bothOpen:'Answers open once you have both answered', invitePartner:'Invite your partner on the Profile tab',
+  you:'You', partner:'Partner', notAnswered:n => `${n} hasn't answered yet`, partnerNotJoined:'Your partner hasn\'t joined yet',
+  datesEmpty:'Add birthdays, anniversaries and other important dates', eventsEmpty:'Nothing planned yet', yearsTogether:y => `${y} ${y === 1 ? 'year' : 'years'} together`,
+  today:'today', tomorrow:'tomorrow', inDays:n => `in ${n} ${n === 1 ? 'day' : 'days'}`, todayTitle:'Today', allDayShort:'all day',
+  listsEmpty:'Create your first list', itemsLeft:(l,n) => `${l} of ${n} left`, emptyList:'empty', listEmptyItems:'Nothing here yet',
+  freeDay:'A free day. Tap + to plan something', confirmDelDate:'Delete this date?', confirmDelList:'Delete this list and all its items?', confirmDelEvent:'Delete this event?',
+  partnerWith:n => `${n} is with you`, partnerInvite:'Send this code to your partner: they open the bot, sign in and enter the code.',
+  tgOn:`Connected. @${BOT} messages you when your partner adds something and reminds you about the question of the day and important dates.`,
+  tgOff:'The bot will message you when your partner answers or adds something, and remind you about important dates.',
+  tgConnect:'Connect Telegram', tgDisconnect:'Turn off notifications', confirmTgOff:'Turn off Telegram notifications?',
+  shareText:c => `Join me in Duo\nOpen the bot: https://t.me/${BOT}\nCouple code: ${c}`, copied:'Copied',
+  enterName:'Enter your name', codeLen:'The code has 6 characters', checkEmail:'We sent you a confirmation email. Open it, then sign in.', loadErr:'Loading error: ',
+  tgErr:'Couldn\'t sign in with Telegram', needDate:'Pick a date',
+  err:{ 'Invalid login credentials':'Wrong email or password', 'User already registered':'This email is already registered', 'code not found':'Code not found, please check it',
+        'couple is full':'This couple already has two people', 'already in a couple':'You are already in a couple' },
+  months:['January','February','March','April','May','June','July','August','September','October','November','December'],
+  monthsGen:['January','February','March','April','May','June','July','August','September','October','November','December'],
+  monthsShort:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  dow:['Mo','Tu','We','Th','Fr','Sa','Su']
+}};
+const detectLang = () => { const c = (tgLangCode() || navigator.language || 'ru').toLowerCase(); return /^(ru|uk|be|kk)/.test(c) ? 'ru' : 'en'; };
+let LANG = pref('lang', null) || detectLang();
+if (!T[LANG]) LANG = 'ru';
+const t = (k, ...a) => { const v = T[LANG][k] ?? T.ru[k] ?? k; return typeof v === 'function' ? v(...a) : v; };
+
+// ===== State & helpers =====
+const S = { user:null, profile:null, couple:null, partner:null, dates:[], lists:[], items:[], events:[],
+  question:null, answers:[], openList:null, calMonth:null, selDay:null, channel:null, tgLinked:false };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icon = (name, style = '') => `<svg class="ic"${style ? ` style="${style}"` : ''}><use href="#i-${name}"/></svg>`;
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const dayDiff = (a,b) => Math.round((b - a) / 86400000);
+const fmtDay = (d, withYear) => `${d.getDate()} ${t('monthsGen')[d.getMonth()]}${withYear ? ' ' + d.getFullYear() : ''}`;
+function show(id){ ['loading','auth','onboard','app'].forEach(x => $(x).classList.toggle('hidden', x!==id)); }
+const errText = e => { const m = e?.message || String(e); const E = t('err'); for (const k in E) if (m.includes(k)) return E[k]; return m; };
+const LIST_ICONS = ['list','cart','film','pin','gift','book','food','plane','home','game','leaf','bulb'];
+const DATE_ICONS = ['heart','cake','gift','ring','plane','star','home','leaf','glass','pin'];
+const safeIcon = (n, set, d) => set.includes(n) ? n : d;
+function iconPicker(el, set, initial){
+  let val = initial;
+  el.innerHTML = set.map(n => `<button type="button" data-v="${n}" class="${n===val?'on':''}">${icon(n)}</button>`).join('');
+  el.onclick = ev => { const b = ev.target.closest('button'); if(!b) return; val = b.dataset.v;
+    [...el.children].forEach(c => c.classList.toggle('on', c===b)); };
+  return () => val;
+}
+
+// ===== Date picker (day first, our own calendar) =====
+function setDate(el, v){ el.dataset.value = v || ''; el.innerHTML = `<span>${v ? fmtDay(parseYmd(v), true) : t('pickDate')}</span>${icon('calendar')}`; el.classList.toggle('placeholder', !v); }
+const getDate = el => el.dataset.value || '';
+const DP = { el:null, y:0, m:0, sel:null };
+function openDP(el){
+  const v = getDate(el), d = v ? parseYmd(v) : today();
+  Object.assign(DP, { el, y:d.getFullYear(), m:d.getMonth(), sel:v || null });
+  const yNow = new Date().getFullYear(); let opts = '';
+  for (let y = yNow + 10; y >= 1940; y--) opts += `<option value="${y}">${y}</option>`;
+  $('dpYear').innerHTML = opts;
+  $('dpMonth').innerHTML = t('months').map((m,i) => `<option value="${i}">${m}</option>`).join('');
+  renderDP(); $('dpSheet').showModal();
+}
+function renderDP(){
+  $('dpYear').value = DP.y; $('dpMonth').value = DP.m;
+  const first = (new Date(DP.y, DP.m, 1).getDay() + 6) % 7, start = new Date(DP.y, DP.m, 1 - first), tk = ymd(today());
+  let html = t('dow').map(d => `<div class="dow">${d}</div>`).join('');
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), k = ymd(d);
+    if (i >= 35 && d.getMonth() !== DP.m) break;
+    html += `<button type="button" class="day ${d.getMonth()!==DP.m?'other':''} ${k===tk?'today':''} ${k===DP.sel?'sel':''}" data-day="${k}">${d.getDate()}</button>`;
+  }
+  $('dpGrid').innerHTML = html;
+}
+const dpShift = n => { const d = new Date(DP.y, DP.m + n, 1); DP.y = d.getFullYear(); DP.m = d.getMonth(); renderDP(); };
+$('dpPrev').onclick = () => dpShift(-1); $('dpNext').onclick = () => dpShift(1);
+$('dpYear').onchange = () => { DP.y = +$('dpYear').value; renderDP(); };
+$('dpMonth').onchange = () => { DP.m = +$('dpMonth').value; renderDP(); };
+$('dpGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.day; if (!k) return; DP.sel = k;
+  const d = parseYmd(k); if (d.getMonth() !== DP.m) { DP.y = d.getFullYear(); DP.m = d.getMonth(); } renderDP(); };
+$('dpCancel').onclick = () => $('dpSheet').close();
+$('dpOk').onclick = () => { if (DP.sel) setDate(DP.el, DP.sel); $('dpSheet').close(); };
+['obStart','meStart','dDate','eDate'].forEach(id => { $(id).onclick = () => openDP($(id)); });
+function fillTimeSelects(){
+  const h = $('eHour').value || '19', m = $('eMin').value || '00';
+  $('eHour').innerHTML = Array.from({length:24}, (_,i) => `<option value="${pad(i)}">${pad(i)}</option>`).join('');
+  $('eMin').innerHTML = Array.from({length:12}, (_,i) => `<option value="${pad(i*5)}">${pad(i*5)}</option>`).join('');
+  $('eHour').value = h; $('eMin').value = m;
+}
+
+// ===== Language & theme =====
+let signUpMode = false;
+function applyI18n(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll('[data-tp]').forEach(el => el.placeholder = t(el.dataset.tp));
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  $('authBtn').textContent = signUpMode ? t('signUpBtn') : t('signInBtn');
+  fillTimeSelects();
+  ['obStart','meStart','dDate','eDate'].forEach(id => setDate($(id), getDate($(id))));
+}
+async function setLang(l, save = true){
+  if (!T[l]) return;
+  LANG = l; setPref('lang', l); applyI18n();
+  if (S.couple) renderAll();
+  if (save && S.user) { await sb.from('profiles').update({ lang: l }).eq('id', S.user.id); if (S.profile) S.profile.lang = l; }
+}
+document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => setLang(b.dataset.lang));
+function applyTheme(){
+  const p = pref('theme', 'auto');
+  let mode = p;
+  if (p === 'auto') { const tc = inTG && tgApp()?.colorScheme; mode = tc || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  document.documentElement.dataset.theme = mode;
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  $('themeColor').setAttribute('content', bg);
+  const a = tgApp(); if (inTG && a) { try { a.setHeaderColor(bg); a.setBackgroundColor(bg); } catch(_){} }
+  document.querySelectorAll('[data-theme-opt]').forEach(b => b.classList.toggle('on', b.dataset.themeOpt === p));
+}
+document.querySelectorAll('[data-theme-opt]').forEach(b => b.onclick = () => { setPref('theme', b.dataset.themeOpt); applyTheme(); });
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch(_){}
+function tgSetup(){ const a = tgApp(); if (!a) return; try { a.ready(); a.expand(); a.onEvent?.('themeChanged', applyTheme); } catch(_){} applyTheme(); }
 if (inTG) { tgSetup(); window.addEventListener('load', tgSetup); }
-function openTg(url){ const t = tgApp(); if (t?.openTelegramLink) t.openTelegramLink(url); else location.href = url; }
+
+// ===== Telegram sign-in =====
 async function tgAuth(mode){
   const r = await fetch(SUPABASE_URL + '/functions/v1/tg-auth', { method:'POST',
-    headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY }, body: JSON.stringify({ initData: TG_INIT, mode }) });
+    headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY }, body: JSON.stringify({ initData: TG_INIT, mode, lang: LANG }) });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error || 'Не получилось войти через Telegram');
+  if (!r.ok) throw new Error(j.error || t('tgErr'));
   if (!j.linked) return false;
   const { error } = await sb.auth.setSession({ access_token: j.access_token, refresh_token: j.refresh_token });
   if (error) throw error;
   return true;
 }
 let tgAutoTried = false, tgLinkTried = false;
-
-// ===== State =====
-const S = { user:null, profile:null, couple:null, partner:null, dates:[], lists:[], items:[], events:[],
-  question:null, answers:[], openList:null, calMonth:null, selDay:null, channel:null };
-
-// ===== Helpers =====
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const pad = n => String(n).padStart(2,'0');
-const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const parseYmd = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
-const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
-const dayDiff = (a,b) => Math.round((b - a) / 86400000);
-const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-const fmtDay = d => `${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`;
-function plural(n, one, few, many){ const a=Math.abs(n)%100, b=a%10; if(a>10&&a<20) return many; if(b>1&&b<5) return few; if(b===1) return one; return many; }
-function show(id){ ['loading','auth','onboard','app'].forEach(x => $(x).classList.toggle('hidden', x!==id)); }
-const ERR = {
-  'Invalid login credentials':'Неверный email или пароль',
-  'User already registered':'Такой email уже зарегистрирован',
-  'code not found':'Код не найден, проверьте его',
-  'couple is full':'В этой паре уже двое',
-  'already in a couple':'Вы уже состоите в паре',
+$('tgLoginBtn').onclick = async () => {
+  $('tgAuthErr').textContent = ''; $('tgLoginBtn').disabled = true;
+  try { await tgAuth('create'); } catch(e){ $('tgAuthErr').textContent = e.message; }
+  $('tgLoginBtn').disabled = false;
 };
-const errText = e => { const m = e?.message || String(e); for (const k in ERR) if (m.includes(k)) return ERR[k]; return m; };
 
-const EMOJIS = ['💗','🎂','💍','✈️','🌹','🎉','🏡','🐾','⭐','🎁','📍','🍷'];
-const LIST_EMOJIS = ['📝','🛒','🎬','📍','🎁','📚','🍝','✈️','🏡','🎮','🌱','💡'];
-function emojiPicker(el, set, initial){
-  let val = initial;
-  el.innerHTML = set.map(e => `<button type="button" class="${e===val?'on':''}">${e}</button>`).join('');
-  el.onclick = ev => { const b = ev.target.closest('button'); if(!b) return; val = b.textContent;
-    [...el.children].forEach(c => c.classList.toggle('on', c===b)); };
-  return () => val;
-}
-
-// ===== Auth =====
-let signUpMode = false;
+// ===== Email auth =====
 function setMode(up){ signUpMode = up; $('segIn').classList.toggle('on',!up); $('segUp').classList.toggle('on',up);
-  $('nameField').classList.toggle('hidden',!up); $('authBtn').textContent = up ? 'Создать аккаунт' : 'Войти';
+  $('nameField').classList.toggle('hidden',!up); $('authBtn').textContent = up ? t('signUpBtn') : t('signInBtn');
   $('authPass').autocomplete = up ? 'new-password' : 'current-password'; $('authErr').textContent=''; }
 $('segIn').onclick = () => setMode(false);
 $('segUp').onclick = () => setMode(true);
 $('authForm').onsubmit = async e => {
   e.preventDefault(); $('authErr').textContent=''; $('authBtn').disabled = true;
-  const email = $('authEmail').value.trim(), password = $('authPass').value;
+  const email = $('authEmail').value.trim().toLowerCase(), password = $('authPass').value;
   try {
     if (signUpMode) {
       const name = $('authName').value.trim();
-      if (!name) throw new Error('Введите имя');
-      const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ display_name:name }, emailRedirectTo: location.origin + location.pathname } });
+      if (!name) throw new Error(t('enterName'));
+      const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ display_name:name, lang:LANG }, emailRedirectTo: location.origin + location.pathname } });
       if (error) throw error;
-      if (!data.session) { $('authErr').textContent = 'Мы отправили письмо для подтверждения. Откройте его и затем войдите.'; setMode(false); }
+      if (!data.session) { $('authErr').textContent = t('checkEmail'); setMode(false); }
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -395,8 +592,7 @@ $('authForm').onsubmit = async e => {
   } catch(err){ $('authErr').textContent = errText(err); }
   $('authBtn').disabled = false;
 };
-
-async function logout(){ if (S.channel) sb.removeChannel(S.channel); S.channel=null; await sb.auth.signOut(); }
+async function logout(){ if (S.channel) sb.removeChannel(S.channel); S.channel = null; S.couple = null; await sb.auth.signOut(); }
 $('logout').onclick = logout; $('obLogout').onclick = logout;
 
 // ===== Boot =====
@@ -411,15 +607,16 @@ async function boot(session){
       show('auth'); return;
     }
     S.user = session.user;
+    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }).catch(() => {}); }
     const { data: profile, error } = await sb.from('profiles').select('*').eq('id', S.user.id).single();
     if (error) throw error;
     S.profile = profile;
-    if (!profile.couple_id) { $('obName').textContent = profile.display_name; show('onboard'); return; }
-    if (inTG && !tgLinkTried) { tgLinkTried = true; await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }).catch(() => {}); }
+    if (profile.lang && profile.lang !== LANG && T[profile.lang]) { LANG = profile.lang; setPref('lang', LANG); applyI18n(); }
+    if (!profile.couple_id) { $('obName').textContent = profile.display_name; setDate($('obStart'), ymd(today())); show('onboard'); return; }
     await loadAll();
     subscribe();
     show('app');
-  } catch(err){ console.error(err); alert('Ошибка загрузки: ' + errText(err)); show('auth'); }
+  } catch(err){ console.error(err); alert(t('loadErr') + errText(err)); show('auth'); }
   finally { booting = false; }
 }
 sb.auth.onAuthStateChange((event, session) => {
@@ -427,17 +624,16 @@ sb.auth.onAuthStateChange((event, session) => {
 });
 
 // ===== Onboarding =====
-$('obStart').value = ymd(today());
 $('obCreate').onclick = async () => {
   $('obErr1').textContent='';
-  const { error } = await sb.rpc('create_couple', { p_name: $('obCoupleName').value, p_start_date: $('obStart').value || null });
+  const { error } = await sb.rpc('create_couple', { p_name: $('obCoupleName').value, p_start_date: getDate($('obStart')) || null, p_lang: LANG });
   if (error) return $('obErr1').textContent = errText(error);
   const { data:{ session } } = await sb.auth.getSession(); boot(session);
 };
 $('obJoin').onclick = async () => {
   $('obErr2').textContent='';
   const code = $('obCode').value.trim();
-  if (code.length < 6) return $('obErr2').textContent = 'Код состоит из 6 символов';
+  if (code.length < 6) return $('obErr2').textContent = t('codeLen');
   const { error } = await sb.rpc('join_couple', { p_code: code });
   if (error) return $('obErr2').textContent = errText(error);
   const { data:{ session } } = await sb.auth.getSession(); boot(session);
@@ -458,12 +654,13 @@ async function loadAll(){
     sb.rpc('tg_is_linked'),
   ]);
   for (const r of [c,p,dt,l,it,ev,q,an]) if (r.error) throw r.error;
-  S.tgLinked = !tl.error && tl.data === true;
   S.couple = c.data;
   S.profile = p.data.find(x => x.id === S.user.id) || S.profile;
   S.partner = p.data.find(x => x.id !== S.user.id) || null;
-  S.dates = dt.data; S.lists = l.data; S.items = it.data; S.events = ev.data;
-  S.question = q.data?.[0] || null; S.answers = an.data;
+  S.dates = dt.data; S.lists = l.data; S.items = it.data; S.events = ev.data; S.answers = an.data;
+  S.tgLinked = !tl.error && tl.data === true;
+  S.question = q.data?.[0] || null;
+  if (S.question) { const { data: qe } = await sb.from('questions').select('text_en').eq('id', S.question.id).single(); S.question.text_en = qe?.text_en; }
   renderAll();
 }
 let reloadTimer;
@@ -472,8 +669,8 @@ function subscribe(){
   if (S.channel) sb.removeChannel(S.channel);
   const cid = S.profile.couple_id;
   const ch = sb.channel('couple-' + cid);
-  ['important_dates','lists','list_items','events','answers'].forEach(t =>
-    ch.on('postgres_changes', { event:'*', schema:'public', table:t, filter:`couple_id=eq.${cid}` }, scheduleReload));
+  ['important_dates','lists','list_items','events','answers'].forEach(tb =>
+    ch.on('postgres_changes', { event:'*', schema:'public', table:tb, filter:`couple_id=eq.${cid}` }, scheduleReload));
   ch.on('postgres_changes', { event:'*', schema:'public', table:'couples', filter:`id=eq.${cid}` }, scheduleReload);
   ch.on('postgres_changes', { event:'*', schema:'public', table:'profiles', filter:`couple_id=eq.${cid}` }, scheduleReload);
   ch.subscribe();
@@ -482,64 +679,60 @@ function subscribe(){
 document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && S.couple) scheduleReload(); });
 
 // ===== Render =====
-function renderAll(){ renderHome(); renderLists(); renderCal(); renderMe(); }
-
+function renderAll(){ if (!S.couple) return; renderHome(); renderLists(); renderCal(); renderMe(); }
 function upcomingDates(){
-  const t = today(), out = [];
+  const td = today(), out = [];
   const next = (dateStr, yearly) => {
     const d = parseYmd(dateStr);
     if (!yearly) return d;
-    let n = new Date(t.getFullYear(), d.getMonth(), d.getDate());
-    if (n < t) n = new Date(t.getFullYear()+1, d.getMonth(), d.getDate());
+    let n = new Date(td.getFullYear(), d.getMonth(), d.getDate());
+    if (n < td) n = new Date(td.getFullYear()+1, d.getMonth(), d.getDate());
     return n;
   };
   if (S.couple?.start_date) {
     const n = next(S.couple.start_date, true), yrs = n.getFullYear() - parseYmd(S.couple.start_date).getFullYear();
-    if (yrs > 0) out.push({ id:null, title:`${yrs} ${plural(yrs,'год','года','лет')} вместе`, emoji:'💞', when:n });
+    if (yrs > 0) out.push({ id:null, title:t('yearsTogether', yrs), icon:'heart', when:n });
   }
-  for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= t) out.push({ id:x.id, title:x.title, emoji:x.emoji, when:n }); }
+  for (const x of S.dates) { const n = next(x.date, x.repeats_yearly); if (n >= td) out.push({ id:x.id, title:x.title, icon:safeIcon(x.emoji, DATE_ICONS, 'heart'), when:n }); }
   return out.sort((a,b) => a.when - b.when);
 }
-function untilLabel(d){ const n = dayDiff(today(), d); if (n===0) return 'сегодня'; if (n===1) return 'завтра'; return `через ${n} ${plural(n,'день','дня','дней')}`; }
+function untilLabel(d){ const n = dayDiff(today(), d); if (n===0) return t('today'); if (n===1) return t('tomorrow'); return t('inDays', n); }
 
 function renderHome(){
   const names = [S.profile?.display_name, S.partner?.display_name].filter(Boolean).join(' & ');
   $('hNames').textContent = S.couple?.name && S.couple.name !== 'Мы' ? S.couple.name : names;
   if (S.couple?.start_date) {
     const n = dayDiff(parseYmd(S.couple.start_date), today()) + 1;
-    $('hDays').textContent = n.toLocaleString('ru-RU');
-    $('hDaysLabel').textContent = `${plural(n,'день','дня','дней')} вместе`;
-  } else { $('hDays').textContent = '💞'; $('hDaysLabel').textContent = 'укажите дату во вкладке «Мы»'; }
+    $('hDays').textContent = n.toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU');
+    $('hDaysLabel').textContent = t('daysTogether', n);
+  } else { $('hDays').innerHTML = icon('heart', 'width:56px;height:56px'); $('hDaysLabel').textContent = t('setDateHint'); }
 
-  // question
-  const t = today(); $('qDate').textContent = fmtDay(t);
-  $('qText').textContent = S.question ? S.question.text : 'Вопросов пока нет';
+  $('qDate').textContent = fmtDay(today());
+  $('qText').textContent = S.question ? (LANG === 'en' && S.question.text_en ? S.question.text_en : S.question.text) : t('noQuestions');
   const mine = S.answers.find(a => a.user_id === S.user.id), theirs = S.answers.find(a => a.user_id !== S.user.id);
-  const pName = esc(S.partner?.display_name || 'Партнёр');
+  const pName = esc(S.partner?.display_name || t('partner'));
   if (!S.question) $('qBody').innerHTML = '';
   else if (!mine) {
-    $('qBody').innerHTML = `<textarea id="qAnswer" placeholder="Ваш ответ…"></textarea>
-      <p class="muted small">${S.partner ? 'Ответы откроются, когда ответите вы оба' : 'Пригласите партнёра во вкладке «Мы»'}</p>
-      <button class="btn" id="qSend">Ответить</button>`;
+    $('qBody').innerHTML = `<textarea id="qAnswer" placeholder="${esc(t('answerPh'))}"></textarea>
+      <p class="muted small">${S.partner ? t('bothOpen') : t('invitePartner')}</p>
+      <button class="btn" id="qSend">${t('answer')}</button>`;
     $('qSend').onclick = sendAnswer;
   } else {
-    $('qBody').innerHTML = `<div class="ans"><div class="who">Вы</div>${esc(mine.answer)}</div>` +
+    $('qBody').innerHTML = `<div class="ans"><div class="who">${t('you')}</div>${esc(mine.answer)}</div>` +
       (theirs ? `<div class="ans"><div class="who">${pName}</div>${esc(theirs.answer)}</div>`
-              : `<div class="lock">⏳ <span>${S.partner ? `${pName} пока не ответил(а)` : 'Партнёр ещё не присоединился'}</span></div>`);
+              : `<div class="lock">${icon('clock')}<span>${S.partner ? t('notAnswered', pName) : t('partnerNotJoined')}</span></div>`);
   }
 
-  // dates
   const ud = upcomingDates();
-  $('datesList').innerHTML = ud.length ? ud.map(x => `<div class="date-item"><div class="em">${esc(x.emoji)}</div>
+  $('datesList').innerHTML = ud.length ? ud.map(x => `<div class="row-item"><div class="bubble">${icon(x.icon)}</div>
       <div class="grow"><div>${esc(x.title)}</div><div class="muted small">${fmtDay(x.when)}</div></div>
       <span class="badge">${untilLabel(x.when)}</span>
-      ${x.id ? `<button class="icon-btn" data-del-date="${x.id}" aria-label="Удалить">✕</button>` : ''}</div>`).join('')
-    : `<div class="empty">Добавьте дни рождения, годовщины и другие важные даты</div>`;
+      ${x.id ? `<button class="icon-btn" data-del-date="${x.id}" aria-label="delete">${icon('x')}</button>` : ''}</div>`).join('')
+    : `<div class="empty">${t('datesEmpty')}</div>`;
 
-  // events
   const now = new Date();
   const soon = S.events.filter(e => new Date(e.starts_at) >= (e.all_day ? today() : now)).slice(0,3);
-  $('homeEvents').innerHTML = soon.length ? soon.map(evRow).join('') : `<div class="empty">Пока ничего не запланировано</div>`;
+  $('homeEvents').innerHTML = soon.length ? soon.map(evRow).join('') : `<div class="empty">${t('eventsEmpty')}</div>`;
 }
 async function sendAnswer(){
   const text = $('qAnswer').value.trim(); if (!text) return;
@@ -550,15 +743,17 @@ async function sendAnswer(){
 }
 $('datesList').onclick = async e => {
   const id = e.target.closest('[data-del-date]')?.dataset.delDate; if (!id) return;
-  if (!confirm('Удалить эту дату?')) return;
+  if (!confirm(t('confirmDelDate'))) return;
   await sb.from('important_dates').delete().eq('id', id); scheduleReload();
 };
-
-let getDateEmoji;
-$('addDateBtn').onclick = () => { $('dateForm').reset(); $('dYearly').checked = true; getDateEmoji = emojiPicker($('dEmoji'), EMOJIS, EMOJIS[0]); $('dateSheet').showModal(); };
+let getDateIcon;
+$('addDateBtn').onclick = () => { $('dateForm').reset(); $('dErr').textContent = ''; $('dYearly').checked = true; setDate($('dDate'), ''); getDateIcon = iconPicker($('dIcon'), DATE_ICONS, 'heart'); $('dateSheet').showModal(); };
+$('dateForm').addEventListener('submit', e => {
+  if (e.submitter?.value === 'ok' && !getDate($('dDate'))) { e.preventDefault(); $('dErr').textContent = t('needDate'); }
+});
 $('dateSheet').onclose = async () => {
-  if ($('dateSheet').returnValue !== 'ok') return;
-  const { error } = await sb.from('important_dates').insert({ couple_id:S.couple.id, title:$('dTitle').value.trim(), date:$('dDate').value, emoji:getDateEmoji(), repeats_yearly:$('dYearly').checked });
+  if ($('dateSheet').returnValue !== 'ok' || !getDate($('dDate'))) return;
+  const { error } = await sb.from('important_dates').insert({ couple_id:S.couple.id, title:$('dTitle').value.trim(), date:getDate($('dDate')), emoji:getDateIcon(), repeats_yearly:$('dYearly').checked });
   if (error) alert(errText(error)); scheduleReload();
 };
 
@@ -566,18 +761,20 @@ $('dateSheet').onclose = async () => {
 function renderLists(){
   $('listsWrap').innerHTML = S.lists.length ? S.lists.map(l => {
     const its = S.items.filter(i => i.list_id === l.id), left = its.filter(i => !i.done).length;
-    return `<div class="card list-tile" data-list="${l.id}"><div class="em">${esc(l.emoji)}</div>
-      <div class="grow"><h3 style="font-size:18px">${esc(l.title)}</h3><div class="muted small">${its.length ? `${left} из ${its.length} осталось` : 'пусто'}</div></div><span class="muted">›</span></div>`;
-  }).join('') : `<div class="card empty">Создайте первый список</div>`;
+    return `<div class="card list-tile" data-list="${l.id}"><div class="bubble">${icon(safeIcon(l.emoji, LIST_ICONS, 'list'))}</div>
+      <div class="grow"><h3 style="font-size:18px">${esc(l.title)}</h3><div class="muted small">${its.length ? t('itemsLeft', left, its.length) : t('emptyList')}</div></div>
+      <span class="muted">${icon('right')}</span></div>`;
+  }).join('') : `<div class="card empty">${t('listsEmpty')}</div>`;
   if (S.openList) {
     const l = S.lists.find(x => x.id === S.openList);
     if (!l) { closeList(); return; }
-    $('ldTitle').textContent = `${l.emoji} ${l.title}`;
+    $('ldIcon').innerHTML = icon(safeIcon(l.emoji, LIST_ICONS, 'list'));
+    $('ldTitle').textContent = l.title;
     const its = S.items.filter(i => i.list_id === l.id).sort((a,b) => (a.done - b.done) || a.created_at.localeCompare(b.created_at));
     $('ldItems').innerHTML = its.length ? its.map(i => `<div class="item ${i.done?'done':''}">
-      <button class="check" data-toggle="${i.id}" aria-label="Отметить">${i.done?'✓':''}</button>
-      <div class="txt">${esc(i.text)}</div><button class="icon-btn" data-del-item="${i.id}" aria-label="Удалить">✕</button></div>`).join('')
-      : `<div class="empty">Пока пусто</div>`;
+      <button class="check" data-toggle="${i.id}" aria-label="check">${i.done ? icon('check') : ''}</button>
+      <div class="txt">${esc(i.text)}</div><button class="icon-btn" data-del-item="${i.id}" aria-label="delete">${icon('x')}</button></div>`).join('')
+      : `<div class="empty">${t('listEmptyItems')}</div>`;
   }
 }
 function openList(id){ S.openList = id; $('listsIndex').classList.add('hidden'); $('listDetail').classList.remove('hidden'); renderLists(); }
@@ -585,9 +782,8 @@ function closeList(){ S.openList = null; $('listsIndex').classList.remove('hidde
 $('listsWrap').onclick = e => { const id = e.target.closest('[data-list]')?.dataset.list; if (id) openList(id); };
 $('backToLists').onclick = closeList;
 $('ldItems').onclick = async e => {
-  const t = e.target.closest('[data-toggle]')?.dataset.toggle, d = e.target.closest('[data-del-item]')?.dataset.delItem;
-  if (t) { const it = S.items.find(i => i.id === t); it.done = !it.done; renderLists();
-    await sb.from('list_items').update({ done: it.done }).eq('id', t); }
+  const tg = e.target.closest('[data-toggle]')?.dataset.toggle, d = e.target.closest('[data-del-item]')?.dataset.delItem;
+  if (tg) { const it = S.items.find(i => i.id === tg); it.done = !it.done; renderLists(); await sb.from('list_items').update({ done: it.done }).eq('id', tg); }
   if (d) { S.items = S.items.filter(i => i.id !== d); renderLists(); await sb.from('list_items').delete().eq('id', d); }
 };
 $('addItemForm').onsubmit = async e => {
@@ -602,47 +798,45 @@ $('clearDone').onclick = async () => {
   await sb.from('list_items').delete().in('id', ids);
 };
 $('delListBtn').onclick = async () => {
-  if (!confirm('Удалить список со всеми пунктами?')) return;
+  if (!confirm(t('confirmDelList'))) return;
   const id = S.openList; closeList(); S.lists = S.lists.filter(l => l.id !== id); renderLists();
   await sb.from('lists').delete().eq('id', id);
 };
-let getListEmoji;
-$('addListBtn').onclick = () => { $('listForm').reset(); getListEmoji = emojiPicker($('lEmoji'), LIST_EMOJIS, LIST_EMOJIS[0]); $('listSheet').showModal(); };
+let getListIcon;
+$('addListBtn').onclick = () => { $('listForm').reset(); getListIcon = iconPicker($('lIcon'), LIST_ICONS, 'list'); $('listSheet').showModal(); };
 $('listSheet').onclose = async () => {
   if ($('listSheet').returnValue !== 'ok') return;
-  const { data, error } = await sb.from('lists').insert({ couple_id:S.couple.id, title:$('lTitle').value.trim(), emoji:getListEmoji() }).select().single();
+  const { data, error } = await sb.from('lists').insert({ couple_id:S.couple.id, title:$('lTitle').value.trim(), emoji:getListIcon() }).select().single();
   if (error) return alert(errText(error));
   if (!S.lists.some(l => l.id === data.id)) S.lists.push(data); openList(data.id);
 };
 
 // ===== Calendar =====
-const DOW = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-function evDayKey(e){ return ymd(new Date(e.starts_at)); }
+const evDayKey = e => ymd(new Date(e.starts_at));
 function evRow(e){
   const d = new Date(e.starts_at);
-  const time = e.all_day ? 'весь день' : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const time = e.all_day ? t('allDayShort') : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const isToday = ymd(d) === ymd(new Date());
-  return `<div class="ev"><div class="time">${isToday ? '' : `<div>${d.getDate()} ${MONTHS_GEN[d.getMonth()].slice(0,3)}</div>`}<div class="${isToday?'':'muted small'}">${time}</div></div>
+  return `<div class="ev"><div class="time">${isToday ? '' : `<div>${d.getDate()} ${t('monthsShort')[d.getMonth()]}</div>`}<div class="${isToday?'':'muted small'}">${time}</div></div>
     <div class="grow"><div>${esc(e.title)}</div>${e.note ? `<div class="muted small">${esc(e.note)}</div>` : ''}</div>
-    <button class="icon-btn" data-del-ev="${e.id}" aria-label="Удалить">✕</button></div>`;
+    <button class="icon-btn" data-del-ev="${e.id}" aria-label="delete">${icon('x')}</button></div>`;
 }
 function renderCal(){
-  if (!S.calMonth) { const t = today(); S.calMonth = new Date(t.getFullYear(), t.getMonth(), 1); S.selDay = ymd(t); }
+  if (!S.calMonth) { const td = today(); S.calMonth = new Date(td.getFullYear(), td.getMonth(), 1); S.selDay = ymd(td); }
   const m = S.calMonth;
-  $('calMonth').textContent = m.toLocaleDateString('ru-RU', { month:'long', year:'numeric' }).replace(' г.','');
+  $('calMonth').textContent = `${t('months')[m.getMonth()]} ${m.getFullYear()}`;
   const first = (m.getDay() + 6) % 7, start = new Date(m.getFullYear(), m.getMonth(), 1 - first);
   const withEv = new Set(S.events.map(evDayKey)), todayKey = ymd(today());
-  let html = DOW.map(d => `<div class="dow">${d}</div>`).join('');
+  let html = t('dow').map(d => `<div class="dow">${d}</div>`).join('');
   for (let i = 0; i < 42; i++) {
     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), k = ymd(d);
     if (i >= 35 && d.getMonth() !== m.getMonth()) break;
     html += `<button class="day ${d.getMonth()!==m.getMonth()?'other':''} ${k===todayKey?'today':''} ${k===S.selDay?'sel':''}" data-day="${k}">${d.getDate()}${withEv.has(k)?'<span class="dot"></span>':''}</button>`;
   }
   $('calGrid').innerHTML = html;
-  const sd = parseYmd(S.selDay);
-  $('selDayTitle').textContent = S.selDay === todayKey ? 'Сегодня' : fmtDay(sd);
+  $('selDayTitle').textContent = S.selDay === todayKey ? t('todayTitle') : fmtDay(parseYmd(S.selDay));
   const evs = S.events.filter(e => evDayKey(e) === S.selDay);
-  $('dayEvents').innerHTML = evs.length ? evs.map(evRow).join('') : `<div class="empty">Свободный день. Нажмите +, чтобы что-то запланировать</div>`;
+  $('dayEvents').innerHTML = evs.length ? evs.map(evRow).join('') : `<div class="empty">${t('freeDay')}</div>`;
 }
 $('calPrev').onclick = () => { S.calMonth = new Date(S.calMonth.getFullYear(), S.calMonth.getMonth()-1, 1); renderCal(); };
 $('calNext').onclick = () => { S.calMonth = new Date(S.calMonth.getFullYear(), S.calMonth.getMonth()+1, 1); renderCal(); };
@@ -650,40 +844,40 @@ $('calGrid').onclick = e => { const k = e.target.closest('[data-day]')?.dataset.
   const d = parseYmd(k); if (d.getMonth() !== S.calMonth.getMonth()) S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); };
 async function delEvent(e){
   const id = e.target.closest('[data-del-ev]')?.dataset.delEv; if (!id) return;
-  if (!confirm('Удалить событие?')) return;
+  if (!confirm(t('confirmDelEvent'))) return;
   S.events = S.events.filter(x => x.id !== id); renderCal(); renderHome();
   await sb.from('events').delete().eq('id', id);
 }
 $('dayEvents').onclick = delEvent; $('homeEvents').onclick = delEvent;
 $('eAllDay').onchange = () => $('eTimeWrap').classList.toggle('hidden', $('eAllDay').checked);
-$('addEventBtn').onclick = () => { $('eventForm').reset(); $('eTime').value='19:00'; $('eTimeWrap').classList.remove('hidden'); $('eDate').value = S.selDay || ymd(today()); $('eventSheet').showModal(); };
+$('addEventBtn').onclick = () => { $('eventForm').reset(); fillTimeSelects(); $('eHour').value = '19'; $('eMin').value = '00'; $('eTimeWrap').classList.remove('hidden'); setDate($('eDate'), S.selDay || ymd(today())); $('eventSheet').showModal(); };
 $('eventSheet').onclose = async () => {
-  if ($('eventSheet').returnValue !== 'ok') return;
-  const allDay = $('eAllDay').checked, [h, mi] = ($('eTime').value || '00:00').split(':').map(Number);
-  const d = parseYmd($('eDate').value); if (!allDay) d.setHours(h, mi);
+  if ($('eventSheet').returnValue !== 'ok' || !getDate($('eDate'))) return;
+  const allDay = $('eAllDay').checked;
+  const d = parseYmd(getDate($('eDate'))); if (!allDay) d.setHours(+$('eHour').value, +$('eMin').value);
   const { data, error } = await sb.from('events').insert({ couple_id:S.couple.id, title:$('eTitle').value.trim(), starts_at:d.toISOString(), all_day:allDay, note:$('eNote').value.trim() || null }).select().single();
   if (error) return alert(errText(error));
   if (!S.events.some(x => x.id === data.id)) { S.events.push(data); S.events.sort((a,b) => a.starts_at.localeCompare(b.starts_at)); }
   S.selDay = ymd(d); S.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); renderCal(); renderHome();
 };
 
-// ===== Me =====
+// ===== Profile =====
 function renderMe(){
   $('inviteCode').textContent = S.couple.invite_code;
-  $('partnerStatus').textContent = S.partner ? `${S.partner.display_name} уже с вами 💞` : 'Отправьте этот код партнёру: он откроет бота, войдёт и введёт код.';
-  $('tgStatus').textContent = S.tgLinked ? `Подключено ✓ Бот @${BOT} пишет, когда партнёр что-то добавил, и напоминает о вопросе дня и важных датах.` : 'Бот будет писать, когда партнёр ответил на вопрос дня или что-то добавил, и напоминать о важных датах.';
-  $('tgBtn').textContent = S.tgLinked ? 'Отключить уведомления' : 'Подключить Telegram';
+  $('partnerStatus').textContent = S.partner ? t('partnerWith', S.partner.display_name) : t('partnerInvite');
+  $('tgStatus').textContent = S.tgLinked ? t('tgOn') : t('tgOff');
+  $('tgBtn').innerHTML = `${icon('send')}<span>${S.tgLinked ? t('tgDisconnect') : t('tgConnect')}</span>`;
   if (document.activeElement?.closest?.('#tab-me')) return;
-  $('meName').value = S.profile.display_name; $('meCouple').value = S.couple.name; $('meStart').value = S.couple.start_date || '';
+  $('meName').value = S.profile.display_name; $('meCouple').value = S.couple.name; setDate($('meStart'), S.couple.start_date || '');
 }
 $('shareCode').onclick = async () => {
-  const text = `Присоединяйся ко мне в Duo 💞\nОткрой бота: https://t.me/${BOT}\nКод пары: ${S.couple.invite_code}`;
+  const text = t('shareText', S.couple.invite_code);
   if (navigator.share) { try { await navigator.share({ text }); } catch(_){} }
-  else { await navigator.clipboard.writeText(text); alert('Скопировано'); }
+  else { try { await navigator.clipboard.writeText(text); alert(t('copied')); } catch(_) { prompt('', text); } }
 };
 $('tgBtn').onclick = async () => {
   if (S.tgLinked) {
-    if (!confirm('Выключить уведомления в Telegram?')) return;
+    if (!confirm(t('confirmTgOff'))) return;
     await sb.rpc('tg_unlink'); S.tgLinked = false; renderMe(); return;
   }
   if (inTG) { const { data } = await sb.rpc('tg_link_webapp', { p_init_data: TG_INIT }); if (data) { S.tgLinked = true; renderMe(); return; } }
@@ -691,36 +885,31 @@ $('tgBtn').onclick = async () => {
   if (error) return alert(errText(error));
   openTg(url);
 };
-$('tgLoginBtn').onclick = async () => {
-  $('tgAuthErr').textContent = ''; $('tgLoginBtn').disabled = true;
-  try { await tgAuth('create'); } catch(e){ $('tgAuthErr').textContent = e.message; }
-  $('tgLoginBtn').disabled = false;
-};
 $('meSave').onclick = async () => {
-  $('meErr').textContent='';
+  $('meErr').textContent=''; $('meErr').classList.remove('ok-text');
   const r1 = await sb.from('profiles').update({ display_name: $('meName').value.trim() || S.profile.display_name }).eq('id', S.user.id);
-  const r2 = await sb.from('couples').update({ name: $('meCouple').value.trim() || 'Мы', start_date: $('meStart').value || null }).eq('id', S.couple.id);
+  const r2 = await sb.from('couples').update({ name: $('meCouple').value.trim() || 'Мы', start_date: getDate($('meStart')) || null }).eq('id', S.couple.id);
   const err = r1.error || r2.error; if (err) return $('meErr').textContent = errText(err);
-  document.activeElement?.blur(); await loadAll(); $('meErr').textContent = 'Сохранено ✓';
+  document.activeElement?.blur(); await loadAll(); $('meErr').textContent = t('saved'); $('meErr').classList.add('ok-text');
 };
 
 // ===== Tabs =====
 function goTab(name){
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
-  ['home','lists','cal','me'].forEach(t => $('tab-'+t).classList.toggle('hidden', t !== name));
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  ['home','lists','cal','me'].forEach(x => $('tab-'+x).classList.toggle('hidden', x !== name));
   window.scrollTo(0,0);
 }
-document.querySelectorAll('.tab').forEach(t => t.onclick = () => goTab(t.dataset.tab));
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset.tab));
 document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => goTab(b.dataset.goto));
 
-// ===== Install hint (iPhone) =====
+// ===== Install hint (iPhone Safari only) =====
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-let hintClosed = false; try { hintClosed = localStorage.getItem('hintClosed') === '1'; } catch(_){}
-if (isIOS && !standalone && !hintClosed) $('installHint').classList.remove('hidden');
-$('installClose').onclick = () => { $('installHint').classList.add('hidden'); try { localStorage.setItem('hintClosed','1'); } catch(_){} };
+if (isIOS && !standalone && !inTG && pref('hintClosed', '0') !== '1') $('installHint').classList.remove('hidden');
+$('installClose').onclick = () => { $('installHint').classList.add('hidden'); setPref('hintClosed', '1'); };
 
-// ===== Service worker =====
+// ===== Start =====
+applyI18n(); applyTheme();
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>
