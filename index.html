@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=7">
+<link rel="stylesheet" href="common.css?v=8">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
@@ -244,7 +244,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=7"></script>
+<script src="common.js?v=8"></script>
 <script>
 addT({
 ru: {
@@ -273,7 +273,7 @@ ru: {
   tgConnect:'Подключить Telegram', tgDisconnect:'Отключить уведомления', confirmTgOff:'Выключить уведомления в Telegram?',
   shareText:c => `Присоединяйся ко мне в Duo\nОткрой бота: https://t.me/${BOT}\nКод пары: ${c}`, copied:'Скопировано',
   enterName:'Введите имя', codeLen:'Код состоит из 6 символов', checkEmail:'Мы отправили письмо для подтверждения. Откройте его и затем войдите.', needDate:'Выберите дату',
-  sWishes:'Желания', sTrips:'Поездки', sCycle:'Цикл', sLists:'Списки', sMoments:'Моменты', sBudget:'Бюджет', soonLabel:'скоро',
+  sWishes:'Желания', sMovies:'Посмотреть вместе', moviesSub:n => `${n} ${plural(n,'совпадение','совпадения','совпадений')}`, moviesEmpty:'Свайпы фильмов и сериалов', sTrips:'Поездки', sCycle:'Цикл', sLists:'Списки', sMoments:'Моменты', sBudget:'Бюджет', soonLabel:'скоро',
   wishesSub:(m,p) => `${m} у вас · ${p} у партнёра`, wishesEmpty:'Добавьте первое желание', tripsEmpty:'Спланируйте поездку', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} сейчас`, cycleEmpty:'Отслеживание цикла', cycleDay:(d,p) => `День ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${plural(n,'список','списка','списков')}`, hiddenN:n => `Показать скрытые (${n})`, editDone:'Готово',
@@ -314,7 +314,7 @@ en: {
   tgConnect:'Connect Telegram', tgDisconnect:'Turn off notifications', confirmTgOff:'Turn off Telegram notifications?',
   shareText:c => `Join me in Duo\nOpen the bot: https://t.me/${BOT}\nCouple code: ${c}`, copied:'Copied',
   enterName:'Enter your name', codeLen:'The code has 6 characters', checkEmail:'We sent you a confirmation email. Open it, then sign in.', needDate:'Pick a date',
-  sWishes:'Wishes', sTrips:'Trips', sCycle:'Cycle', sLists:'Lists', sMoments:'Moments', sBudget:'Budget', soonLabel:'coming soon',
+  sWishes:'Wishes', sMovies:'Watch together', moviesSub:n => `${n} ${n === 1 ? 'match' : 'matches'}`, moviesEmpty:'Swipe films and series', sTrips:'Trips', sCycle:'Cycle', sLists:'Lists', sMoments:'Moments', sBudget:'Budget', soonLabel:'coming soon',
   wishesSub:(m,p) => `${m} yours · ${p} partner's`, wishesEmpty:'Add your first wish', tripsEmpty:'Plan a trip', tripsNext:(n,w) => `${n} ${w}`,
   tripsNow:n => `${n} now`, cycleEmpty:'Cycle tracking', cycleDay:(d,p) => `Day ${d} · ${p}`, partnerCycle:(n,p) => `${n}: ${p}`,
   listsSub:n => `${n} ${n === 1 ? 'list' : 'lists'}`, hiddenN:n => `Show hidden (${n})`, editDone:'Done',
@@ -455,13 +455,14 @@ async function loadAll(){
 }
 // Small summaries for the section tiles (each section has its own page)
 async function loadSummary(){
-  const [w, tr, cs, pcs] = await Promise.all([
+  const [w, tr, cs, pcs, mm] = await Promise.all([
     sb.from('wishes').select('owner_id, received'),
     sb.from('trips').select('title,start_date,end_date').order('start_date', { ascending: true, nullsFirst: false }),
     sb.rpc('cycle_status'),
-    S.partner ? sb.rpc('cycle_status', { p_user: S.partner.id }) : Promise.resolve({ data: null })
+    S.partner ? sb.rpc('cycle_status', { p_user: S.partner.id }) : Promise.resolve({ data: null }),
+    sb.rpc('movie_matches')
   ]);
-  S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data };
+  S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data, movieMatches: (mm.data || []).length };
   // Period days (actual and forecast) to show in the Plan calendar
   const { data: per } = await sb.from('cycle_periods').select('user_id,start_date,end_date').gte('start_date', ymd(addDays(today(), -400)));
   const set = new Set();
@@ -771,6 +772,7 @@ function tileDefs(){
     { id:'wishes', icon:'gift', href:'wishes.html', title:t('sWishes'), sub: w.length ? t('wishesSub', mineW, partW) : t('wishesEmpty') },
     { id:'trips', icon:'plane', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty') },
     { id:'cycle', icon:'droplet', href:'cycle.html', title:t('sCycle'), sub: cycleSub },
+    { id:'movies', icon:'film', href:'movies.html', title:t('sMovies'), sub: sm.movieMatches ? t('moviesSub', sm.movieMatches) : t('moviesEmpty') },
     { id:'lists', icon:'list', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length) },
     { id:'moments', icon:'photo', soon:true, title:t('sMoments'), sub:t('soonLabel') },
     { id:'budget', icon:'wallet', soon:true, title:t('sBudget'), sub:t('soonLabel') },

@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Посмотреть вместе</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=8">
+<style>
+.pools{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -16px 12px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.pools::-webkit-scrollbar{display:none}
+.pools button{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
+.pools button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.stack{position:relative;height:min(62dvh,560px);margin-bottom:18px;touch-action:pan-y}
+.mcard{position:absolute;inset:0;border-radius:24px;overflow:hidden;background:#1f2b24;box-shadow:0 14px 34px rgba(20,40,30,.22);user-select:none;-webkit-user-select:none;will-change:transform}
+.mcard.back{transform:scale(.95) translateY(12px);opacity:.7;transition:transform .2s,opacity .2s}
+.mcard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.mcard .ph{position:absolute;inset:0;background:linear-gradient(160deg,var(--grad-a),#1f2b24);display:grid;place-items:center;color:#fff;font-family:Lora,serif;font-size:28px;text-align:center;padding:24px}
+.mcard .info{position:absolute;left:0;right:0;bottom:0;padding:70px 18px 18px;background:linear-gradient(transparent,rgba(8,12,10,.94) 45%);color:#fff}
+.mcard .info h2{font-size:26px;line-height:1.15}
+.mcard .meta{font-size:13px;opacity:.85;margin:4px 0 8px}
+.mcard .tag{display:inline-block;background:rgba(255,255,255,.18);border-radius:99px;padding:2px 9px;font-size:12px;margin:0 4px 4px 0}
+.mcard .blurb{font-size:13.5px;line-height:1.45;opacity:.92;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px}
+.mcard.open .blurb{-webkit-line-clamp:12}
+.stamp{position:absolute;top:22px;padding:4px 12px;border:3px solid;border-radius:10px;font-weight:800;font-size:22px;letter-spacing:.06em;opacity:0;text-transform:uppercase}
+.stamp.yes{left:18px;color:#9cc7a6;border-color:#9cc7a6;transform:rotate(-12deg)}
+.stamp.no{right:18px;color:#f2a1a1;border-color:#f2a1a1;transform:rotate(12deg)}
+.acts{display:flex;justify-content:center;align-items:center;gap:22px}
+.act{border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);background:var(--card)}
+.act .ic{width:26px;height:26px;stroke-width:2.4}
+.act.no{width:62px;height:62px;color:#c0564f}
+.act.yes{width:72px;height:72px;background:var(--accent);color:var(--accent-ink)}
+.act.yes .ic{width:32px;height:32px}
+.act.later{width:52px;height:52px;color:var(--warm-ink)}
+.mrow{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:0}
+.mrow .poster{width:52px;height:76px;border-radius:10px;object-fit:cover;flex:none;background:linear-gradient(160deg,var(--grad-a),var(--grad-b))}
+.mrow .grow{flex:1;min-width:0}
+.mrow .t{font-weight:600}
+.mrow .acts2{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.rates{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.rate-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.rate-grid button{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 0;font-weight:700;font-size:17px;cursor:pointer}
+.rate-grid button.on{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.match{text-align:center}
+.match .posters{display:flex;justify-content:center;margin:12px 0 14px}
+.match img,.match .pp{width:110px;height:160px;border-radius:16px;object-fit:cover;border:4px solid var(--card);box-shadow:var(--shadow)}
+.match .pp{background:linear-gradient(160deg,var(--grad-a),var(--grad-b))}
+.match .kicker{text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--accent);font-size:13px}
+.empty-stack{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;border:1.5px dashed var(--line);border-radius:24px;color:var(--muted)}
+.sgrp{font-size:13px;font-weight:700;color:var(--muted);margin:18px 4px 8px;text-transform:uppercase;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar">
+    <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+    <h1 data-t="mvTitle" style="font-size:23px"></h1>
+    <button class="icon-btn" id="searchBtn" aria-label="search"><svg class="ic"><use href="#i-search"/></svg></button>
+  </div>
+  <div class="seg" style="margin-bottom:14px" id="tabSeg"><button data-tab="pick" class="on" data-t="tPick"></button><button data-tab="match" id="tabMatch"></button><button data-tab="seen" data-t="tSeen"></button></div>
+
+  <div id="v-pick">
+    <div class="pools" id="pools"></div>
+    <div class="stack" id="stack"></div>
+    <div class="acts" id="acts">
+      <button class="act no" id="bNo" aria-label="no"><svg class="ic"><use href="#i-x"/></svg></button>
+      <button class="act yes" id="bYes" aria-label="yes"><svg class="ic"><use href="#i-heart"/></svg></button>
+      <button class="act later" id="bLater" aria-label="later"><svg class="ic"><use href="#i-clock"/></svg></button>
+    </div>
+    <p class="muted small" style="text-align:center;margin-top:14px" data-t="pickHint"></p>
+  </div>
+
+  <div id="v-match" class="hidden">
+    <div class="card"><div id="matchList"></div></div>
+    <div class="sgrp" id="likesHead"></div><div class="card" id="likesCard"><div id="likesList"></div></div>
+    <div class="sgrp" id="laterHead"></div><div class="card" id="laterCard"><div id="laterList"></div></div>
+  </div>
+
+  <div id="v-seen" class="hidden"><div class="card"><div id="seenList"></div></div></div>
+</main>
+
+<dialog id="matchSheet"><div class="sheet match">
+  <div class="kicker" data-t="matchKicker"></div>
+  <div class="posters" id="mPosters"></div>
+  <h2 id="mTitle"></h2>
+  <p class="muted" id="mSub" style="margin:6px 0 0"></p>
+  <div class="actions" style="flex-direction:column"><button class="btn" id="mPlan" type="button" data-t="planWatch"></button><button class="btn ghost" id="mClose" type="button" data-t="keepPicking"></button></div>
+</div></dialog>
+
+<dialog id="planSheet"><form class="sheet" method="dialog" id="planForm">
+  <h2 data-t="planWatch"></h2>
+  <p class="muted" id="pMovie" style="margin:4px 0 0"></p>
+  <label data-t="day"></label><button type="button" class="field" data-date id="pDate"></button>
+  <label data-t="time"></label><div class="two"><select id="pHour"></select><select id="pMin"></select></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+</form></dialog>
+
+<dialog id="rateSheet"><form class="sheet" method="dialog" id="rateForm">
+  <h2 id="rTitle"></h2>
+  <p class="muted" data-t="rateHint" style="margin:4px 0 14px"></p>
+  <div class="rate-grid" id="rGrid"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+</form></dialog>
+
+<dialog id="searchSheet"><div class="sheet" style="min-height:70dvh">
+  <div class="row-item" style="padding-top:0"><input id="sInput" data-tp="searchPh" autocomplete="off" style="flex:1"><button class="icon-btn" id="sClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+  <div id="sResults" style="margin-top:8px"></div>
+</div></dialog>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=8"></script>
+<script>
+addT({
+ru: { mvTitle:'Посмотреть вместе', tPick:'Выбор', tMatch:n => n ? `Совпали · ${n}` : 'Совпали', tSeen:'Смотрели',
+  pickHint:'Сердце — хочу посмотреть, крестик — нет, часы — решу позже. Партнёр не видит ваш выбор, пока не совпадёт.',
+  pools:[['all','Популярное'],['comedy','Комедии'],['drama','Драмы'],['romance','Мелодрамы'],['scifi','Фантастика'],['thriller','Триллеры'],['action','Боевики'],['horror','Ужасы'],['animation','Мультфильмы'],['series','Сериалы']],
+  film:'фильм', series:'сериал', yes:'Хочу', no:'Нет', loadingFeed:'Подбираю фильмы…', feedEmpty:'В этой подборке вы посмотрели всё. Выберите другой жанр или найдите фильм через поиск.',
+  feedErr:'Не получилось загрузить фильмы. Попробуйте ещё раз.', retry:'Повторить',
+  matchKicker:'Мэтч', matchSub:n => `Вы с ${n} оба хотите посмотреть`, planWatch:'Запланировать просмотр', keepPicking:'Продолжить выбор',
+  matchEmpty:'Пока совпадений нет. Листайте ленту: когда вам обоим понравится один фильм, он появится здесь.',
+  likesHead:n => `Вам понравились · ${n}`, laterHead:n => `Отложенные · ${n}`, planned:d => `В календаре: ${d}`, watched:'Посмотрели', plan:'Запланировать', rate:'Оценить',
+  seenEmpty:'Здесь будут фильмы, которые вы посмотрели вместе, с оценками каждого.', rateHint:'Как вам? Партнёр увидит вашу оценку.', yourRate:'Вы', notRated:'нет оценки',
+  day:'День', time:'Время', searchPh:'Название фильма или сериала', searching:'Ищу…', notFound:'Ничего не нашлось', added:'В списке «хочу»', addYes:'Хочу посмотреть',
+  eventTitle:t => `Кино: ${t}`, back2pick:'Хочу', back2no:'Не хочу' },
+en: { mvTitle:'Watch together', tPick:'Pick', tMatch:n => n ? `Matches · ${n}` : 'Matches', tSeen:'Watched',
+  pickHint:'Heart: want to watch, cross: no, clock: decide later. Your partner doesn\'t see your choices unless you match.',
+  pools:[['all','Popular'],['comedy','Comedy'],['drama','Drama'],['romance','Romance'],['scifi','Sci-fi'],['thriller','Thriller'],['action','Action'],['horror','Horror'],['animation','Animation'],['series','Series']],
+  film:'film', series:'series', yes:'Yes', no:'No', loadingFeed:'Finding films…', feedEmpty:'You\'ve been through this whole selection. Pick another genre or search for a film.',
+  feedErr:'Couldn\'t load films. Please try again.', retry:'Retry',
+  matchKicker:'It\'s a match', matchSub:n => `You and ${n} both want to watch`, planWatch:'Plan a movie night', keepPicking:'Keep picking',
+  matchEmpty:'No matches yet. Keep swiping: when you both like the same film, it shows up here.',
+  likesHead:n => `You liked · ${n}`, laterHead:n => `Saved for later · ${n}`, planned:d => `In calendar: ${d}`, watched:'Watched', plan:'Plan', rate:'Rate',
+  seenEmpty:'Films you watched together will show up here, with each of your ratings.', rateHint:'How was it? Your partner will see your rating.', yourRate:'You', notRated:'not rated',
+  day:'Day', time:'Time', searchPh:'Film or series title', searching:'Searching…', notFound:'Nothing found', added:'In your “yes” list', addYes:'Want to watch',
+  eventTitle:t => `Movie: ${t}`, back2pick:'Yes', back2no:'No' }
+});
+
+const M = { ctx:null, tab:'pick', pool:pref('moviePool', 'all'), queue:[], loading:false, feedErr:false, swipes:{}, matches:[], status:{}, ratings:[], movies:{}, planFor:null, rateFor:null, rateVal:null };
+const clean = s => { if (!s) return ''; let x = s.replace(/́/g, '').replace(/^«[^»]+»\s*(?:\([^)]*\)\s*)?[—–-]\s*/, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
+const metaLine = m => [m.year, m.kind === 'series' ? t('series') : t('film')].filter(Boolean).join(' · ');
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+const poster = (m, cls = 'poster') => m.poster ? `<img class="${cls}" src="${esc(m.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${BLANK}'">` : `<div class="${cls}"></div>`;
+const pName = () => M.ctx.partner?.display_name || t('partner');
+
+// ===== Feed =====
+async function fetchFeed(){
+  if (M.loading) return; M.loading = true; M.feedErr = false; renderStack();
+  try {
+    const { data, error } = await sb.functions.invoke('movies', { body: { action:'feed', pool:M.pool, exclude:M.queue.map(m => m.qid) } });
+    if (error) throw error;
+    let added = 0;
+    (data.items || []).forEach(m => { M.movies[m.qid] = m; if (!M.queue.some(q => q.qid === m.qid) && !M.swipes[m.qid]) { M.queue.push(m); added++; } });
+    M.exhausted = !added || !data.remaining;
+  } catch(e) { console.error(e); M.feedErr = true; }
+  M.loading = false; renderStack();
+}
+function cardHTML(m, back){
+  return `<div class="mcard ${back ? 'back' : ''}" data-q="${m.qid}">
+    <div class="ph">${esc(m.title)}</div>${m.poster ? `<img src="${esc(m.poster)}" alt="" referrerpolicy="no-referrer" style="position:absolute;inset:0" onerror="this.remove()">` : ''}
+    <div class="stamp yes">${t('yes')}</div><div class="stamp no">${t('no')}</div>
+    <div class="info"><h2>${esc(m.title)}</h2><div class="meta">${esc(metaLine(m))}</div>
+      ${(m.genres || []).map(g => `<span class="tag">${esc(g)}</span>`).join('')}
+      ${m.extract ? `<div class="blurb">${esc(clean(m.extract))}</div>` : ''}</div></div>`;
+}
+function renderStack(){
+  const st = $('stack'), q = M.queue;
+  if (!q.length) {
+    st.innerHTML = `<div class="empty-stack"><div>${M.loading ? t('loadingFeed') : M.feedErr ? `${t('feedErr')}<br><button class="btn ghost sm" style="margin:12px auto 0" id="retry">${t('retry')}</button>` : t('feedEmpty')}</div></div>`;
+    $('retry') && ($('retry').onclick = () => { M.feedErr = false; fetchFeed(); });
+    $('acts').style.visibility = 'hidden'; return;
+  }
+  $('acts').style.visibility = 'visible';
+  st.innerHTML = (q[1] ? cardHTML(q[1], true) : '') + cardHTML(q[0], false);
+  bindDrag(st.querySelector('.mcard:not(.back)'));
+  if (q.length < 4 && !M.loading && !M.exhausted && !M.feedErr) setTimeout(fetchFeed, 0);
+}
+function bindDrag(card){
+  if (!card) return;
+  let x0 = null, y0 = null, dx = 0, moved = false;
+  const yes = card.querySelector('.stamp.yes'), no = card.querySelector('.stamp.no');
+  card.addEventListener('pointerdown', e => { x0 = e.clientX; y0 = e.clientY; dx = 0; moved = false; card.setPointerCapture(e.pointerId); card.style.transition = 'none'; });
+  card.addEventListener('pointermove', e => {
+    if (x0 === null) return; dx = e.clientX - x0; const dy = e.clientY - y0;
+    if (!moved && Math.abs(dx) < 6) return; moved = true;
+    card.style.transform = `translate(${dx}px, ${dy * .2}px) rotate(${dx / 18}deg)`;
+    yes.style.opacity = Math.max(0, Math.min(1, dx / 90)); no.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+  });
+  const end = () => {
+    if (x0 === null) return; x0 = null;
+    if (!moved) { card.classList.toggle('open'); return; }
+    if (Math.abs(dx) > 100) decide(dx > 0 ? 'yes' : 'no', card);
+    else { card.style.transition = 'transform .2s'; card.style.transform = ''; yes.style.opacity = 0; no.style.opacity = 0; }
+  };
+  card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end);
+}
+async function decide(choice, card){
+  const m = M.queue[0]; if (!m) return;
+  card = card || $('stack').querySelector('.mcard:not(.back)');
+  if (card) {
+    const dir = choice === 'yes' ? 1 : choice === 'no' ? -1 : 0;
+    card.style.transition = 'transform .28s ease-in, opacity .28s';
+    card.style.transform = dir ? `translate(${dir * 520}px, 40px) rotate(${dir * 24}deg)` : 'translateY(-560px)';
+    card.style.opacity = '0';
+    if (dir) card.querySelector('.stamp.' + choice).style.opacity = 1;
+  }
+  M.queue.shift(); M.swipes[m.qid] = { qid:m.qid, choice };
+  setTimeout(renderStack, 220);
+  try { navigator.vibrate?.(8); } catch(_){}
+  await saveSwipe(m.qid, choice);
+  if (choice === 'yes') await checkMatch(m);
+}
+async function saveSwipe(qid, choice){
+  const { error } = await sb.from('movie_swipes').upsert({ user_id:M.ctx.user.id, couple_id:M.ctx.couple.id, qid, choice });
+  if (error) alert(errText(error));
+  M.swipes[qid] = { qid, choice };
+}
+async function checkMatch(m){
+  if (!M.ctx.partner) return;
+  await loadMatches();
+  if (M.matches.some(x => x.qid === m.qid)) showMatch(m);
+}
+function showMatch(m){
+  $('mPosters').innerHTML = poster(m, 'pp').replace('class="pp"', 'class="pp" style="transform:rotate(-5deg)"') ;
+  $('mTitle').textContent = m.title; $('mSub').textContent = t('matchSub', pName());
+  $('mPlan').onclick = () => { $('matchSheet').close(); openPlan(m); };
+  $('matchSheet').showModal();
+}
+$('mClose').onclick = () => $('matchSheet').close();
+$('bYes').onclick = () => decide('yes'); $('bNo').onclick = () => decide('no'); $('bLater').onclick = () => decide('later');
+
+function renderPools(){
+  $('pools').innerHTML = t('pools').map(([k, l]) => `<button type="button" data-pool="${k}" class="${k === M.pool ? 'on' : ''}">${esc(l)}</button>`).join('');
+}
+$('pools').onclick = e => { const k = e.target.closest('[data-pool]')?.dataset.pool; if (!k || k === M.pool) return; M.pool = k; setPref('moviePool', k); M.queue = []; M.exhausted = false; renderPools(); fetchFeed(); };
+
+// ===== Matches, likes, watched =====
+async function loadMatches(){
+  const [mt, stt, rt, sw] = await Promise.all([
+    sb.rpc('movie_matches'),
+    sb.from('movie_status').select('*'),
+    sb.from('movie_ratings').select('*'),
+    sb.from('movie_swipes').select('qid, choice, created_at, movies(*)').order('created_at', { ascending:false })
+  ]);
+  M.matches = mt.data || [];
+  M.status = Object.fromEntries((stt.data || []).map(s => [s.qid, s]));
+  M.ratings = rt.data || [];
+  M.swipes = {}; (sw.data || []).forEach(s => { M.swipes[s.qid] = s; if (s.movies) M.movies[s.qid] = s.movies; });
+  M.matches.forEach(m => M.movies[m.qid] = m);
+  const evIds = Object.values(M.status).map(s => s.event_id).filter(Boolean);
+  M.events = {};
+  if (evIds.length) { const { data: ev } = await sb.from('events').select('id, starts_at').in('id', evIds); (ev || []).forEach(e => M.events[e.id] = e); }
+  renderLists();
+}
+function plannedLabel(s){
+  const e = s?.event_id && M.events?.[s.event_id]; if (!e) return '';
+  const d = new Date(e.starts_at); if (d < today()) return '';
+  return t('planned', `${fmtDay(d)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+}
+function rateBadges(qid){
+  const mine = M.ratings.find(r => r.qid === qid && r.user_id === M.ctx.user.id), theirs = M.ratings.find(r => r.qid === qid && r.user_id !== M.ctx.user.id);
+  return `<div class="rates"><span class="badge">${t('yourRate')}: ${mine ? mine.rating + '/10' : t('notRated')}</span>${M.ctx.partner ? `<span class="badge warm">${esc(pName())}: ${theirs ? theirs.rating + '/10' : t('notRated')}</span>` : ''}</div>`;
+}
+function renderLists(){
+  const matches = M.matches.filter(m => M.status[m.qid]?.status !== 'watched');
+  $('tabMatch').textContent = t('tMatch', matches.length);
+  $('matchList').innerHTML = matches.length ? matches.map(m => `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
+      ${plannedLabel(M.status[m.qid]) ? `<div class="badge" style="display:inline-block;margin-top:6px">${esc(plannedLabel(M.status[m.qid]))}</div>` : ''}
+      <div class="acts2"><button class="btn ghost sm" data-plan="${m.qid}">${icon('calendar')}<span>${t('plan')}</span></button><button class="btn sm" data-watched="${m.qid}">${icon('check')}<span>${t('watched')}</span></button></div></div></div>`).join('')
+    : `<div class="empty">${t('matchEmpty')}</div>`;
+  const matchSet = new Set(M.matches.map(m => m.qid));
+  const likes = Object.values(M.swipes).filter(s => s.choice === 'yes' && !matchSet.has(s.qid) && M.movies[s.qid]);
+  const later = Object.values(M.swipes).filter(s => s.choice === 'later' && M.movies[s.qid]);
+  $('likesHead').textContent = t('likesHead', likes.length); $('likesHead').classList.toggle('hidden', !likes.length); $('likesCard').classList.toggle('hidden', !likes.length);
+  $('likesList').innerHTML = likes.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div></div><button class="icon-btn" data-set="${m.qid}" data-choice="no" aria-label="no">${icon('x')}</button></div>`; }).join('');
+  $('laterHead').textContent = t('laterHead', later.length); $('laterHead').classList.toggle('hidden', !later.length); $('laterCard').classList.toggle('hidden', !later.length);
+  $('laterList').innerHTML = later.map(s => { const m = M.movies[s.qid]; return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
+    <div class="acts2"><button class="btn sm" data-set="${m.qid}" data-choice="yes">${icon('heart')}<span>${t('back2pick')}</span></button><button class="btn ghost sm" data-set="${m.qid}" data-choice="no">${t('back2no')}</button></div></div></div>`; }).join('');
+  const seen = Object.values(M.status).filter(s => s.status === 'watched' && M.movies[s.qid]).sort((a,b) => String(b.watched_at).localeCompare(String(a.watched_at)));
+  $('seenList').innerHTML = seen.length ? seen.map(s => { const m = M.movies[s.qid]; return `<div class="mrow" data-rate="${m.qid}" style="cursor:pointer">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div>
+      <div class="muted small">${esc(metaLine(m))}${s.watched_at ? ' · ' + fmtDay(parseYmd(s.watched_at)) : ''}</div>${rateBadges(m.qid)}</div><span class="muted">${icon('edit')}</span></div>`; }).join('')
+    : `<div class="empty">${t('seenEmpty')}</div>`;
+}
+document.addEventListener('click', async e => {
+  const p = e.target.closest('[data-plan]')?.dataset.plan; if (p) return openPlan(M.movies[p]);
+  const w = e.target.closest('[data-watched]')?.dataset.watched;
+  if (w) { await sb.from('movie_status').upsert({ couple_id:M.ctx.couple.id, qid:w, status:'watched', watched_at:ymd(today()), event_id:M.status[w]?.event_id || null }); await loadMatches(); return openRate(M.movies[w]); }
+  const set = e.target.closest('[data-set]');
+  if (set) { const qid = set.dataset.set, ch = set.dataset.choice; await saveSwipe(qid, ch); if (ch === 'yes') await checkMatch(M.movies[qid]); return loadMatches(); }
+  const r = e.target.closest('[data-rate]')?.dataset.rate; if (r) return openRate(M.movies[r]);
+});
+
+// ===== Plan a movie night =====
+function openPlan(m){
+  M.planFor = m; $('planForm').reset(); $('pMovie').textContent = m.title;
+  const fri = addDays(today(), (5 - today().getDay() + 7) % 7); setDate($('pDate'), ymd(fri));
+  $('pHour').innerHTML = Array.from({length:24}, (_,i) => `<option value="${pad(i)}">${pad(i)}</option>`).join('');
+  $('pMin').innerHTML = Array.from({length:12}, (_,i) => `<option value="${pad(i*5)}">${pad(i*5)}</option>`).join('');
+  $('pHour').value = '20'; $('pMin').value = '00';
+  $('planSheet').showModal();
+}
+$('planSheet').onclose = async () => {
+  if ($('planSheet').returnValue !== 'ok' || !M.planFor || !getDate($('pDate'))) return;
+  const m = M.planFor, d = parseYmd(getDate($('pDate'))); d.setHours(+$('pHour').value, +$('pMin').value);
+  const { data: ev, error } = await sb.from('events').insert({ couple_id:M.ctx.couple.id, title:t('eventTitle', m.title), starts_at:d.toISOString(), all_day:false, kind:'date', repeat:'none', remind:'same' }).select().single();
+  if (error) return alert(errText(error));
+  await sb.from('movie_status').upsert({ couple_id:M.ctx.couple.id, qid:m.qid, status:'planned', event_id:ev.id });
+  loadMatches();
+};
+
+// ===== Rate =====
+function openRate(m){
+  M.rateFor = m; const mine = M.ratings.find(r => r.qid === m.qid && r.user_id === M.ctx.user.id); M.rateVal = mine?.rating || null;
+  $('rTitle').textContent = m.title;
+  const draw = () => $('rGrid').innerHTML = Array.from({length:10}, (_,i) => `<button type="button" data-v="${i+1}" class="${M.rateVal === i+1 ? 'on' : ''}">${i+1}</button>`).join('');
+  draw(); $('rGrid').onclick = e => { const v = e.target.closest('[data-v]')?.dataset.v; if (v) { M.rateVal = +v; draw(); } };
+  $('rateSheet').showModal();
+}
+$('rateSheet').onclose = async () => {
+  if ($('rateSheet').returnValue !== 'ok' || !M.rateFor || !M.rateVal) return;
+  const { error } = await sb.from('movie_ratings').upsert({ user_id:M.ctx.user.id, couple_id:M.ctx.couple.id, qid:M.rateFor.qid, rating:M.rateVal });
+  if (error) alert(errText(error)); loadMatches();
+};
+
+// ===== Search =====
+let sTimer, sSeq = 0;
+$('searchBtn').onclick = () => { $('sInput').value = ''; $('sResults').innerHTML = ''; $('searchSheet').showModal(); setTimeout(() => $('sInput').focus(), 50); };
+$('sClose').onclick = () => $('searchSheet').close();
+$('sInput').oninput = () => { clearTimeout(sTimer); sTimer = setTimeout(runSearch, 450); };
+async function runSearch(){
+  const q = $('sInput').value.trim(); if (q.length < 2) { $('sResults').innerHTML = ''; return; }
+  const my = ++sSeq; $('sResults').innerHTML = `<div class="empty">${t('searching')}</div>`;
+  const { data, error } = await sb.functions.invoke('movies', { body: { action:'search', q } });
+  if (my !== sSeq) return;
+  const items = (data?.items || []); items.forEach(m => M.movies[m.qid] = m);
+  $('sResults').innerHTML = error ? `<div class="empty">${t('feedErr')}</div>` : items.length ? items.map(m => {
+    const sw = M.swipes[m.qid]?.choice;
+    return `<div class="mrow">${poster(m)}<div class="grow"><div class="t">${esc(m.title)}</div><div class="muted small">${esc(metaLine(m))}</div>
+      ${m.extract ? `<div class="muted small" style="margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(clean(m.extract))}</div>` : ''}</div>
+      ${sw === 'yes' ? `<span class="badge">${t('added')}</span>` : `<button class="add-btn" data-set="${m.qid}" data-choice="yes" aria-label="${t('addYes')}">${icon('heart')}</button>`}</div>`;
+  }).join('') : `<div class="empty">${t('notFound')}</div>`;
+}
+$('sResults').addEventListener('click', () => setTimeout(runSearch, 600));
+
+// ===== Tabs =====
+function setTab(k){ M.tab = k; document.querySelectorAll('#tabSeg button').forEach(b => b.classList.toggle('on', b.dataset.tab === k));
+  ['pick','match','seen'].forEach(x => $('v-' + x).classList.toggle('hidden', x !== k)); }
+document.querySelectorAll('#tabSeg button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+// ===== Start =====
+(async () => {
+  applyI18n(); setupBack();
+  M.ctx = await requireCouple();
+  applyI18n(); renderPools();
+  await loadMatches();
+  show('page', ['loading','page']);
+  fetchFeed();
+  sb.channel('movies-' + M.ctx.couple.id)
+    .on('postgres_changes', { event:'*', schema:'public', table:'movie_status', filter:`couple_id=eq.${M.ctx.couple.id}` }, () => loadMatches())
+    .on('postgres_changes', { event:'*', schema:'public', table:'movie_ratings', filter:`couple_id=eq.${M.ctx.couple.id}` }, () => loadMatches())
+    .subscribe();
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (M.ctx) { renderPools(); renderStack(); renderLists(); } });
+</script>
+</body>
+</html>
