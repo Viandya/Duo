@@ -17,7 +17,25 @@
 .trip-card.past .cover{height:104px}
 .trip-card .cover img,.hero-trip img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
 .trip-card .cover img.ok,.hero-trip img.bg.ok{opacity:1}
-.trip-card .cover.ph:after,.hero-trip.ph:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.62))}
+.trip-card .cover.ph:after,.hero-trip.ph:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12) 0,rgba(0,0,0,0) 30%,rgba(0,0,0,.35) 55%,rgba(0,0,0,.78))}
+.hero-trip.ph .sub{text-shadow:0 1px 6px rgba(0,0,0,.45);opacity:1}
+.ideas{background:linear-gradient(160deg,color-mix(in srgb,var(--accent-soft) 55%,var(--card)),var(--card));box-shadow:inset 0 0 0 1px var(--line)}
+.ideas .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.ideas .hd h2{font-size:19px}
+.ichips{display:flex;flex-wrap:wrap;gap:8px}
+.ichip{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--accent-soft);color:var(--ink);border-radius:99px;padding:7px 14px 7px 7px;font-weight:600;font-size:15px;cursor:pointer;max-width:100%;text-align:left}
+.ichip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ichip i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ichip i .ic{width:15px;height:15px}
+.ichip:active{transform:scale(.97)}
+.ichip.add{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted);padding:7px 14px}
+.ia{background:var(--blue-s);color:var(--blue)}.ib{background:var(--warm);color:var(--warm-ink)}.ic3{background:var(--rose);color:var(--rose-ink)}.id{background:var(--card);color:var(--accent)}.ie{background:var(--violet-s);color:var(--violet)}
+.ideas .hint{color:var(--muted);font-size:13px;margin-top:12px}
+.dstrip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 6px;margin:12px -2px 0;scrollbar-width:none}
+.dstrip::-webkit-scrollbar{display:none}
+.dstrip button{flex:none;min-width:58px;border:0;border-radius:14px;background:var(--bg);color:var(--muted);padding:9px 6px;font-size:12px;cursor:pointer;text-align:center}
+.dstrip button b{display:block;font-size:19px;color:var(--ink);font-family:Lora,serif;font-weight:600;margin-top:1px}
+.dstrip button.on{background:var(--sel-bg);color:var(--sel-ink)}.dstrip button.on b{color:var(--sel-ink)}
 .trip-card .cover h2,.trip-card .cover .bdg{position:relative;z-index:1}
 .trip-card .cover h2{font-size:25px;text-shadow:0 1px 8px rgba(0,0,0,.25)}
 .trip-card .cover .bdg{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.9);color:#1f2b24;border-radius:99px;padding:4px 10px;font-size:12.5px;font-weight:700}
@@ -83,6 +101,7 @@ details summary::-webkit-details-marker{display:none}
 
     <div id="kv-plan" class="kv">
       <div class="card"><div id="planList"></div><button class="btn ghost" id="addPlan" style="margin-top:12px"><svg class="ic"><use href="#i-plus"/></svg><span data-t="addPlan"></span></button></div>
+      <div class="card ideas" id="ideasCard"><div class="hd"><h2 data-t="ideasT"></h2><span class="muted" id="ideasN"></span></div><div class="ichips" id="ideasList"></div><div class="hint" id="ideasHint"></div></div>
     </div>
 
     <div id="kv-pack" class="kv hidden">
@@ -135,6 +154,12 @@ details summary::-webkit-details-marker{display:none}
   <input type="file" id="cvFile" accept="image/*" class="hidden">
 </form></dialog>
 
+<dialog id="daySheet"><form class="sheet" method="dialog">
+  <h2 id="dsTitle"></h2><p class="muted small" data-t="dsHint" style="margin:4px 0 0"></p>
+  <div class="dstrip" id="dsDays"></div>
+  <div class="actions"><button type="button" class="btn ghost" id="dsEdit" data-t="edit"></button><button class="btn" value="cancel" data-t="cancel"></button></div>
+</form></dialog>
+
 <dialog id="itemSheet"><form class="sheet" method="dialog" id="itemForm">
   <h2 id="isTitle"></h2>
   <label data-t="title"></label><input id="iTitle" required>
@@ -161,7 +186,7 @@ ru: { trTitle:'Поездки', trEmpty:'Здесь будут ваши поез
   spent:'Потрачено', ofBudget:(b) => `из ${b}`, noBudget:'Бюджет не задан. Укажите его в настройках поездки.', over:n => `Перерасход ${n}`, left:n => `Осталось ${n}`,
   expEmpty:'Пока трат нет', paidBy:n => `оплата: ${n}`, bookEmpty:'Добавьте билеты, отель, аренду машины: номера бронирований будут под рукой.',
   newPlan:'В план', newExp:'Трата', newBook:'Бронь', iDay:'День', iTime:'Время', iAmount:'Сумма', planDet:'Подробности', bookDet:'Номер брони, адрес, ссылка', expDet:'Комментарий',
-  noTime:'без времени', confirmDelItem:'Удалить?', cvChange:'Сменить обложку', cvTitle:'Обложка', cvMoments:'Из «Моментов»', cvUpload:'Загрузить своё фото', cvNone:'Без фото, цветной фон', cvNoMom:'В «Моментах» пока нет фото' },
+  noTime:'без времени', confirmDelItem:'Удалить?', cvChange:'Сменить обложку', cvTitle:'Обложка', cvMoments:'Из «Моментов»', cvUpload:'Загрузить своё фото', cvNone:'Без фото, цветной фон', cvNoMom:'В «Моментах» пока нет фото', ideasT:'Идеи на поездку', ideasHint:'Нажмите на идею, чтобы выбрать день', ideasHintNo:'Нажмите на идею, чтобы изменить её', ideaAdd:'идея', dsTitle:x => `«${x}»: в какой день?`, dsHint:'Идея перейдёт в план этого дня', planEmpty2:'Добавьте, что хотите сделать. Без даты это станет идеей, день можно выбрать потом.' },
 en: { trTitle:'Trips', trEmpty:'Your trips will live here: a day-by-day plan, packing, budget and bookings. Tap + to start.', past:n => `Past trips (${n})`,
   now:'now', noDates:'no dates yet', newTrip:'New trip', editTrip:'Trip', where:'Where to', wherePh:'Istanbul', from:'From', to:'To', budget:'Budget', budgetPh:'1,000',
   delTrip:'Delete trip', confirmDelTrip:'Delete this trip with all plans and expenses?',
@@ -172,7 +197,7 @@ en: { trTitle:'Trips', trEmpty:'Your trips will live here: a day-by-day plan, pa
   spent:'Spent', ofBudget:(b) => `of ${b}`, noBudget:'No budget set. Add one in the trip settings.', over:n => `Over by ${n}`, left:n => `${n} left`,
   expEmpty:'No expenses yet', paidBy:n => `paid by ${n}`, bookEmpty:'Add tickets, hotel, car rental: booking numbers will be at hand.',
   newPlan:'Plan item', newExp:'Expense', newBook:'Booking', iDay:'Day', iTime:'Time', iAmount:'Amount', planDet:'Details', bookDet:'Booking number, address, link', expDet:'Comment',
-  noTime:'no time', confirmDelItem:'Delete?', cvChange:'Change cover', cvTitle:'Cover', cvMoments:'From Moments', cvUpload:'Upload a photo', cvNone:'No photo, colour background', cvNoMom:'No photos in Moments yet' }
+  noTime:'no time', confirmDelItem:'Delete?', cvChange:'Change cover', cvTitle:'Cover', cvMoments:'From Moments', cvUpload:'Upload a photo', cvNone:'No photo, colour background', cvNoMom:'No photos in Moments yet', ideasT:'Trip ideas', ideasHint:'Tap an idea to pick a day', ideasHintNo:'Tap an idea to edit it', ideaAdd:'idea', dsTitle:x => `“${x}”: which day?`, dsHint:'The idea moves to that day\'s plan', planEmpty2:'Add what you want to do. Without a date it becomes an idea, pick the day later.' }
 });
 const TR = { ctx:null, trips:[], items:[], open:null, tab:'plan', packOwner:'shared', editingTrip:null, editingItem:null, itemKind:'plan' };
 const nameOf = id => id === TR.ctx.user.id ? t('you') : (TR.ctx.partner?.id === id ? TR.ctx.partner.display_name : '');
@@ -233,19 +258,22 @@ function renderTrip(){
   document.querySelectorAll('.kv').forEach(v => v.classList.toggle('hidden', v.id !== 'kv-' + TR.tab));
   const by = k => TR.items.filter(i => i.kind === k);
 
-  // Plan grouped by day
-  const plan = by('plan'), days = tripDays(tr);
-  if (!plan.length) $('planList').innerHTML = `<div class="empty">${t('planEmpty')}</div>`;
+  // Plan grouped by day; items without a day are ideas
+  const plan = by('plan'), days = tripDays(tr), dated = plan.filter(p => p.day), ideas = plan.filter(p => !p.day);
+  if (!dated.length) $('planList').innerHTML = `<div class="empty">${ideas.length ? t('planEmpty2') : t('planEmpty')}</div>`;
   else {
-    const groups = {}; plan.forEach(p => (groups[p.day || ''] = groups[p.day || ''] || []).push(p));
-    const keys = Object.keys(groups).sort((a,b) => (a || '9999').localeCompare(b || '9999'));
-    $('planList').innerHTML = keys.map(k => {
-      const n = days.indexOf(k) + 1;
-      const head = k ? (n > 0 ? t('dayN', n, fmtDay(parseYmd(k))) : fmtDay(parseYmd(k))) : t('noDay');
+    const groups = {}; dated.forEach(p => (groups[p.day] = groups[p.day] || []).push(p));
+    $('planList').innerHTML = Object.keys(groups).sort().map(k => {
+      const n = days.indexOf(k) + 1, head = n > 0 ? t('dayN', n, fmtDay(parseYmd(k))) : fmtDay(parseYmd(k));
       return `<div class="dayblock"><div class="dayhead">${esc(head)}</div>${groups[k].map(p => `<div class="pl" data-item="${p.id}" style="cursor:pointer">
-        <div class="tm">${p.time ? esc(p.time) : '·'}</div><div class="grow"><div>${esc(p.title)}</div>${p.details ? `<div class="muted small">${esc(p.details)}</div>` : ''}</div></div>`).join('')}</div>`;
+        <div class="tm">${p.time ? esc(p.time) : ''}</div><div class="grow"><div>${esc(p.title)}</div>${p.details ? `<div class="muted small">${esc(p.details)}</div>` : ''}</div></div>`).join('')}</div>`;
     }).join('');
   }
+  $('ideasCard').classList.toggle('hidden', !ideas.length);
+  $('ideasN').textContent = ideas.length || '';
+  $('ideasList').innerHTML = ideas.map(p => { const [ic, cl] = ideaIcon(p.title); return `<button type="button" class="ichip" data-idea="${p.id}"><i class="${cl}">${icon(ic)}</i><span>${esc(p.title)}</span></button>`; }).join('')
+    + `<button type="button" class="ichip add" id="ideaAdd">+ ${t('ideaAdd')}</button>`;
+  $('ideasHint').textContent = days.length ? t('ideasHint') : t('ideasHintNo');
 
   // Packing
   const pack = by('pack'), doneN = pack.filter(p => p.done).length;
@@ -423,6 +451,41 @@ $('cvFile').onchange = async () => {
     await setCover({ cover_kind:'upload', cover_path:path, cover_url:null });
   } catch(e) { alert(errText(e)); }
 };
+
+// ===== Ideas: pick a day =====
+const IDEA_ICONS = [
+  [/аква|бассейн|пляж|мор[еяю]|озер|купа|спа|баня|aqua|pool|beach|sea|lake|spa|swim/i, 'droplet', 'ia'],
+  [/экскурс|тур\b|пещер|музе|гид|прогулк|tour|cave|museum|guide|walk/i, 'map', 'ib'],
+  [/встреч|мам|пап|друз|родител|бабушк|свидан|meet|mom|dad|friend|parents|date/i, 'heart', 'ic3'],
+  [/ресторан|кафе|ужин|обед|завтрак|поесть|еда|кухн|restaurant|cafe|dinner|lunch|breakfast|food/i, 'food', 'ib'],
+  [/бар|вин|коктейл|bar|wine|cocktail/i, 'glass', 'ie'],
+  [/магазин|шопинг|рынок|сувенир|shop|market|mall|souvenir/i, 'cart', 'ia'],
+  [/кино|театр|концерт|шоу|cinema|theat|concert|show/i, 'film', 'ie'],
+  [/парк|сад|лес|гор[аыу]|поход|природ|park|garden|forest|mountain|hike/i, 'leaf', 'id'],
+  [/фото|photo/i, 'camera', 'ic3'],
+  [/кремл|собор|храм|церк|мечет|замок|дворец|башн|площад|kremlin|cathedral|church|mosque|castle|palace|tower|square/i, 'star', 'id']
+];
+const ideaIcon = s => { const m = IDEA_ICONS.find(([re]) => re.test(s || '')); return m ? [m[1], m[2]] : ['sparkle', 'ie']; };
+let ideaOpen = null;
+document.addEventListener('click', e => {
+  if (e.target.closest('#ideaAdd')) return openItem('plan');
+  const id = e.target.closest('[data-idea]')?.dataset.idea; if (!id) return;
+  const row = TR.items.find(i => i.id === id), tr = TR.trips.find(x => x.id === TR.open), days = tripDays(tr);
+  if (!row) return;
+  if (!days.length) return openItem('plan', row);
+  ideaOpen = row; $('dsTitle').textContent = t('dsTitle', row.title);
+  const wd = LANG === 'en' ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['вс','пн','вт','ср','чт','пт','сб'];
+  $('dsDays').innerHTML = days.map(d => { const x = parseYmd(d); return `<button type="button" data-dsday="${d}">${wd[x.getDay()]}<b>${x.getDate()}</b>${t('monthsShort')[x.getMonth()]}</button>`; }).join('');
+  $('daySheet').showModal();
+});
+$('dsDays').onclick = async e => {
+  const d = e.target.closest('[data-dsday]')?.dataset.dsday; if (!d || !ideaOpen) return;
+  e.target.closest('button').classList.add('on');
+  const row = ideaOpen; ideaOpen = null; row.day = d; setTimeout(() => $('daySheet').close(), 150); renderTrip();
+  const { error } = await sb.from('trip_items').update({ day:d }).eq('id', row.id); if (error) alert(errText(error));
+  loadItems();
+};
+$('dsEdit').onclick = () => { const row = ideaOpen; $('daySheet').close(); if (row) openItem('plan', row); };
 
 // ===== Trip sheet =====
 function openTripSheet(tr){
