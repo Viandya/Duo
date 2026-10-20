@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Админка</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=19">
+<style>
+.lb{font-size:11.5px;color:var(--muted);font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border-radius:18px;padding:14px;box-shadow:inset 0 0 0 1px var(--line)}
+.kpi .n{font-family:Lora,serif;font-size:32px;font-weight:600;line-height:1.1;margin-top:4px}
+.kpi .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+.kpi.gold{background:linear-gradient(150deg,#fbf6ea,#f1e2bf);box-shadow:inset 0 0 0 1px #ead9b2;color:#5a4010}
+.kpi.gold .lb,.kpi.gold .s{color:#8a6420}
+:root[data-theme="dark"] .kpi.gold,:root[data-palette="pumpkin"] .kpi.gold,:root[data-palette="gothic"] .kpi.gold{background:linear-gradient(150deg,#3a2f1a,#2a2318);box-shadow:inset 0 0 0 1px #5b4a2a;color:#f6e3b4}
+:root[data-theme="dark"] .kpi.gold .lb,:root[data-theme="dark"] .kpi.gold .s{color:#d8b56a}
+.up{color:var(--accent);font-weight:700}
+.box{background:var(--card);border-radius:18px;padding:14px;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:12px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;vertical-align:middle;margin-right:5px}
+.fun{display:flex;flex-direction:column;gap:7px}
+.fun .r{display:flex;align-items:center;gap:9px;font-size:14px}
+.fun .bar{height:22px;border-radius:6px;background:var(--accent);flex:none;min-width:4px}
+.fun b{min-width:22px}
+.fun span.t{color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .grow{flex:1;min-width:0;font-weight:600}
+.row .grow div{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none;background:var(--accent-soft);color:var(--accent)}
+.tag{font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tag.gold{background:linear-gradient(135deg,#f6ead0,#e2c385);color:#5a4010}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:20px;letter-spacing:.12em;font-weight:700;text-align:center;padding:12px;border-radius:12px;background:var(--bg);margin-top:10px;user-select:all}
+.toast{position:fixed;left:50%;bottom:calc(30px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.uses .r span.t{width:76px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar"><button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button><h1>Админка</h1><button class="icon-btn" id="reload" aria-label="refresh"><svg class="ic"><use href="#i-refresh"/></svg></button></div>
+  <div class="seg" id="tabs" style="margin-bottom:10px"><button data-tab="ov" class="on">Обзор</button><button data-tab="st">Звёзды</button><button data-tab="pp">Люди</button></div>
+  <div class="seg" id="period" style="margin-bottom:14px;background:none;box-shadow:inset 0 0 0 1.5px var(--line)"><button data-d="1">Сегодня</button><button data-d="7" class="on">7 дней</button><button data-d="30">30 дней</button><button data-d="3650">Всё</button></div>
+  <div id="vOv"></div><div id="vSt" class="hidden"></div><div id="vPp" class="hidden"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=19"></script>
+<script>
+const A = { d:7, tab:'ov', s:null, tg:null };
+const nf = n => Number(n || 0).toLocaleString('ru-RU');
+const toast = m => { const el = $('toast'); el.textContent = m; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600); };
+const ago = v => { const d = new Date(v), m = Math.round((Date.now() - d) / 6e4); if (m < 60) return `${Math.max(1, m)} мин назад`; if (m < 1440) return `${Math.round(m / 60)} ч назад`; const dd = Math.round(m / 1440); return dd < 8 ? `${dd} ${plural(dd, 'день', 'дня', 'дней')} назад` : d.toLocaleDateString('ru-RU'); };
+const PL = { life:'Plus навсегда', month:'Plus, месяц', year:'Plus, год', trial:'пробный', gift:'Plus, подарок', lifetime:'Plus навсегда' };
+const KIND = { plus_month:'Duo Plus, месяц', plus_year:'Duo Plus, год', code_month:'Код Plus на месяц', code_year:'Код Plus на год', wrapped:'Итоги года', gift:'Подарок' };
+const period = () => ({ 1:'сегодня', 7:'за 7 дней', 30:'за 30 дней', 3650:'за всё время' })[A.d];
+
+function chart(series){
+  const W = 320, H = 110, n = series.length, mx = Math.max(1, ...series.map(x => Math.max(x.new, x.act))), bw = Math.max(3, W / n - 4);
+  const x = i => (i + .5) * W / n, y = v => H - 8 - v / mx * (H - 22);
+  const bars = series.map((p, i) => `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(p.new).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - 8 - y(p.new)).toFixed(1)}" rx="2" fill="var(--sel-bg)"/>`).join('');
+  const line = series.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.act).toFixed(1)}`).join(' ');
+  const labels = series.map((p, i) => (n <= 7 || i % Math.ceil(n / 7) === 0 || i === n - 1) ? `<text x="${x(i).toFixed(1)}" y="${H + 6}" text-anchor="middle" font-size="9" fill="var(--muted)">${n <= 7 ? ['вс','пн','вт','ср','чт','пт','сб'][parseYmd(p.d).getDay()] : parseYmd(p.d).getDate()}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${W} ${H + 10}" width="100%">${bars}<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>${series.map((p, i) => p.act ? `<circle cx="${x(i).toFixed(1)}" cy="${y(p.act).toFixed(1)}" r="2.6" fill="var(--accent)"/>` : '').join('')}${labels}</svg>
+    <div class="legend"><span><i style="width:10px;height:10px;border-radius:2px;background:var(--sel-bg)"></i>новые</span><span><i style="width:12px;height:2px;background:var(--accent)"></i>заходили</span></div>`;
+}
+function renderOv(){
+  const s = A.s, f = s.funnel, mx = Math.max(1, f[0]);
+  const steps = [['зарегистрировались'], ['создали пару или вошли в неё'], ['партнёр присоединился'], ['подключили Telegram'], ['оплатили']];
+  $('vOv').innerHTML = `<div class="kpis">
+      <div class="kpi"><div class="lb">Пользователи</div><div class="n">${nf(s.users)}</div><div class="s"><span class="up">+${nf(s.users_new)}</span> ${period()}</div></div>
+      <div class="kpi"><div class="lb">Заходили</div><div class="n">${nf(A.d === 1 ? s.visit_today : s.visit_period)}</div><div class="s">${period()} · сегодня ${nf(s.visit_today)}</div></div>
+      <div class="kpi"><div class="lb">Пары</div><div class="n">${nf(s.couples)}</div><div class="s">полных: ${nf(s.couples_full)}</div></div>
+      <div class="kpi gold"><div class="lb">Звёзды</div><div class="n">${nf(s.stars)} ★</div><div class="s">${A.tg?.balance != null ? `баланс бота: ${nf(A.tg.balance)} ★` : `${nf(s.stars_period)} ★ ${period()}`}</div></div></div>
+    <div class="box"><div class="hd"><span class="lb">Новые и активные</span><span class="muted small">по дням</span></div>${chart(s.series || [])}</div>
+    <div class="box"><div class="lb" style="margin-bottom:10px">Воронка</div><div class="fun">${f.map((v, i) => `<div class="r"><span class="bar" style="width:${Math.round(v / mx * 150)}px;opacity:${1 - i * .15}"></span><b>${nf(v)}</b><span class="t">${steps[i][0]}</span></div>`).join('')}</div></div>
+    <p class="muted small" style="margin:0 4px">«Заходили» считается с 20 октября 2026, когда появилась отметка о входе.</p>`;
+}
+function renderSt(){
+  const s = A.s, tg = A.tg;
+  const pays = s.payments || [];
+  $('vSt').innerHTML = `<div class="kpi gold" style="text-align:center;padding:20px;margin-bottom:12px"><div class="lb">Заработано всего</div><div class="n" style="font-size:42px">${nf(s.stars)} ★</div>
+      <div class="s">${tg?.balance != null ? `на балансе бота ${nf(tg.balance)} ★` : 'баланс бота не загрузился'} · ${nf(s.stars_period)} ★ ${period()}</div>
+      <div class="s" style="margin-top:6px;opacity:.85">Вывести звёзды можно в @BotFather через Fragment, спустя 21 день после оплаты</div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="lb">С Plus</div><div class="n">${nf(s.plus_on)}</div><div class="s">платных ${nf(s.plus_paid)} · навсегда ${nf(s.plus_life)}</div></div>
+      <div class="kpi"><div class="lb">Пробный</div><div class="n">${nf(s.trial)}</div><div class="s">кончится за неделю у ${nf(s.trial_ending)}</div></div>
+      <div class="kpi"><div class="lb">Подарки</div><div class="n">${nf(s.gifts)}</div><div class="s">из них в тестовой паре ${nf(s.gifts_test)}</div></div>
+      <div class="kpi"><div class="lb">Подписки</div><div class="n">${nf(s.subs * 99)} ★</div><div class="s">в месяц · ${nf(s.subs)} ${plural(s.subs, 'подписка', 'подписки', 'подписок')}</div></div></div>
+    <div class="box"><div class="lb" style="margin-bottom:4px">Последние оплаты</div>${pays.length ? pays.map(p => `<div class="row"><span class="av" style="background:linear-gradient(135deg,#f6ead0,#e2c385);color:#5a4010">★</span>
+      <span class="grow">${esc(KIND[p.kind] || p.kind)}${p.recurring ? ' · продление' : ''}<div>${esc(p.couple || '—')} · ${ago(p.created_at)}</div></span><b>${nf(p.stars)} ★</b></div>`).join('') : '<div class="empty">Оплат пока нет</div>'}</div>`;
+}
+function renderPp(){
+  const s = A.s, u = s.usage || {}, uses = [['События', u.events, '#3f7aa0'], ['Подарки', u.gifts, '#b8506a'], ['Ответы', u.answers, '#c99a3b'], ['Фото', u.moments, '#6e5aa6'], ['Кино', u.swipes, 'var(--accent)'], ['Желания', u.wishes, '#c0674b'], ['Поездки', u.trips, '#2b84a8'], ['Списки', u.lists, '#7a62c9'], ['Бюджет', u.budget, '#8a6a40']];
+  const mx = Math.max(1, ...uses.map(x => x[1] || 0));
+  const via = { tg:'Telegram', email:'почта', test:'тестовая' };
+  $('vPp').innerHTML = `<div class="box"><div class="lb" style="margin-bottom:4px">Новые пользователи</div>${(s.recent_users || []).map(r => `<div class="row"><span class="av">${esc(r.name.charAt(0).toUpperCase())}</span>
+      <span class="grow">${esc(r.name)}<div>${via[r.via]} · ${r.couple ? esc(r.couple) : 'без пары'}</div></span>${r.plus ? `<span class="tag ${r.plus === 'life' ? 'gold' : ''}">${PL[r.plus] || r.plus}</span>` : ''}<span class="muted small" style="white-space:nowrap">${ago(r.created_at)}</span></div>`).join('')}</div>
+    <div class="box uses"><div class="hd"><span class="lb">Чем пользуются</span><span class="muted small">${period()}</span></div><div class="fun">${uses.map(([n, v, c]) => `<div class="r"><span class="t">${n}</span><span class="bar" style="width:${Math.round((v || 0) / mx * 150)}px;background:${c}"></span><b>${nf(v)}</b></div>`).join('')}</div></div>
+    <div class="box"><div class="lb" style="margin-bottom:10px">Инструменты</div>
+      <label style="margin-top:0">Plus навсегда для пары</label><select id="cpl">${(s.couples_list || []).map(c => `<option value="${c.id}">${esc(c.name || '—')} · ${c.members} ${plural(c.members, 'человек', 'человека', 'человек')}${c.plus === 'life' ? ' · навсегда' : ''}${c.test ? ' · тест' : ''}</option>`).join('')}</select>
+      <div class="two" style="margin-top:8px"><button class="btn" id="lifeOn" style="background:linear-gradient(135deg,#d8b56a,#f6e3b4);color:#2a2112">Выдать навсегда</button><button class="btn ghost" id="lifeOff">Забрать</button></div>
+      <label>Промокод на Duo Plus</label><div class="chips" id="codeKind"><button type="button" data-k="month" class="on">месяц</button><button type="button" data-k="year">год</button><button type="button" data-k="lifetime">навсегда</button></div>
+      <button class="btn ghost" id="mkCode" style="margin-top:10px">Создать промокод</button><div id="codeOut"></div></div>`;
+  $('lifeOn').onclick = () => life(true); $('lifeOff').onclick = () => life(false);
+  $('codeKind').onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; [...$('codeKind').children].forEach(x => x.classList.toggle('on', x === b)); };
+  $('mkCode').onclick = async () => { const k = $('codeKind').querySelector('.on').dataset.k; const { data, error } = await sb.rpc('admin_make_code', { p_kind:k }); if (error) return alert(errText(error));
+    $('codeOut').innerHTML = `<div class="code">${esc(data)}</div><p class="muted small" style="text-align:center;margin:6px 0 0">Нажмите на код, чтобы скопировать</p>`;
+    $('codeOut').querySelector('.code').onclick = () => { try { navigator.clipboard.writeText(data); toast('Скопировано'); } catch(_){} }; };
+}
+async function life(on){ const id = $('cpl').value; if (!id) return; if (!confirm(on ? 'Выдать этой паре Duo Plus навсегда?' : 'Забрать Plus навсегда у этой пары?')) return;
+  const { error } = await sb.rpc('admin_grant_lifetime', { p_couple:id, p_on:on }); if (error) return alert(errText(error)); toast(on ? 'Готово, Plus навсегда' : 'Готово'); load(); }
+function render(){ if (!A.s) return; renderOv(); renderSt(); if (A.tab === 'pp' || !$('vPp').innerHTML) renderPp(); }
+async function load(){
+  const [{ data, error }, tg] = await Promise.all([sb.rpc('admin_stats', { p_days:A.d }), A.tg ? Promise.resolve({ data:A.tg }) : sb.functions.invoke('admin', { body:{} })]);
+  if (error) throw error; A.s = data; if (tg?.data && !A.tg) A.tg = tg.data;
+  const keep = $('cpl')?.value; renderOv(); renderSt(); renderPp(); if (keep && $('cpl')) $('cpl').value = keep;
+}
+$('tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; A.tab = b.dataset.tab; [...$('tabs').children].forEach(x => x.classList.toggle('on', x === b));
+  ['ov','st','pp'].forEach(k => $('v' + k[0].toUpperCase() + k[1]).classList.toggle('hidden', k !== A.tab)); };
+$('period').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; A.d = +b.dataset.d; [...$('period').children].forEach(x => x.classList.toggle('on', x === b)); load().catch(err => alert(errText(err))); };
+$('reload').onclick = () => { A.tg = null; load().catch(err => alert(errText(err))); };
+(async () => {
+  setupBack();
+  const ctx = await requireCouple().catch(() => null);
+  const { data: ok } = await sb.rpc('is_admin');
+  if (ok !== true) { location.replace('index.html'); return; }
+  await load(); show('page', ['loading','page']);
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+</script>
+</body>
+</html>

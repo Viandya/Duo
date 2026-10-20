@@ -345,6 +345,7 @@ async function requireCouple(){
     sb.from('couples').select('*').eq('id', profile.couple_id).single()
   ]);
   guardPalette(couple, user.id);
+  sb.rpc('touch_visit').then(() => {});
   return { user, profile, couple, partner: (members || []).find(m => m.id !== user.id) || null };
 }
 // Back navigation for section pages (also Telegram's own back button)

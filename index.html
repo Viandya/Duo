@@ -424,6 +424,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
       <button type="button" class="mrow" id="leaveRow"><span class="sq c2"><svg class="ic"><use href="#i-logout"/></svg></span><span class="grow"><span data-t="leaveT"></span><small id="leaveSub"></small></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <button type="button" class="mrow" id="deleteRow"><span class="sq cr"><svg class="ic"><use href="#i-trash"/></svg></span><span class="grow" style="color:#c0564f"><span data-t="deleteT"></span><small data-t="deleteSub"></small></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
     </div>
+    <div class="card k-list hidden" id="adminCard"><a class="mrow" href="admin.html"><span class="sq" style="background:#1f2b24;color:#f6ead0"><svg class="ic"><use href="#i-grid"/></svg></span><span class="grow">Админка<small>пользователи, звёзды, статистика</small></span><svg class="ic chev"><use href="#i-chev"/></svg></a></div>
     <button class="btn link logout" id="logout" data-t="logoutAcc"></button>
   </section>
 
@@ -776,6 +777,8 @@ async function boot(session){
     const { data: profile, error } = await sb.from('profiles').select('*').eq('id', S.user.id).single();
     if (error) throw error;
     S.profile = profile;
+    sb.rpc('touch_visit').then(() => {});
+    sb.rpc('is_admin').then(({ data }) => $('adminCard').classList.toggle('hidden', data !== true));
     if (profile.lang && profile.lang !== LANG && T[profile.lang]) { LANG = profile.lang; setPref('lang', LANG); applyI18n(); }
     if (profile.palette && profile.palette !== pref('palette', 'sage')) { setPref('palette', profile.palette); applyTheme(); }
     if (!profile.couple_id) { $('obName').textContent = profile.display_name; setDate($('obStart'), ymd(today())); show('onboard', SCREENS); return; }
