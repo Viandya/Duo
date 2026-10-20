@@ -151,3 +151,8 @@ dialog{cursor:pointer}dialog>*{cursor:auto}
 .gold-text{background:linear-gradient(120deg,#b98a3c,#e9cf93 45%,#c99a3b);-webkit-background-clip:text;background-clip:text;color:transparent}
 .btn.plus{background:#1f2a24;color:#f6ead0}
 :root[data-theme="dark"] .btn.plus,:root[data-palette="pumpkin"] .btn.plus,:root[data-palette="gothic"] .btn.plus{background:linear-gradient(135deg,#d8b56a,#f6e3b4);color:#2a2112}
+/* no blue focus ring after a tap (keyboard focus keeps a soft ring) */
+dialog,dialog:focus,.sheet:focus{outline:none}
+button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
+.icon-btn:focus,.icon-btn:focus-visible{outline:none}
+.icon-btn:focus-visible{box-shadow:0 0 0 2px var(--accent-soft)}
