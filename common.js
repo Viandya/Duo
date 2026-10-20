@@ -151,6 +151,7 @@ function applyTheme(){
   let mode = p;
   if (p === 'auto') { const tc = inTG && tgApp()?.colorScheme; mode = tc || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
   document.documentElement.dataset.theme = mode;
+  const pal = pref('palette', 'sage'); if (pal && pal !== 'sage') document.documentElement.dataset.palette = pal; else delete document.documentElement.dataset.palette;
   const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg);
   const a = tgApp(); if (inTG && a) { try { a.setHeaderColor(bg); a.setBackgroundColor(bg); } catch(_){} }
@@ -256,6 +257,7 @@ async function requireCouple(){
   const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
   if (!profile?.couple_id) { location.replace('index.html'); return new Promise(() => {}); }
   if (profile.lang && profile.lang !== LANG && T[profile.lang]) { LANG = profile.lang; setPref('lang', LANG); }
+  if (profile.palette && profile.palette !== pref('palette', 'sage')) { setPref('palette', profile.palette); applyTheme(); }
   const [{ data: members }, { data: couple }] = await Promise.all([
     sb.from('profiles').select('*').eq('couple_id', profile.couple_id),
     sb.from('couples').select('*').eq('id', profile.couple_id).single()

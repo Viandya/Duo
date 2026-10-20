@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=16">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=17">
 <style>
 .topbar .add-btn{margin-left:auto}
 .mem{position:relative;border-radius:22px;overflow:hidden;height:190px;margin-bottom:16px;cursor:pointer;background:var(--accent-soft)}
@@ -85,7 +85,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=16"></script>
+<script src="common.js?v=17"></script>
 <script>
 addT({
 ru: { mTitle:'Моменты', date:'Дата', vFeed:'Лента', vAlbums:'Альбомы', vMap:'Карта', mNew:'Новый момент', mCaption:'Подпись', mCaptionPh:'Ужин на крыше',

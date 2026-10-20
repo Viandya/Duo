@@ -14,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=16">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=17">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
@@ -181,6 +181,14 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
 .cr{background:#f6dedd;color:#c0564f}
 :root[data-theme="dark"] .cr{background:#3a2424;color:#e08f8f}
 .btn.danger{background:#c0564f;color:#fff}
+.pdots{display:flex;gap:3px;margin-right:2px}
+.pdots i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(128,128,128,.25)}
+.pals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pals button{border:0;border-radius:18px;padding:12px;text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1.5px var(--line);background:var(--bg);color:var(--ink);display:flex;flex-direction:column;gap:10px}
+.pals button.on{box-shadow:inset 0 0 0 2.5px var(--accent)}
+.pals .prev{height:58px;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:flex-end;gap:5px;padding:8px}
+.pals .prev i{display:block;border-radius:50%}
+.pals b{font-weight:600;font-size:15px}
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .status{display:flex;gap:8px;align-items:center;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px}
@@ -348,6 +356,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
     <div class="card k-list">
       <button type="button" class="mrow" id="notifRow"><span class="sq c4"><svg class="ic"><use href="#i-send"/></svg></span><span class="grow"><span data-t="tgNotif"></span><small id="notifSub"></small></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <div class="mrow"><span class="sq c5"><svg class="ic"><use href="#i-globe"/></svg></span><span class="grow" data-t="language"></span><div class="seg mini"><button data-lang="ru">RU</button><button data-lang="en">EN</button></div></div>
+      <button type="button" class="mrow" id="palRow"><span class="sq c3"><svg class="ic"><use href="#i-sparkle"/></svg></span><span class="grow"><span data-t="palette"></span><small id="palSub"></small></span><span class="pdots" id="palDots"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <div class="mrow"><span class="sq c1"><svg class="ic"><use href="#i-moon"/></svg></span><span class="grow" data-t="theme"></span><div class="seg mini"><button data-theme-opt="auto" data-t="themeAuto"></button><button data-theme-opt="light" data-t="themeLightS"></button><button data-theme-opt="dark" data-t="themeDarkS"></button></div></div>
     </div>
     <div class="grp" data-t="dataGroup"></div>
@@ -459,6 +468,13 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn danger" value="ok" data-t="delete"></button></div>
 </form></dialog>
 
+<dialog id="palSheet"><form class="sheet" method="dialog">
+  <h2 data-t="palette"></h2>
+  <p class="muted small" data-t="palHint" style="margin:4px 0 12px"></p>
+  <div class="pals" id="palPick"></div>
+  <div class="actions"><button class="btn" value="ok" data-t="done"></button></div>
+</form></dialog>
+
 <div class="toast" id="toast"></div>
 <div class="ptr" id="ptr"><svg class="ic"><use href="#i-refresh"/></svg></div>
 
@@ -472,7 +488,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=16"></script>
+<script src="common.js?v=17"></script>
 <script>
 addT({
 ru: {
@@ -525,7 +541,7 @@ ru: {
   usGroup:'Мы', appGroup:'Приложение', startShort:'Начали встречаться', themeLightS:'Светлая', themeDarkS:'Тёмная',
   tgOnShort:'подключено', tgOffShort:'выключено', waitPartner:'ждём вторую половинку',
   statDays:n => plural(n,'день','дня','дней'), statAnswers:n => plural(n,'ответ','ответа','ответов'), statMovies:n => plural(n,'фильм','фильма','фильмов'),
-  ansReady:n => `${n}: ответ готов`, needName:'Введите имя', editEventT:'Изменить событие', allAnswers:'Все ответы', searchPh:'Поиск по Duo', sAll:'Всё', sEvents:'События', sAnswers:'Ответы', sDates:'Даты',
+  ansReady:n => `${n}: ответ готов`, needName:'Введите имя', editEventT:'Изменить событие', palette:'Цвет', palHint:'У вас и у партнёра может быть свой цвет. Он сохранится на всех устройствах.', pals:[['sage','Шалфей'],['clay','Глина'],['lavender','Лаванда'],['ocean','Океан'],['rose','Роза и слива'],['graphite','Графит и золото']], allAnswers:'Все ответы', searchPh:'Поиск по Duo', sAll:'Всё', sEvents:'События', sAnswers:'Ответы', sDates:'Даты',
   sNothing:'Ничего не нашлось', sHint:'Ищите по событиям, спискам, желаниям, поездкам и ответам на вопросы дня',
   mnLabel:'Идея на вечер', mnBoth:'совпали оба', mnWatch:t => `Смотрим в ${t}`, mnOther:'Другой', mnPlanned:'Вечер кино запланирован', mnEvTitle:n => `Кино: ${n}`,
   restoreDone:n => `Вернуть отмеченные (${n})`, tplTitle:'Обычный набор', tplHint:'Раз в неделю список сам заполнится этими пунктами, а купленное снова станет не отмеченным.',
@@ -592,7 +608,7 @@ en: {
   usGroup:'Us', appGroup:'App', startShort:'Started dating', themeLightS:'Light', themeDarkS:'Dark',
   tgOnShort:'on', tgOffShort:'off', waitPartner:'waiting for your partner',
   statDays:n => n === 1 ? 'day' : 'days', statAnswers:n => n === 1 ? 'answer' : 'answers', statMovies:n => n === 1 ? 'film' : 'films',
-  ansReady:n => `${n} has answered`, needName:'Enter a name', editEventT:'Edit event', allAnswers:'All answers', searchPh:'Search Duo', sAll:'All', sEvents:'Events', sAnswers:'Answers', sDates:'Dates',
+  ansReady:n => `${n} has answered`, needName:'Enter a name', editEventT:'Edit event', palette:'Colour', palHint:'You and your partner can each have your own colour. It is saved on all your devices.', pals:[['sage','Sage'],['clay','Clay'],['lavender','Lavender'],['ocean','Ocean'],['rose','Rose & plum'],['graphite','Graphite & gold']], allAnswers:'All answers', searchPh:'Search Duo', sAll:'All', sEvents:'Events', sAnswers:'Answers', sDates:'Dates',
   sNothing:'Nothing found', sHint:'Search events, lists, wishes, trips and answers to the question of the day',
   mnLabel:'Idea for tonight', mnBoth:'you both liked it', mnWatch:t => `Watch at ${t}`, mnOther:'Another', mnPlanned:'Movie night planned', mnEvTitle:n => `Movie: ${n}`,
   restoreDone:n => `Uncheck all (${n})`, tplTitle:'Usual set', tplHint:'Once a week the list refills itself with these items, and checked ones become unchecked again.',
@@ -680,6 +696,7 @@ async function boot(session){
     if (error) throw error;
     S.profile = profile;
     if (profile.lang && profile.lang !== LANG && T[profile.lang]) { LANG = profile.lang; setPref('lang', LANG); applyI18n(); }
+    if (profile.palette && profile.palette !== pref('palette', 'sage')) { setPref('palette', profile.palette); applyTheme(); }
     if (!profile.couple_id) { $('obName').textContent = profile.display_name; setDate($('obStart'), ymd(today())); show('onboard', SCREENS); return; }
     await loadAll();
     subscribe();
@@ -1251,7 +1268,7 @@ function renderMe(){
   $('vCouple').textContent = S.couple.name && S.couple.name !== 'Мы' ? S.couple.name : coupleTitle();
   $('vStart').textContent = S.couple.start_date ? parseYmd(S.couple.start_date).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU') : '—';
   $('tgStatus').textContent = S.tgLinked ? t('tgOnShort') : t('tgOffShort');
-  renderNotif();
+  renderNotif(); renderPal();
   $('tgSw').classList.toggle('on', !!S.tgLinked);
 }
 let editKind = null;
@@ -1416,6 +1433,23 @@ $('delSheet').onclose = async () => {
   if (error || !data?.ok) return alert(errText(error || data?.error));
   try { localStorage.clear(); sessionStorage.clear(); } catch(_){}
   await sb.auth.signOut(); location.replace(location.pathname);
+};
+
+// ===== Colour palette =====
+const PAL_SW = { sage:['#4f8a6b','#9cc7a6','#f3e3c4','#141b17'], clay:['#c0674b','#e6a98f','#f4e4c6','#1b1512'], lavender:['#7a62c9','#b6a6ec','#fbe4d8','#16141d'],
+  ocean:['#2b84a8','#7cc2dc','#f2ecc4','#0f161c'], rose:['#b84a74','#e79bb6','#f6e5d4','#1a1216'], graphite:['#2f2f2f','#a8833a','#f2e8cf','#121212'] };
+function renderPal(){
+  const cur = pref('palette', 'sage'), sw = PAL_SW[cur] || PAL_SW.sage;
+  $('palSub').textContent = (t('pals').find(p => p[0] === cur) || t('pals')[0])[1];
+  $('palDots').innerHTML = sw.slice(0, 3).map(c => `<i style="background:${c}"></i>`).join('');
+  $('palPick').innerHTML = t('pals').map(([k, l]) => { const c = PAL_SW[k];
+    return `<button type="button" data-pal="${k}" class="${k === cur ? 'on' : ''}"><span class="prev" style="background:linear-gradient(150deg,${c[0]},${c[1]})"><i style="width:22px;height:22px;background:${c[2]}"></i><i style="width:14px;height:14px;background:${c[3]};opacity:.85"></i></span><b>${esc(l)}</b></button>`; }).join('');
+}
+$('palRow').onclick = () => { renderPal(); $('palSheet').showModal(); };
+$('palPick').onclick = async e => {
+  const k = e.target.closest('[data-pal]')?.dataset.pal; if (!k) return;
+  setPref('palette', k); applyTheme(); renderPal(); haptic();
+  if (S.profile) { S.profile.palette = k; const { error } = await sb.from('profiles').update({ palette:k }).eq('id', S.user.id); if (error) console.error(error); }
 };
 
 // ===== Pull to refresh (home) =====
