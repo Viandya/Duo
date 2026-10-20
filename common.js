@@ -63,6 +63,7 @@ const ICONS = {
   sparkle:'<path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7z"/>',
   bed:'<path d="M3 18V6M3 14h18v4M21 14v-2.5A2.5 2.5 0 0 0 18.5 9H11v5M6.5 11.5h.01"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   crown:'<path d="M4 18h16M5 15 3.5 7l5 3.5L12 5l3.5 5.5 5-3.5L19 15z"/>',
   scratch:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 14c2-3 3-1 5-4s3-1 5-3"/>',
   music:'<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',

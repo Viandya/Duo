@@ -188,6 +188,22 @@
 @keyframes ptrspin{to{transform:rotate(360deg)}}
 .h-search{margin-right:-6px;color:var(--muted)}
 .h-search .ic{width:24px;height:24px}
+.h-bell{position:relative;margin-right:-10px}
+.bbdg{position:absolute;top:2px;right:1px;min-width:18px;height:18px;border-radius:9px;background:#c0564f;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 0 0 2px var(--bg);line-height:1}
+@keyframes bellRing{0%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-12deg)}30%{transform:rotate(8deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(0)}}
+.h-bell.ring .ic{animation:bellRing 1.6s ease-in-out 2;transform-origin:50% 10%}
+@media (prefers-reduced-motion: reduce){.h-bell.ring .ic{animation:none}}
+.tdw{position:relative;display:inline-flex}
+.tdot{position:absolute;right:-4px;top:-2px;width:8px;height:8px;border-radius:50%;background:#c0564f;box-shadow:0 0 0 2px var(--card)}
+.act-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.act-it{display:flex;gap:12px;align-items:flex-start;padding:10px 8px;border-radius:14px;margin:0 -8px;cursor:pointer}
+.act-it.new{background:var(--accent-soft)}
+.act-it .av2{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;position:relative;background:var(--rose);color:var(--rose-ink);font-weight:700}
+.act-it .av2 i{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:var(--card);color:var(--accent);display:grid;place-items:center;box-shadow:0 0 0 1px var(--line)}
+.act-it .av2 i .ic{width:12px;height:12px}
+.act-it .g{flex:1;min-width:0;font-size:15px;line-height:1.38;word-break:break-word}
+.act-it .g div{color:var(--muted);font-size:12.5px;margin-top:2px}
+.act-it .dt{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex:none}
 .qcard .lb{display:flex;justify-content:space-between;align-items:center}
 .qall{font-size:12px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--warm-ink);text-decoration:none;opacity:.85}
 .qall::after{content:" ›"}
@@ -312,6 +328,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
     <div class="h-top">
       <svg class="h-logo" viewBox="5.6 11.6 27.2 18.6" aria-hidden="true"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg>
       <div class="grow"><div class="h-names" id="hNames"></div><div class="h-mood" id="hMood"></div></div>
+      <button type="button" class="icon-btn h-search h-bell" id="bellBtn" aria-label="notifications"><svg class="ic"><use href="#i-bell"/></svg><span class="bbdg hidden" id="bellN"></span></button>
       <button type="button" class="icon-btn h-search" id="searchBtn" aria-label="search"><svg class="ic"><use href="#i-search"/></svg></button>
     </div>
     <div class="qa">
@@ -413,7 +430,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
   <nav class="tabbar"><div class="in">
     <button class="tab on" data-tab="home"><svg class="ic"><use href="#i-heart"/></svg><span data-t="tabHome"></span></button>
     <button class="tab" data-tab="plan"><svg class="ic"><use href="#i-calendar"/></svg><span data-t="plan"></span></button>
-    <button class="tab" data-tab="sections"><svg class="ic"><use href="#i-grid"/></svg><span data-t="sections"></span></button>
+    <button class="tab" data-tab="sections"><span class="tdw"><svg class="ic"><use href="#i-grid"/></svg><i class="tdot hidden" id="secDot"></i></span><span data-t="sections"></span></button>
     <button class="tab" data-tab="me"><svg class="ic"><use href="#i-user"/></svg><span data-t="profile"></span></button>
   </div></nav>
 </main>
@@ -471,6 +488,11 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
   <div class="error" id="edErr"></div>
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
 </form></dialog>
+
+<dialog id="actSheet"><div class="sheet" style="min-height:60dvh">
+  <div class="act-h"><h2 data-t="actTitle"></h2></div>
+  <div id="actList"></div>
+</div></dialog>
 
 <dialog id="searchSheet"><div class="sheet search-sheet">
   <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input id="sInput" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" data-tp="searchPh"><button type="button" class="icon-btn" id="sClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
@@ -590,6 +612,7 @@ ru: {
   usGroup:'Мы', appGroup:'Приложение', startShort:'Начали встречаться', themeLightS:'Светлая', themeDarkS:'Тёмная',
   tgOnShort:'подключено', tgOffShort:'выключено', waitPartner:'ждём вторую половинку',
   statDays:n => plural(n,'день','дня','дней'), statAnswers:n => plural(n,'ответ','ответа','ответов'), statMovies:n => plural(n,'фильм','фильма','фильмов'),
+  actTitle:'Что нового', actEmpty:'Здесь будет всё, что делает партнёр: события, ответы, подарки, желания', actToday:'Сегодня', actYest:'Вчера', actEarlier:'Раньше', actMin:n => n < 1 ? 'только что' : `${n} мин назад`, actHour:n => `${n} ${plural(n,'час','часа','часов')} назад`,
   giftBox:'Шкатулка подарков', giftsN:n => `${n} ${plural(n,'подарок','подарка','подарков')}`, giftsEmpty:'Подарите что-нибудь друг другу', gpOpen:'Открыть подарок', gpFrom:n => `${n} дарит тебе подарок`,
   plusUntil:d => `до ${d}`, plusLife:'навсегда', plusTrialN:n => `пробный период, ещё ${n} ${plural(n,'день','дня','дней')}`, plusOff:'Фото без лимита, особые темы, итоги года', plusGift:'Подарить Plus или ввести код',
   clubUp:'Улучшить', clubSince:d => `с ${d}`, clubTo:d => `до ${d}`, clubTrial:n => `пробный, ещё ${n} ${plural(n,'день','дня','дней')}`, statPhotos:n => 'фото', statGifts:n => plural(n,'подарок','подарка','подарков'),
@@ -661,6 +684,7 @@ en: {
   usGroup:'Us', appGroup:'App', startShort:'Started dating', themeLightS:'Light', themeDarkS:'Dark',
   tgOnShort:'on', tgOffShort:'off', waitPartner:'waiting for your partner',
   statDays:n => n === 1 ? 'day' : 'days', statAnswers:n => n === 1 ? 'answer' : 'answers', statMovies:n => n === 1 ? 'film' : 'films',
+  actTitle:'What\'s new', actEmpty:'Everything your partner does will show up here: events, answers, gifts, wishes', actToday:'Today', actYest:'Yesterday', actEarlier:'Earlier', actMin:n => n < 1 ? 'just now' : `${n} min ago`, actHour:n => `${n} ${n === 1 ? 'hour' : 'hours'} ago`,
   giftBox:'Gift box', giftsN:n => `${n} ${n === 1 ? 'gift' : 'gifts'}`, giftsEmpty:'Give each other something', gpOpen:'Open the gift', gpFrom:n => `${n} sent you a gift`,
   plusUntil:d => `until ${d}`, plusLife:'forever', plusTrialN:n => `free trial, ${n} ${n === 1 ? 'day' : 'days'} left`, plusOff:'Unlimited photos, special themes, year in review', plusGift:'Give Plus or enter a code',
   clubUp:'Upgrade', clubSince:d => `since ${d}`, clubTo:d => `until ${d}`, clubTrial:n => `trial, ${n} ${n === 1 ? 'day' : 'days'} left`, statPhotos:n => n === 1 ? 'photo' : 'photos', statGifts:n => n === 1 ? 'gift' : 'gifts',
@@ -811,7 +835,7 @@ async function loadAll(){
 }
 // Small summaries for the section tiles (each section has its own page)
 async function loadSummary(){
-  const [w, tr, cs, pcs, mm, ac, wc, mst, mo, ex, gfl] = await Promise.all([
+  const [w, tr, cs, pcs, mm, ac, wc, mst, mo, ex, gfl, act] = await Promise.all([
     sb.from('wishes').select('owner_id, received, created_at'),
     sb.from('trips').select('title,start_date,end_date').order('start_date', { ascending: true, nullsFirst: false }),
     sb.rpc('cycle_status'),
@@ -822,7 +846,8 @@ async function loadSummary(){
     sb.from('movie_status').select('qid,status'),
     sb.from('moments').select('id', { count:'exact', head:true }),
     sb.from('expenses').select('amount').eq('is_settle', false).gte('spent_on', ymd(new Date(today().getFullYear(), today().getMonth(), 1))),
-    sb.rpc('gifts_list')
+    sb.rpc('gifts_list'),
+    sb.from('activity').select('*').order('created_at', { ascending:false }).limit(60)
   ]);
   const gifts = Array.isArray(gfl.data) ? gfl.data : [];
   S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data, movieMatches: (mm.data || []).length,
@@ -830,6 +855,7 @@ async function loadSummary(){
     movieStatus: Object.fromEntries((mst.data || []).map(x => [x.qid, x.status])), momentsCount: mo.count || 0,
     monthSpent: (ex.data || []).reduce((a, x) => a + Number(x.amount), 0),
     giftsCount: gifts.length, giftNew: gifts.some(g => g.to_user === S.user.id && !g.seen_at) };
+  S.activity = act.data || []; renderBell();
   giftPopup(gifts.find(g => g.to_user === S.user.id && !g.seen_at));
   // Period days (actual and forecast) to show in the Plan calendar
   const { data: per } = await sb.from('cycle_periods').select('user_id,start_date,end_date').gte('start_date', ymd(addDays(today(), -400)));
@@ -853,6 +879,7 @@ function subscribe(){
     ch.on('postgres_changes', { event:'*', schema:'public', table:tb, filter:`couple_id=eq.${cid}` }, scheduleReload));
   ch.on('postgres_changes', { event:'*', schema:'public', table:'couples', filter:`id=eq.${cid}` }, scheduleReload);
   ch.on('postgres_changes', { event:'*', schema:'public', table:'profiles', filter:`couple_id=eq.${cid}` }, scheduleReload);
+  ch.on('postgres_changes', { event:'INSERT', schema:'public', table:'activity', filter:`user_id=eq.${S.user.id}` }, () => { S.bellRing = true; scheduleReload(); });
   ch.subscribe();
   S.channel = ch;
 }
@@ -1277,15 +1304,16 @@ function tileDefs(){
   let cycleSub = t('cycleEmpty');
   if (sm.cycle?.has_data) cycleSub = t('cycleDay', sm.cycle.day, ph(sm.cycle));
   else if (sm.partnerCycle?.has_data && S.partner) cycleSub = t('partnerCycle', S.partner.display_name, ph(sm.partnerCycle));
+  const nd = id => newIn(id);
   return [
-    { id:'wishes', icon:'gift', c:'c2', href:'wishes.html', title:t('sWishes'), sub: w.length ? t('wishesSub', mineW, partW) : t('wishesEmpty'), dot:newW },
-    { id:'movies', icon:'film', c:'c4', href:'movies.html', title:t('sMovies'), sub: sm.movieMatches ? t('moviesSub', sm.movieMatches) : t('moviesEmpty'), cnt:sm.movieMatches || 0 },
-    { id:'trips', icon:'plane', c:'c1', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty') },
-    { id:'cycle', icon:'droplet', c:'c3', href:'cycle.html', title:t('sCycle'), sub: cycleSub },
-    { id:'lists', icon:'list', c:'c5', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length) },
-    { id:'moments', icon:'photo', c:'c3', href:'moments.html', title:t('sMoments'), sub: !plusOn(S.couple) && sm.momentsCount ? t('momentsOf', sm.momentsCount) : sm.momentsCount ? t('momentsSubN', sm.momentsCount) : t('momentsEmpty') },
-    { id:'budget', icon:'wallet', c:'c2', href:'budget.html', title:t('sBudget'), sub: sm.monthSpent ? t('budgetSubN', fmtMoney(sm.monthSpent)) : t('budgetEmpty') },
-    { id:'gifts', icon:'gift', c:'c5', href:'gifts.html', title:t('sGifts'), sub: sm.giftsCount ? t('giftsN', sm.giftsCount) : t('giftsSec'), dot: !!sm.giftNew },
+    { id:'wishes', icon:'gift', c:'c2', href:'wishes.html', title:t('sWishes'), sub: w.length ? t('wishesSub', mineW, partW) : t('wishesEmpty'), dot:newW || nd('wishes') },
+    { id:'movies', icon:'film', c:'c4', href:'movies.html', title:t('sMovies'), sub: sm.movieMatches ? t('moviesSub', sm.movieMatches) : t('moviesEmpty'), cnt:sm.movieMatches || 0, dot:nd('movies') },
+    { id:'trips', icon:'plane', c:'c1', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty'), dot:nd('trips') },
+    { id:'cycle', icon:'droplet', c:'c3', href:'cycle.html', title:t('sCycle'), sub: cycleSub, dot:nd('cycle') },
+    { id:'lists', icon:'list', c:'c5', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length), dot:nd('lists') },
+    { id:'moments', icon:'photo', c:'c3', href:'moments.html', title:t('sMoments'), sub: !plusOn(S.couple) && sm.momentsCount ? t('momentsOf', sm.momentsCount) : sm.momentsCount ? t('momentsSubN', sm.momentsCount) : t('momentsEmpty'), dot:nd('moments') },
+    { id:'budget', icon:'wallet', c:'c2', href:'budget.html', title:t('sBudget'), sub: sm.monthSpent ? t('budgetSubN', fmtMoney(sm.monthSpent)) : t('budgetEmpty'), dot:nd('budget') },
+    { id:'gifts', icon:'gift', c:'c5', href:'gifts.html', title:t('sGifts'), sub: sm.giftsCount ? t('giftsN', sm.giftsCount) : t('giftsSec'), dot: !!sm.giftNew || nd('gifts') },
     ...(wrappedSeason() ? [{ id:'wrapped', icon:'sparkle', c:'c1', href:'wrapped.html', title:t('sWrapped'), sub:t('wrappedSub', wrappedYear()) }] : []),
   ];
 }
@@ -1309,6 +1337,7 @@ function renderTiles(){
   $('secSoon').classList.toggle('hidden', !SOON().length); $('secSoon').previousElementSibling.classList.toggle('hidden', !SOON().length);
   $('secSoon').innerHTML = SOON().map(d => `<div class="mrow"><span class="sq ${d.c}">${icon(d.icon)}</span><span class="grow">${esc(d.title)}<span class="sub">${esc(d.sub)}</span></span></div>`).join('');
   $('editSections').textContent = editingTiles ? t('editDone') : t('edit');
+  $('secDot').classList.toggle('hidden', !tileDefs().some(d => d.dot && !hiddenTiles().includes(d.id)));
 }
 $('secList').onclick = e => {
   const h = e.target.closest('[data-hide]')?.dataset.hide;
@@ -1316,7 +1345,7 @@ $('secList').onclick = e => {
   if (e.target.closest('#showHidden')) { editingTiles = true; renderTiles(); return; }
   const tid = e.target.closest('[data-tile]')?.dataset.tile;
   if (editingTiles) return;
-  if (tid === 'lists') { goTab('plan'); setPlanView('lists'); }
+  if (tid === 'lists') { setPref('seen.lists', new Date().toISOString()); goTab('plan'); setPlanView('lists'); renderTiles(); }
 };
 $('editSections').onclick = () => { editingTiles = !editingTiles; renderTiles(); };
 
@@ -1328,7 +1357,7 @@ function renderMe(){
   const dstr = v => new Date(v).toLocaleDateString(loc);
   const right = c.plus_lifetime ? t('plusLife') : on ? (plusTrial(c) ? t('clubTrial', plusDaysLeft(c)) : t('clubTo', dstr(c.plus_until))) : '';
   $('meHero').className = 'club' + (on ? '' : ' basic');
-  $('meHero').innerHTML = `<div class="shim"></div><svg class="bgh2" viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z"/></svg>
+  $('meHero').innerHTML = `<svg class="bgh2" viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z"/></svg>
     <div class="top"><span>${on ? 'DUO PLUS' : 'DUO'}</span><svg viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg></div>
     <div class="avs"><div class="av">${ini(S.profile.display_name)}</div>${S.partner ? `<div class="av">${ini(S.partner.display_name)}</div>` : '<div class="av empty">+</div>'}</div>
     <h2>${esc(S.partner ? coupleTitle() : S.profile.display_name)}</h2>
@@ -1511,6 +1540,56 @@ $('delSheet').onclose = async () => {
   if (error || !data?.ok) return alert(errText(error || data?.error));
   try { localStorage.clear(); sessionStorage.clear(); } catch(_){}
   await sb.auth.signOut(); location.replace(location.pathname);
+};
+
+// ===== Activity feed (bell) =====
+const SEC_OF = { wish:'wishes', movie:'movies', trip:'trips', cycle:'cycle', list:'lists', moment:'moments', budget:'budget', gift:'gifts' };
+const ACT_ICON = { calendar:'calendar', list:'list', wish:'gift', trip:'plane', answer:'message', movie:'film', ping:'heart', mood:'smile', cycle:'droplet', moment:'photo', budget:'wallet', gift:'gift', plus:'sparkle' };
+// a section has news if the partner did something there after you last opened it
+function newIn(sec){ if (S.seenBase === undefined) S.seenBase = S.profile?.activity_seen_at || ''; const seen = pref('seen.' + sec, '') || S.seenBase; return (S.activity || []).some(a => SEC_OF[a.kind] === sec && a.created_at > seen); }
+const actUnseen = () => (S.activity || []).filter(a => !S.profile?.activity_seen_at || a.created_at > S.profile.activity_seen_at);
+function renderBell(){
+  const n = actUnseen().length;
+  $('bellN').textContent = n > 9 ? '9+' : n; $('bellN').classList.toggle('hidden', !n);
+  if (S.bellRing && n) { $('bellBtn').classList.remove('ring'); void $('bellBtn').offsetWidth; $('bellBtn').classList.add('ring'); }
+  S.bellRing = false;
+  renderTiles();
+}
+function actTime(d){
+  const now = new Date(), m = Math.round((now - d) / 6e4);
+  if (sameDay(d, now)) return m < 60 ? t('actMin', m) : m < 300 ? t('actHour', Math.round(m / 60)) : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (sameDay(d, addDays(today(), -1))) return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return fmtDay(d, d.getFullYear() !== now.getFullYear());
+}
+$('bellBtn').onclick = async () => {
+  const seen = S.profile?.activity_seen_at || '', list = S.activity || [];
+  const grp = d => sameDay(d, new Date()) ? t('actToday') : sameDay(d, addDays(today(), -1)) ? t('actYest') : t('actEarlier');
+  let last = '', html = '';
+  for (const a of list) {
+    const d = new Date(a.created_at), g = grp(d);
+    if (g !== last) { html += `<div class="sgrp">${g}</div>`; last = g; }
+    const who = a.actor === S.partner?.id ? S.partner.display_name : a.actor === S.user.id ? S.profile.display_name : '';
+    const txt = (LANG === 'en' ? a.text_en : a.text_ru) || a.text_ru || '';
+    const body = who && txt.startsWith(who) ? `<b>${esc(who)}</b>${esc(txt.slice(who.length))}` : esc(txt);
+    html += `<div class="act-it ${!seen || a.created_at > seen ? 'new' : ''}" data-act="${a.id}"><span class="av2">${esc((who || 'D').charAt(0).toUpperCase())}<i>${icon(ACT_ICON[a.kind] || 'sparkle')}</i></span>
+      <div class="g">${body}<div>${actTime(d)}</div></div>${!seen || a.created_at > seen ? '<span class="dt"></span>' : ''}</div>`;
+  }
+  $('actList').innerHTML = html || `<div class="empty">${t('actEmpty')}</div>`;
+  $('actSheet').showModal(); haptic();
+  if (list.length && (!seen || list[0].created_at > seen)) {
+    const at = list[0].created_at; S.profile.activity_seen_at = at; renderBell();
+    await sb.from('profiles').update({ activity_seen_at: at }).eq('id', S.user.id);
+  }
+};
+$('actList').onclick = e => {
+  const id = e.target.closest('[data-act]')?.dataset.act; if (!id) return;
+  const a = (S.activity || []).find(x => String(x.id) === id); if (!a) return;
+  const sec = SEC_OF[a.kind]; if (sec) setPref('seen.' + sec, new Date().toISOString());
+  if (!a.link) return $('actSheet').close();
+  $('actSheet').close();
+  if (a.link === 'index.html#plan') return goTab('plan');
+  if (a.link === 'index.html#lists') { goTab('plan'); return setPlanView('lists'); }
+  location.href = a.link;
 };
 
 // ===== A new gift: show it when Duo opens =====
