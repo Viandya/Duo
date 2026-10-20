@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
 <link rel="stylesheet" href="common.css?v=18">
 <style>
@@ -92,12 +92,12 @@ ru: { mTitle:'Моменты', date:'Дата', vFeed:'Лента', vAlbums:'А�
   mAlbum:'Альбом', mAlbumPh:'Название альбома', mNoAlbum:'Без альбома', mNewAlbum:'+ Новый', mEvent:'Связать с событием', mNone:'Не связывать',
   mPrivate:'Фото видите только вы двое', mEmpty:'Добавьте первое фото: нажмите +', mAgo:y => y === 1 ? 'Год назад' : `${y} ${plural(y,'год','года','лет')} назад`,
   mPhotos:n => `${n} фото`, mFromPhoto:'Дата взята из фото', mUploading:(a,b) => `Загружаем ${a} из ${b}…`, mConfirmDel:'Удалить это фото?',
-  mMapEmpty:'Здесь появятся фото, в которых сохранилось место съёмки', mMapN:n => `${n} фото на карте` },
+  mMapErr:'Карта сейчас не загрузилась. Проверьте интернет и откройте вкладку ещё раз', mMapEmpty:'Здесь появятся фото, в которых сохранилось место съёмки', mMapN:n => `${n} фото на карте` },
 en: { mTitle:'Moments', date:'Date', vFeed:'Feed', vAlbums:'Albums', vMap:'Map', mNew:'New moment', mCaption:'Caption', mCaptionPh:'Rooftop dinner',
   mAlbum:'Album', mAlbumPh:'Album name', mNoAlbum:'No album', mNewAlbum:'+ New', mEvent:'Link to an event', mNone:'Don\'t link',
   mPrivate:'Only the two of you can see these photos', mEmpty:'Add your first photo: tap +', mAgo:y => y === 1 ? 'A year ago' : `${y} years ago`,
   mPhotos:n => `${n} ${n === 1 ? 'photo' : 'photos'}`, mFromPhoto:'Date taken from the photo', mUploading:(a,b) => `Uploading ${a} of ${b}…`, mConfirmDel:'Delete this photo?',
-  mMapEmpty:'Photos with a saved location will appear here', mMapN:n => `${n} ${n === 1 ? 'photo' : 'photos'} on the map` }
+  mMapErr:'The map didn\'t load. Check your connection and open the tab again', mMapEmpty:'Photos with a saved location will appear here', mMapN:n => `${n} ${n === 1 ? 'photo' : 'photos'} on the map` }
 });
 const MO = { ctx:null, items:[], urls:{}, view:pref('momentsView', 'feed'), album:null, files:[], events:[], map:null };
 const thumbOf = p => p.replace(/\.jpg$/, '_t.jpg');
@@ -184,7 +184,11 @@ function render(){
 async function drawMap(){
   const geo = MO.items.filter(m => m.lat != null && m.lng != null);
   $('mapHint').textContent = geo.length ? t('mMapN', geo.length) : t('mMapEmpty');
-  if (!window.L) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+  // the map library loads once; a second CDN is used if the first one is blocked
+  const load = src => new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+  if (!window.L) MO.leaflet = MO.leaflet || load('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').catch(() => load('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'));
+  try { await MO.leaflet; } catch(_) { $('mapHint').textContent = t('mMapErr'); return; }
+  if (!window.L || MO.view !== 'map') return;
   if (!MO.map) { MO.map = L.map('map', { zoomControl:false, attributionControl:true }).setView([55.75, 37.62], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap' }).addTo(MO.map); }
   setTimeout(() => MO.map.invalidateSize(), 50);

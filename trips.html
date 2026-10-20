@@ -340,15 +340,16 @@ document.addEventListener('click', async e => {
 // ===== Covers: city photos from Wikipedia (Wikidata finds the place in Russian or English) =====
 const WIKI = {
   lang: q => /[а-яё]/i.test(q) ? 'ru' : 'en',
-  get: u => fetch(u).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+  get: u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null),
   file: (f, w) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(String(f).replace(/^File:/, '').replace(/ /g, '_'))}?width=${w}`,
   bad: /collage|montage|coat|flag|map|logo|emblem|seal|locator|location|karte|wappen|signature|diagram|chart|plan_of|scheme|lccn|sentinel|satellite|portrait|19[0-6]\ds|18\d\ds|\d{4}s\b|stamp|banknote|press_conference/i,
   async search(q){
     q = q.trim(); if (q.length < 2) return [];
     const l = WIKI.lang(q);
     const r = await WIKI.get(`https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&type=item&limit=6&language=${l}&uselang=${LANG}&search=${encodeURIComponent(q)}`);
+    if (!r) return null; // offline or blocked: try again later
     const list = r.search || []; if (!list.length) return [];
-    const e = await WIKI.get(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims|sitelinks|labels|descriptions&languages=ru|en&sitefilter=enwiki|ruwiki&ids=${list.map(x => x.id).join('|')}`);
+    const e = (await WIKI.get(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims|sitelinks|labels|descriptions&languages=ru|en&sitefilter=enwiki|ruwiki&ids=${list.map(x => x.id).join('|')}`)) || {};
     return list.map(x => { const en = e.entities?.[x.id] || {};
       return { id:x.id, label: en.labels?.[LANG]?.value || en.labels?.ru?.value || en.labels?.en?.value || x.label, desc: en.descriptions?.[LANG]?.value || x.description || '',
         img: en.claims?.P18?.[0]?.mainsnak?.datavalue?.value, geo: !!en.claims?.P625, en: en.sitelinks?.enwiki?.title, ru: en.sitelinks?.ruwiki?.title }; })
@@ -357,7 +358,7 @@ const WIKI = {
   async photos(p){
     for (const [l, title] of [['en', p.en], ['ru', p.ru]]) {
       if (!title) continue;
-      const r = await WIKI.get(`https://${l}.wikipedia.org/api/rest_v1/page/media-list/${encodeURIComponent(title.replace(/ /g, '_'))}`);
+      const r = (await WIKI.get(`https://${l}.wikipedia.org/api/rest_v1/page/media-list/${encodeURIComponent(title.replace(/ /g, '_'))}`)) || {};
       const files = (r.items || []).filter(i => i.type === 'image' && /\.jpe?g$/i.test(i.title) && !WIKI.bad.test(i.title)).map(i => i.title.replace(/^File:/, ''));
       if (files.length) return [...new Set(files)].slice(0, 6);
     }
@@ -386,7 +387,8 @@ async function autoCovers(){
   if (autoBusy) return; autoBusy = true;
   try {
     for (const tr of TR.trips.filter(x => !x.cover_kind && x.title)) {
-      const p = (await WIKI.search(tr.title))[0];
+      const found = await WIKI.search(tr.title); if (found === null) break; // no connection: don't mark as 'no photo'
+      const p = found[0];
       const row = p ? placeRow(p, await WIKI.photos(p)) : { cover_kind:'none' };
       Object.assign(tr, row); renderList(); if (TR.open === tr.id) renderTrip();
       await sb.from('trips').update(row).eq('id', tr.id);
@@ -399,7 +401,7 @@ $('tTitle').addEventListener('input', () => {
   TR.pick = null; clearTimeout(sugTimer);
   const q = $('tTitle').value, my = ++sugSeq;
   sugTimer = setTimeout(async () => {
-    const res = await WIKI.search(q); if (my !== sugSeq) return;
+    const res = (await WIKI.search(q)) || []; if (my !== sugSeq) return;
     TR.sug = res;
     $('tSug').innerHTML = res.map((p, i) => `<button type="button" data-sug="${i}">${p.img ? `<img src="${esc(WIKI.file(p.img, 120))}" alt="" onerror="this.replaceWith(document.createElement('i'))">` : '<i></i>'}<span><b>${esc(p.label)}</b><small>${esc(p.desc)}</small></span></button>`).join('');
     $('tSug').classList.toggle('hidden', !res.length);
@@ -420,7 +422,7 @@ async function openCover(){
     $('cvWiki').innerHTML = alts.map(f => `<button type="button" data-wiki="${esc(f)}" class="${tr.cover_kind === 'wiki' && tr.cover_url === WIKI.file(f, 1200) ? 'on' : ''}"><img src="${esc(WIKI.file(f, 300))}" alt="" loading="lazy"></button>`).join(''); };
   drawWiki();
   $('coverSheet').showModal();
-  if (!alts.length && tr.title) { const p = tr.place_qid ? null : (await WIKI.search(tr.title))[0]; if (p) { alts = await WIKI.photos(p); tr.cover_alts = alts; drawWiki(); } }
+  if (!alts.length && tr.title) { const p = ((await WIKI.search(tr.title)) || [])[0]; if (p) { alts = await WIKI.photos(p); tr.cover_alts = alts; drawWiki(); } }
   // moments: photos from the trip dates first
   const { data: ms } = await sb.from('moments').select('path,taken_on').order('taken_on', { ascending:false }).limit(60);
   const inTrip = m => tr.start_date && m.taken_on >= tr.start_date && m.taken_on <= (tr.end_date || tr.start_date);
@@ -561,7 +563,7 @@ $('iDelete').onclick = async () => {
 // ===== Start =====
 (async () => {
   applyI18n();
-  const go = () => { if (TR.open) { if (history.state?.trip) history.back(); else closeTrip(); } else location.href = 'index.html#sections'; };
+  const go = () => { const dl = [...document.querySelectorAll('dialog[open]')]; if (dl.length) { dl[dl.length - 1].close('cancel'); return; } if (TR.open) { if (history.state?.trip) history.back(); else closeTrip(); } else location.href = 'index.html#sections'; };
   $('backBtn').onclick = go;
   const a = tgApp(); if (inTG && a?.BackButton) { try { a.BackButton.show(); a.BackButton.onClick(go); } catch(_){} }
   TR.ctx = await requireCouple();
