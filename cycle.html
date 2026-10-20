@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=15">
+<link rel="stylesheet" href="common.css?v=16">
 <style>
 .ringwrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:4px auto}
@@ -183,7 +183,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=15"></script>
+<script src="common.js?v=16"></script>
 <script>
 addT({
 ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслеживание цикла', cIntroText:'Отметьте, когда начались последние месячные. Дальше приложение посчитает средний цикл и покажет прогноз. По умолчанию данные видите только вы.',
@@ -203,12 +203,12 @@ ru: { cTitle:'Цикл', cMine:'Мой цикл', cIntroTitle:'Отслежив�
     luteal:'Ближе к месячным бывает больше усталости и раздражения. Чуть больше заботы не помешает.', follicular:'Обычно время подъёма сил и настроения.', fertile:'Середина цикла, обычно хорошее самочувствие.' },
   pmsSoon:'Скоро месячные', confirmUnmark:'Убрать отметку начала месячных?',
   cIntimacy:'Близость', cProtection:'Защита', prot:[['protected','С защитой'],['unprotected','Без защиты']], lIntim:'близость',
-  shareItems:[['phase','Фаза и прогноз','День цикла, фаза и когда ждать месячные'],['analysis','Анализ','Средний цикл и график, без дат'],['periods','Дни месячных в календаре','Отмеченные и ожидаемые дни'],['feelings','Самочувствие и симптомы','Настроение и симптомы по дням'],['intimacy','Близость','Отметки близости и защиты'],['notes','Заметки','Ваши заметки к дням']],
+  shareItems:[['phase','Фаза и прогноз','День цикла, фаза и когда ждать месячные'],['analysis','Анализ','Средний цикл и график, без дат'],['periods','Дни месячных в календаре','Отмеченные и ожидаемые дни'],['feelings','Самочувствие и симптомы','Настроение и симптомы по дням'],['intimacy','Близость','Отметки близости и защиты'],['notes','Заметки','Ваши заметки к дням'],['hints','Подсказки партнёру','Бот мягко напомнит о заботе за 2 дня до месячных и в первый день. Работает вместе с «Фаза и прогноз»']],
   shareNone:n => `Сейчас ${n} не видит ничего.`, pNothingDay:'В этот день отметок нет.',
   vToday:'Сегодня', vCal:'Календарь', vAn:'Анализ', cDayOf:'День цикла', lLogged:'есть запись', cIntimacyQ:'Был секс', cDefaults:'Если данных мало',
   seesN:n => `Видит ${n}`, hidden:'Скрыто', access:'Доступ', shTitleN:n => `Что видит ${n}`, shTitle:'Что увидит партнёр', shOnlyYou:'Остальное видно только вам',
   pvSees:n => `${n} увидит:`, pvNothing:n => `${n} ничего не видит.`, pvNoPartner:'Партнёр ещё не присоединился. Когда присоединится, увидит только то, что включено здесь.',
-  pv:{ periods:'дни месячных в календаре', feelings:'самочувствие и симптомы', intimacy:'отметки близости', notes:'заметки', analysis:'средний цикл и график' },
+  pv:{ periods:'дни месячных в календаре', feelings:'самочувствие и симптомы', intimacy:'отметки близости', notes:'заметки', analysis:'средний цикл и график', hints:'подсказки о заботе в Telegram' },
   inDaysF:n => n === 0 ? 'сегодня' : n === 1 ? 'завтра' : `через ${n} ${plural(n,'день','дня','дней')}`, fPeriod:'месячные', fLikely:d => `скорее всего ${d}-го`,
   fPeriodDay:d => `${d}-й день`, fPeriodNow:'месячные', fEndsL:'закончатся примерно', fLate:n => `задержка ${n} ${plural(n,'день','дня','дней')}`, fExpectedL:'ожидались',
   anAvg:n => `Средний цикл · ${n} ${plural(n,'цикл','цикла','циклов')}`, anUsual:(a,b) => `обычно<br>${a}–${b} дней`, daysW:n => plural(Math.round(n),'день','дня','дней'),
@@ -238,12 +238,12 @@ en: { cTitle:'Cycle', cMine:'My cycle', cIntroTitle:'Cycle tracking', cIntroText
     luteal:'Closer to the period there can be more tiredness and irritability. A little extra care goes a long way.', follicular:'Usually a time of more energy and good mood.', fertile:'Mid-cycle, usually feeling good.' },
   pmsSoon:'Period soon', confirmUnmark:'Remove this period start?',
   cIntimacy:'Intimacy', cProtection:'Protection', prot:[['protected','Protected'],['unprotected','Unprotected']], lIntim:'intimacy',
-  shareItems:[['phase','Phase and forecast','Cycle day, phase and when to expect the period'],['analysis','Insights','Average cycle and chart, no dates'],['periods','Period days in the calendar','Marked and expected days'],['feelings','Mood and symptoms','Mood and symptoms by day'],['intimacy','Intimacy','Intimacy and protection marks'],['notes','Notes','Your notes for each day']],
+  shareItems:[['phase','Phase and forecast','Cycle day, phase and when to expect the period'],['analysis','Insights','Average cycle and chart, no dates'],['periods','Period days in the calendar','Marked and expected days'],['feelings','Mood and symptoms','Mood and symptoms by day'],['intimacy','Intimacy','Intimacy and protection marks'],['notes','Notes','Your notes for each day'],['hints','Hints for your partner','The bot gently reminds them to care 2 days before the period and on day one. Works together with “Phase and forecast”']],
   shareNone:n => `Right now ${n} can't see anything.`, pNothingDay:'No entries for this day.',
   vToday:'Today', vCal:'Calendar', vAn:'Insights', cDayOf:'Cycle day', lLogged:'entry', cIntimacyQ:'We had sex', cDefaults:'When there is little data',
   seesN:n => `${n} sees`, hidden:'Hidden', access:'Sharing', shTitleN:n => `What ${n} sees`, shTitle:'What your partner will see', shOnlyYou:'Everything else is only for you',
   pvSees:n => `${n} will see:`, pvNothing:n => `${n} can't see anything.`, pvNoPartner:'Your partner hasn\'t joined yet. They will only see what is switched on here.',
-  pv:{ periods:'period days in the calendar', feelings:'mood and symptoms', intimacy:'intimacy marks', notes:'notes', analysis:'average cycle and chart' },
+  pv:{ periods:'period days in the calendar', feelings:'mood and symptoms', intimacy:'intimacy marks', notes:'notes', analysis:'average cycle and chart', hints:'care hints in Telegram' },
   inDaysF:n => n === 0 ? 'today' : n === 1 ? 'tomorrow' : `in ${n} days`, fPeriod:'period', fLikely:d => `most likely on the ${d}th`,
   fPeriodDay:d => `day ${d}`, fPeriodNow:'of period', fEndsL:'expected to end', fLate:n => `${n} ${n === 1 ? 'day' : 'days'} late`, fExpectedL:'was expected',
   anAvg:n => `Average cycle · ${n} ${n === 1 ? 'cycle' : 'cycles'}`, anUsual:(a,b) => `usually<br>${a}–${b} days`, daysW:n => 'days',
@@ -359,6 +359,7 @@ function previewText(sh, partner, pName, s){
   const parts = [];
   if (sh.phase && s?.has_data) parts.push(`«${t('ph')[s.phase]}${s.phase === 'period' || s.phase === 'late' ? '' : ', ' + t('fPeriod') + ' ' + t('inDaysF', dayDiff(today(), parseYmd(s.next_start)))}»`);
   for (const k of ['periods','feelings','intimacy','notes','analysis']) if (sh[k]) parts.push(t('pv')[k]);
+  if (sh.hints && sh.phase) parts.push(t('pv').hints);
   return parts.length ? `<b>${esc(t('pvSees', pName))}</b> ${esc(parts.join(', '))}` : esc(t('pvNothing', pName));
 }
 function analysisHTML(cyc, o){
@@ -450,7 +451,7 @@ function render(){
   $('shareBtn').innerHTML = `${icon(anyOn && partner ? 'eye' : 'lock')}<span>${partner ? (anyOn ? t('seesN', pName) : t('hidden')) : t('access')}</span>`;
   $('shTitle').textContent = partner ? t('shTitleN', pName) : t('shTitle');
   $('shareOpts').innerHTML = t('shareItems').map(([k, title, sub]) => `<div class="share-row" data-share="${k}">
-    <div class="bubble">${icon({ phase:'eye', periods:'calendar', feelings:'sparkle', intimacy:'heart', notes:'edit', analysis:'grid' }[k])}</div>
+    <div class="bubble">${icon({ phase:'eye', periods:'calendar', feelings:'sparkle', intimacy:'heart', notes:'edit', analysis:'grid', hints:'bulb' }[k])}</div>
     <div class="grow"><b>${title}</b><div class="muted">${sub}</div></div><span class="switch ${sh[k] ? 'on' : ''}"></span></div>`).join('');
   $('shPreview').innerHTML = previewText(sh, partner, pName, s);
   if (document.activeElement?.id !== 'setLen') $('setLen').value = C.settings?.cycle_length || s?.cycle_length || 28;

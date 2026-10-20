@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Наши ответы</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=16">
+<style>
+.sbox{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:14px;padding:2px 14px;box-shadow:inset 0 0 0 1.5px var(--line);margin-bottom:10px}
+.sbox input{border:0;background:none;padding:11px 0;flex:1}
+.sbox .ic{color:var(--muted)}
+.stat{color:var(--muted);font-size:14px;margin:0 4px 14px}
+.qa{box-shadow:inset 0 0 0 1px var(--line);padding:16px}
+.qa .d{font-size:12.5px;color:var(--muted)}
+.qa .q{font-family:Lora,serif;font-style:italic;font-size:17px;line-height:1.35;margin:4px 0 10px}
+.ans{background:var(--bg);border-radius:13px;padding:10px 12px;margin-top:7px;font-size:15px;line-height:1.4;word-break:break-word}
+.ans .who{font-size:11.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.lock{color:var(--muted);font-size:14px;margin-top:6px}
+.qa.dim{opacity:.6}
+mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-radius:4px;padding:0 1px}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar">
+    <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+    <h1 data-t="aTitle"></h1>
+  </div>
+  <div class="sbox"><svg class="ic"><use href="#i-search"/></svg><input id="q" type="text" inputmode="search" autocomplete="off" data-tp="aSearch"></div>
+  <div class="stat" id="stat"></div>
+  <div id="list"></div>
+</main>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=16"></script>
+<script>
+addT({
+ru: { aTitle:'Наши ответы', aSearch:'Поиск по ответам', aStat:(n, b) => `${n} ${plural(n,'вопрос','вопроса','вопросов')} · вы оба ответили на ${b}`,
+  aEmpty:'Здесь появятся ваши ответы на вопросы дня', aNotYet:n => `${n}: ответа нет`, aYouNot:'Вы не ответили, поэтому ответ партнёра скрыт', yesterday:'вчера', aNothing:'Ничего не нашлось' },
+en: { aTitle:'Our answers', aSearch:'Search answers', aStat:(n, b) => `${n} ${n === 1 ? 'question' : 'questions'} · you both answered ${b}`,
+  aEmpty:'Your answers to the questions of the day will appear here', aNotYet:n => `${n} didn't answer`, aYouNot:'You didn\'t answer, so your partner\'s answer is hidden', yesterday:'yesterday', aNothing:'Nothing found' }
+});
+const A = { ctx:null, days:[] };
+const hl = (s, q) => { s = String(s || ''); if (!q) return esc(s); const i = s.toLowerCase().indexOf(q); return i < 0 ? esc(s) : esc(s.slice(0, i)) + '<mark>' + esc(s.slice(i, i + q.length)) + '</mark>' + esc(s.slice(i + q.length)); };
+async function load(){
+  // RLS returns my answers and my partner's only for days I answered too
+  const { data: ans } = await sb.from('answers').select('user_id,answer,answer_date,question_id').order('answer_date', { ascending:false }).limit(1000);
+  const ids = [...new Set((ans || []).map(a => a.question_id))];
+  const { data: qs } = ids.length ? await sb.from('questions').select('id,text,text_en').in('id', ids) : { data:[] };
+  const Q = Object.fromEntries((qs || []).map(q => [q.id, q])), by = {};
+  for (const a of ans || []) { const k = a.answer_date; (by[k] = by[k] || { date:k, qid:a.question_id, mine:null, theirs:null }); if (a.user_id === A.ctx.user.id) by[k].mine = a.answer; else by[k].theirs = a.answer; }
+  A.days = Object.values(by).sort((a, b) => b.date.localeCompare(a.date)).map(d => ({ ...d, q:Q[d.qid] }));
+  render();
+}
+function render(){
+  const q = $('q').value.trim().toLowerCase(), pn = A.ctx.partner?.display_name || t('partner');
+  const both = A.days.filter(d => d.mine && d.theirs).length;
+  $('stat').textContent = A.days.length ? t('aStat', A.days.length, both) : '';
+  const qtext = d => LANG === 'en' && d.q?.text_en ? d.q.text_en : (d.q?.text || '');
+  const list = q ? A.days.filter(d => [qtext(d), d.mine, d.theirs].some(x => String(x || '').toLowerCase().includes(q))) : A.days;
+  const tk = ymd(today()), yk = ymd(addDays(today(), -1));
+  $('list').innerHTML = list.length ? list.map(d => `<div class="card qa ${d.mine && d.theirs ? '' : 'dim'}">
+      <div class="d">${d.date === tk ? t('today') : d.date === yk ? t('yesterday') : fmtDay(parseYmd(d.date), parseYmd(d.date).getFullYear() !== today().getFullYear())}</div>
+      <div class="q">${hl(qtext(d), q)}</div>
+      ${d.mine ? `<div class="ans"><div class="who">${t('you')}</div>${hl(d.mine, q)}</div>` : `<div class="lock">${t('aYouNot')}</div>`}
+      ${d.mine ? (d.theirs ? `<div class="ans"><div class="who">${esc(pn)}</div>${hl(d.theirs, q)}</div>` : `<div class="lock">${esc(t('aNotYet', pn))}</div>`) : ''}
+    </div>`).join('') : `<div class="card empty">${q ? t('aNothing') : t('aEmpty')}</div>`;
+}
+$('q').oninput = render;
+(async () => {
+  applyI18n(); setupBack();
+  A.ctx = await requireCouple(); applyI18n();
+  await load(); show('page', ['loading','page']);
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (A.ctx) render(); });
+</script>
+</body>
+</html>

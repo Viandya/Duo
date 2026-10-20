@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=15">
+<link rel="stylesheet" href="common.css?v=16">
 <style>
 .wish{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line);align-items:flex-start}
 .wish:first-child{border-top:0;padding-top:4px}
@@ -51,36 +51,53 @@ details summary::-webkit-details-marker{display:none}
   <button type="button" class="btn link hidden" id="wDelete" style="margin:12px auto 0;color:#c0564f"><svg class="ic"><use href="#i-trash"/></svg><span data-t="delete"></span></button>
 </form></dialog>
 
+<dialog id="giftSheet"><form class="sheet" method="dialog" id="giftForm">
+  <h2 data-t="gTitle"></h2>
+  <div style="font-weight:700;font-size:17px;margin-top:2px" id="gWish"></div>
+  <p class="muted small" id="gHint" style="margin:2px 0 4px"></p>
+  <label data-t="gWhen"></label><div class="chips" id="gWhen"></div>
+  <div id="gDateWrap" class="hidden" style="margin-top:10px"><button type="button" class="field" data-date id="gDate"></button></div>
+  <div id="gRemWrap"><label data-t="gRemind"></label><div class="chips" id="gRem"></div>
+  <p class="muted small" style="margin:12px 0 0;display:flex;gap:8px;align-items:center"><svg class="ic" style="width:16px;height:16px"><use href="#i-lock"/></svg><span data-t="gPrivate"></span></p></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" id="gGo"></button></div>
+</form></dialog>
+
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=15"></script>
+<script src="common.js?v=16"></script>
 <script>
 addT({
 ru: { wTitle:'Желания', wMine:'Мои', wPartners:n => `${n}`, wAddFirst:'Добавьте то, что хотели бы получить в подарок: вещь или впечатление.',
-  wPartnerEmpty:n => `${n} пока ничего не добавил(а)`, wNoPartner:'Партнёр ещё не присоединился к паре',
+  wPartnerEmpty:n => `${n}: пока пусто`, wNoPartner:'Партнёр ещё не присоединился к паре',
   wHintMine:'Партнёр видит ваш список, но вы не видите, что он собирается подарить.', wHintPartner:n => `Нажмите «Я подарю», чтобы забронировать. ${n} этого не увидит.`,
   wNew:'Новое желание', wEdit:'Желание', wWhat:'Что хочется', wWhatPh:'Фотоаппарат Instax', wLink:'Ссылка', wPrice:'Цена', wPricePh:'9 000 ₽',
   wKind:'Что это', wThing:'Вещь', wExp:'Впечатление', wPriority:'Насколько хочется', wWant:'Хочу', wReally:'Очень хочу', wReceived:'Уже подарили',
   wReserve:'Я подарю', wYouGift:'Вы дарите', wUnreserve:'Отменить', wTaken:'Уже кто-то дарит', wOpen:'Открыть ссылку', wDone:n => `Сбылось (${n})`,
-  wConfirmDel:'Удалить это желание?' },
+  wConfirmDel:'Удалить это желание?', gTitle:'Вы подарите', gHidden:n => `${n} не узнает, что вы это забронировали`, gWhen:'Когда подарить', gRemind:'Напомнить',
+  gNoDate:'Пока без даты', gOther:'Другая дата', gNY:'Новый год', gPrivate:'В календаре будет видно только вам', gGo:'Забронировать', gGoPlan:'Запланировать',
+  gEvent:t => `Подарок: ${t}`, gRem:[['day','За день'],['week','За неделю']], gAnniv:y => `${y} ${plural(y,'год','года','лет')} вместе`, gOn:d => `· ${d}` },
 en: { wTitle:'Wishes', wMine:'Mine', wPartners:n => `${n}`, wAddFirst:'Add things you\'d love to get as a gift: an item or an experience.',
   wPartnerEmpty:n => `${n} hasn't added anything yet`, wNoPartner:'Your partner hasn\'t joined yet',
   wHintMine:'Your partner sees your list, but you can\'t see what they plan to give you.', wHintPartner:n => `Tap “I'll give this” to reserve it. ${n} won't see it.`,
   wNew:'New wish', wEdit:'Wish', wWhat:'What would you like', wWhatPh:'Instax camera', wLink:'Link', wPrice:'Price', wPricePh:'$90',
   wKind:'What is it', wThing:'Item', wExp:'Experience', wPriority:'How much', wWant:'Want', wReally:'Really want', wReceived:'Already received',
   wReserve:'I\'ll give this', wYouGift:'You\'re giving this', wUnreserve:'Cancel', wTaken:'Someone is giving this', wOpen:'Open link', wDone:n => `Came true (${n})`,
-  wConfirmDel:'Delete this wish?' }
+  wConfirmDel:'Delete this wish?', gTitle:'You\'ll give', gHidden:n => `${n} won't know you reserved it`, gWhen:'When to give it', gRemind:'Remind me',
+  gNoDate:'No date yet', gOther:'Other date', gNY:'New Year', gPrivate:'Only you will see it in the calendar', gGo:'Reserve', gGoPlan:'Reserve and plan',
+  gEvent:t => `Gift: ${t}`, gRem:[['day','A day before'],['week','A week before']], gAnniv:y => `${y} ${y === 1 ? 'year' : 'years'} together`, gOn:d => `· ${d}` }
 });
-const P = { ctx:null, who:'me', wishes:[], res:[], editing:null };
+const P = { ctx:null, who:'me', wishes:[], res:[], events:[], dates:[], editing:null };
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch(_) { return ''; } };
 
 async function load(){
-  const [w, r] = await Promise.all([
+  const [w, r, ev, dt] = await Promise.all([
     sb.from('wishes').select('*').order('priority', { ascending:false }).order('created_at', { ascending:false }),
-    sb.from('wish_reservations').select('*')
+    sb.from('wish_reservations').select('*'),
+    sb.from('events').select('id,title,kind,repeat,starts_at,private_to'),
+    sb.from('important_dates').select('title,date,repeats_yearly')
   ]);
   if (w.error) throw w.error;
-  P.wishes = w.data; P.res = r.data || [];
+  P.wishes = w.data; P.res = r.data || []; P.events = ev.data || []; P.dates = dt.data || [];
   render();
 }
 function wishRow(w, mine){
@@ -94,7 +111,8 @@ function wishRow(w, mine){
   let acts = '';
   if (w.url) acts += `<button class="btn ghost sm" data-open="${w.id}">${icon('link')}<span>${t('wOpen')}</span></button>`;
   if (!mine && !w.received) {
-    if (byMe) acts += `<span class="reserved">${icon('gift')}${t('wYouGift')}</span><button class="btn link sm" data-unres="${w.id}">${t('wUnreserve')}</button>`;
+    const gev = byMe && res.event_id && P.events.find(e => e.id === res.event_id);
+    if (byMe) acts += `<span class="reserved">${icon('gift')}${t('wYouGift')}${gev ? ' ' + t('gOn', fmtDay(new Date(gev.starts_at))) : ''}</span><button class="btn link sm" data-unres="${w.id}">${t('wUnreserve')}</button>`;
     else acts += `<button class="btn warm sm" data-res="${w.id}">${icon('gift')}<span>${t('wReserve')}</span></button>`;
   }
   return `<div class="wish" ${mine ? `data-edit="${w.id}" style="cursor:pointer"` : ''}>
@@ -124,12 +142,55 @@ document.addEventListener('click', async e => {
   const o = e.target.closest('[data-open]')?.dataset.open;
   if (o) { e.stopPropagation(); const w = P.wishes.find(x => x.id === o); if (w?.url) openLink(w.url); return; }
   const r = e.target.closest('[data-res]')?.dataset.res;
-  if (r) { const { error } = await sb.from('wish_reservations').insert({ wish_id:r, couple_id:P.ctx.couple.id }); if (error) alert(errText(error)); return load(); }
+  if (r) return openGift(P.wishes.find(x => x.id === r));
   const u = e.target.closest('[data-unres]')?.dataset.unres;
-  if (u) { await sb.from('wish_reservations').delete().eq('wish_id', u); return load(); }
+  if (u) {
+    const res = P.res.find(x => x.wish_id === u);
+    await sb.from('wish_reservations').delete().eq('wish_id', u);
+    if (res?.event_id) await sb.from('events').delete().eq('id', res.event_id).eq('private_to', P.ctx.user.id);
+    return load();
+  }
   const ed = e.target.closest('[data-edit]')?.dataset.edit;
   if (ed && !e.target.closest('button')) openSheet(P.wishes.find(x => x.id === ed));
 });
+
+// ===== Gift: reserve + plan a private reminder =====
+let getWhen, getRem, giftWish;
+function occasions(){
+  const td = today(), out = [], nextOf = (m, d) => { let n = new Date(td.getFullYear(), m, d); if (n < td) n = new Date(td.getFullYear() + 1, m, d); return n; };
+  const st = P.ctx.couple.start_date;
+  if (st) { const s0 = parseYmd(st), n = nextOf(s0.getMonth(), s0.getDate()), y = n.getFullYear() - s0.getFullYear(); if (y > 0) out.push([t('gAnniv', y), n]); }
+  for (const e of P.events.filter(e => (e.kind === 'birthday' || e.kind === 'anniversary') && e.repeat === 'yearly')) { const d = new Date(e.starts_at); out.push([e.title, nextOf(d.getMonth(), d.getDate())]); }
+  for (const x of P.dates) { const d = parseYmd(x.date); const n = x.repeats_yearly ? nextOf(d.getMonth(), d.getDate()) : d; if (n >= td) out.push([x.title, n]); }
+  out.push([t('gNY'), nextOf(11, 31)]);
+  return out.sort((a, b) => a[1] - b[1]).slice(0, 5);
+}
+function openGift(w){
+  giftWish = w; P.occ = occasions();
+  $('gWish').textContent = w.title; $('gHint').textContent = t('gHidden', P.ctx.partner?.display_name || t('partner'));
+  const opts = [...P.occ.map(([title, d], i) => [String(i), `${title} · ${d.getDate()} ${t('monthsShort')[d.getMonth()]}`]), ['other', t('gOther')], ['none', t('gNoDate')]];
+  getWhen = chipPicker($('gWhen'), opts, P.occ.length ? '0' : 'none');
+  getRem = chipPicker($('gRem'), t('gRem'), 'week');
+  setDate($('gDate'), '');
+  const sync = () => { const v = getWhen(); $('gDateWrap').classList.toggle('hidden', v !== 'other'); $('gRemWrap').classList.toggle('hidden', v === 'none'); $('gGo').textContent = v === 'none' ? t('gGo') : t('gGoPlan'); };
+  const orig = $('gWhen').onclick; $('gWhen').onclick = ev => { orig(ev); sync(); }; sync();
+  $('giftSheet').showModal();
+}
+$('giftSheet').onclose = async () => {
+  if ($('giftSheet').returnValue !== 'ok' || !giftWish) return;
+  const v = getWhen(); let when = null;
+  if (v === 'other') when = getDate($('gDate')) ? parseYmd(getDate($('gDate'))) : null;
+  else if (v !== 'none') when = P.occ[+v]?.[1] || null;
+  const { error } = await sb.from('wish_reservations').insert({ wish_id:giftWish.id, couple_id:P.ctx.couple.id });
+  if (error) { alert(errText(error)); return load(); }
+  if (when) {
+    const d = new Date(when); d.setHours(12, 0, 0, 0);
+    const { data: ev, error: e2 } = await sb.from('events').insert({ couple_id:P.ctx.couple.id, title:t('gEvent', giftWish.title), starts_at:d.toISOString(), all_day:true,
+      kind:'reminder', repeat:'none', remind:getRem(), private_to:P.ctx.user.id }).select().single();
+    if (!e2 && ev) await sb.from('wish_reservations').update({ event_id:ev.id }).eq('wish_id', giftWish.id);
+  }
+  load();
+};
 
 // ===== Add / edit =====
 let getKind, getPrio;

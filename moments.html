@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Моменты</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=16">
+<style>
+.topbar .add-btn{margin-left:auto}
+.mem{position:relative;border-radius:22px;overflow:hidden;height:190px;margin-bottom:16px;cursor:pointer;background:var(--accent-soft)}
+.mem img{width:100%;height:100%;object-fit:cover;display:block}
+.mem .ov{position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.72));display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff}
+.mem .ov small{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.9}
+.mem .ov b{font-family:Lora,serif;font-size:21px;font-weight:600;margin-top:2px}
+.mem .ov span{font-size:13px;opacity:.9;margin-top:2px}
+.grp{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:18px 4px 8px}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.pgrid button{aspect-ratio:1;border:0;padding:0;border-radius:12px;overflow:hidden;background:var(--accent-soft);cursor:pointer;position:relative}
+.pgrid button img{width:100%;height:100%;object-fit:cover;display:block}
+.pgrid button.big{grid-column:span 2;grid-row:span 2}
+.albums{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.album{border:0;padding:0;background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.album .cv{aspect-ratio:1;border-radius:18px;overflow:hidden;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent)}
+.album .cv img{width:100%;height:100%;object-fit:cover}
+.album b{display:block;margin-top:8px;font-weight:600}
+.album small{color:var(--muted);font-size:13px}
+#map{height:62dvh;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.leaflet-container{background:var(--card);font:inherit}
+.pin{width:44px;height:44px;border-radius:12px;border:3px solid #fff;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.3);background:var(--accent)}
+.pin img{width:100%;height:100%;object-fit:cover}
+.prev{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.prev div{aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--accent-soft)}
+.prev img{width:100%;height:100%;object-fit:cover}
+.viewer{background:#000;max-height:100dvh;height:100dvh;margin:0}
+.viewer .in{height:100%;display:flex;flex-direction:column;color:#fff}
+.viewer .img{flex:1;display:grid;place-items:center;min-height:0}
+.viewer .img img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer .bar{padding:14px 18px calc(16px + var(--safe-b));background:linear-gradient(0deg,rgba(0,0,0,.9),transparent)}
+.viewer .bar b{font-size:17px}
+.viewer .top{display:flex;justify-content:space-between;padding:calc(10px + var(--safe-t)) 10px 0}
+.viewer .icon-btn{color:#fff}
+.upl{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:600;font-size:14px;z-index:40}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar">
+    <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+    <h1 data-t="mTitle"></h1>
+    <button class="add-btn" id="addBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
+  </div>
+  <div class="seg" id="viewSeg" style="margin-bottom:14px"><button data-v="feed" class="on" data-t="vFeed"></button><button data-v="albums" data-t="vAlbums"></button><button data-v="map" data-t="vMap"></button></div>
+  <div id="vFeed"></div>
+  <div id="vAlbums" class="hidden"></div>
+  <div id="vMap" class="hidden"><div id="map"></div><p class="muted small" id="mapHint" style="text-align:center;margin-top:10px"></p></div>
+  <input type="file" id="file" accept="image/*" multiple hidden>
+</main>
+
+<dialog id="newSheet"><form class="sheet" method="dialog" id="newForm">
+  <h2 data-t="mNew"></h2>
+  <div class="prev" id="prev"></div>
+  <label data-t="mCaption"></label><input id="nCaption" maxlength="120" data-tp="mCaptionPh">
+  <label data-t="date"></label><button type="button" class="field" data-date id="nDate"></button>
+  <p class="muted small" id="nDateHint" style="margin:6px 2px 0"></p>
+  <label data-t="mAlbum"></label><div class="chips" id="nAlbums"></div>
+  <input id="nAlbumNew" class="hidden" maxlength="40" data-tp="mAlbumPh" style="margin-top:8px">
+  <div id="nEvWrap"><label data-t="mEvent"></label><div class="chips" id="nEvents"></div></div>
+  <p class="muted small" style="margin:12px 2px 0;display:flex;gap:8px;align-items:center"><svg class="ic" style="width:16px;height:16px"><use href="#i-lock"/></svg><span data-t="mPrivate"></span></p>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+</form></dialog>
+
+<dialog id="viewer" class="viewer"><div class="in">
+  <div class="top"><button type="button" class="icon-btn" id="vClose" aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button><button type="button" class="icon-btn" id="vDel" aria-label="delete"><svg class="ic"><use href="#i-trash"/></svg></button></div>
+  <div class="img"><img id="vImg" alt=""></div>
+  <div class="bar"><b id="vCap"></b><div class="small" style="opacity:.8;margin-top:3px" id="vMeta"></div></div>
+</div></dialog>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=16"></script>
+<script>
+addT({
+ru: { mTitle:'Моменты', date:'Дата', vFeed:'Лента', vAlbums:'Альбомы', vMap:'Карта', mNew:'Новый момент', mCaption:'Подпись', mCaptionPh:'Ужин на крыше',
+  mAlbum:'Альбом', mAlbumPh:'Название альбома', mNoAlbum:'Без альбома', mNewAlbum:'+ Новый', mEvent:'Связать с событием', mNone:'Не связывать',
+  mPrivate:'Фото видите только вы двое', mEmpty:'Добавьте первое фото: нажмите +', mAgo:y => y === 1 ? 'Год назад' : `${y} ${plural(y,'год','года','лет')} назад`,
+  mPhotos:n => `${n} фото`, mFromPhoto:'Дата взята из фото', mUploading:(a,b) => `Загружаем ${a} из ${b}…`, mConfirmDel:'Удалить это фото?',
+  mMapEmpty:'Здесь появятся фото, в которых сохранилось место съёмки', mMapN:n => `${n} фото на карте` },
+en: { mTitle:'Moments', date:'Date', vFeed:'Feed', vAlbums:'Albums', vMap:'Map', mNew:'New moment', mCaption:'Caption', mCaptionPh:'Rooftop dinner',
+  mAlbum:'Album', mAlbumPh:'Album name', mNoAlbum:'No album', mNewAlbum:'+ New', mEvent:'Link to an event', mNone:'Don\'t link',
+  mPrivate:'Only the two of you can see these photos', mEmpty:'Add your first photo: tap +', mAgo:y => y === 1 ? 'A year ago' : `${y} years ago`,
+  mPhotos:n => `${n} ${n === 1 ? 'photo' : 'photos'}`, mFromPhoto:'Date taken from the photo', mUploading:(a,b) => `Uploading ${a} of ${b}…`, mConfirmDel:'Delete this photo?',
+  mMapEmpty:'Photos with a saved location will appear here', mMapN:n => `${n} ${n === 1 ? 'photo' : 'photos'} on the map` }
+});
+const MO = { ctx:null, items:[], urls:{}, view:pref('momentsView', 'feed'), album:null, files:[], events:[], map:null };
+const thumbOf = p => p.replace(/\.jpg$/, '_t.jpg');
+
+// ---- minimal EXIF reader: date taken and GPS
+function readExif(buf){
+  const v = new DataView(buf); if (v.getUint16(0) !== 0xFFD8) return {};
+  let o = 2;
+  while (o < v.byteLength - 4) {
+    const m = v.getUint16(o), len = v.getUint16(o + 2);
+    if (m === 0xFFE1 && v.getUint32(o + 4) === 0x45786966) {
+      const t0 = o + 10, le = v.getUint16(t0) === 0x4949, u16 = p => v.getUint16(p, le), u32 = p => v.getUint32(p, le);
+      const str = (p, n) => { let s = ''; for (let i = 0; i < n - 1; i++) s += String.fromCharCode(v.getUint8(p + i)); return s; };
+      const ifd = p => { const out = {}; const n = u16(p); for (let i = 0; i < n; i++) { const e = p + 2 + i * 12; out[u16(e)] = { type:u16(e + 2), count:u32(e + 4), val:e + 8 }; } return out; };
+      const ptr = e => e.count * ({ 2:1, 5:8, 3:2, 4:4 }[e.type] || 1) > 4 ? t0 + u32(e.val) : e.val;
+      const rat = (p, i) => u32(p + i * 8) / (u32(p + i * 8 + 4) || 1);
+      const res = {}, i0 = ifd(t0 + u32(t0 + 4));
+      if (i0[0x8769]) { const ex = ifd(t0 + u32(i0[0x8769].val)); const d = ex[0x9003] || ex[0x9004]; if (d) res.date = str(ptr(d), d.count); }
+      if (!res.date && i0[0x0132]) res.date = str(ptr(i0[0x0132]), i0[0x0132].count);
+      if (i0[0x8825]) {
+        const g = ifd(t0 + u32(i0[0x8825].val));
+        if (g[2] && g[4]) {
+          const dms = e => { const p = ptr(e); return rat(p, 0) + rat(p, 1) / 60 + rat(p, 2) / 3600; };
+          let lat = dms(g[2]), lng = dms(g[4]);
+          if (g[1] && String.fromCharCode(v.getUint8(g[1].val)) === 'S') lat = -lat;
+          if (g[3] && String.fromCharCode(v.getUint8(g[3].val)) === 'W') lng = -lng;
+          if (isFinite(lat) && isFinite(lng) && (lat || lng)) { res.lat = lat; res.lng = lng; }
+        }
+      }
+      if (res.date) { const m2 = res.date.match(/^(\d{4}):(\d{2}):(\d{2})/); res.date = m2 ? `${m2[1]}-${m2[2]}-${m2[3]}` : null; }
+      return res;
+    }
+    if ((m & 0xFF00) !== 0xFF00) break;
+    o += 2 + len;
+  }
+  return {};
+}
+async function resize(file, max, q){
+  const bmp = await createImageBitmap(file, { imageOrientation:'from-image' });
+  const k = Math.min(1, max / Math.max(bmp.width, bmp.height)), w = Math.round(bmp.width * k), h = Math.round(bmp.height * k);
+  const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(bmp, 0, 0, w, h);
+  return { blob: await new Promise(r => c.toBlob(r, 'image/jpeg', q)), w, h };
+}
+
+async function load(){
+  const { data, error } = await sb.from('moments').select('*').order('taken_on', { ascending:false }).order('created_at', { ascending:false });
+  if (error) throw error;
+  MO.items = data || [];
+  const need = MO.items.flatMap(m => [thumbOf(m.path)]).filter(p => !MO.urls[p]);
+  for (let i = 0; i < need.length; i += 100) {
+    const { data: s } = await sb.storage.from('moments').createSignedUrls(need.slice(i, i + 100), 3600);
+    (s || []).forEach(x => { if (x.signedUrl) MO.urls[x.path] = x.signedUrl; });
+  }
+  render();
+}
+const img = m => MO.urls[thumbOf(m.path)] ? `<img src="${MO.urls[thumbOf(m.path)]}" alt="" loading="lazy">` : '';
+function memoryCard(){
+  const md = ymd(today()).slice(5), y0 = today().getFullYear();
+  const hits = MO.items.filter(m => m.taken_on.slice(5) === md && +m.taken_on.slice(0, 4) < y0);
+  if (!hits.length) return '';
+  const top = hits[0], same = hits.filter(m => m.taken_on === top.taken_on), y = y0 - +top.taken_on.slice(0, 4);
+  return `<div class="mem" data-view="${top.id}">${img(top)}<div class="ov"><small>${t('mAgo', y)}</small><b>${esc(top.caption || top.album || fmtDay(parseYmd(top.taken_on), true))}</b><span>${fmtDay(parseYmd(top.taken_on), true)} · ${t('mPhotos', same.length)}</span></div></div>`;
+}
+function grid(list){ return `<div class="pgrid">${list.map((m, i) => `<button type="button" data-view="${m.id}" class="${i === 0 && list.length >= 3 ? 'big' : ''}">${img(m)}</button>`).join('')}</div>`; }
+function render(){
+  document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === MO.view));
+  ['feed','albums','map'].forEach(v => $('v' + v[0].toUpperCase() + v.slice(1)).classList.toggle('hidden', MO.view !== v));
+  if (!MO.items.length) { $('vFeed').innerHTML = $('vAlbums').innerHTML = `<div class="card empty">${t('mEmpty')}</div>`; if (MO.view === 'map') drawMap(); return; }
+  // feed by month
+  const by = {}; MO.items.forEach(m => (by[m.taken_on.slice(0, 7)] = by[m.taken_on.slice(0, 7)] || []).push(m));
+  $('vFeed').innerHTML = memoryCard() + Object.entries(by).map(([k, list]) => { const [y, mo] = k.split('-').map(Number);
+    return `<div class="grp">${t('months')[mo - 1]} ${y}</div>` + grid(list); }).join('');
+  // albums
+  if (MO.album !== null) {
+    const list = MO.items.filter(m => (m.album || '') === MO.album);
+    $('vAlbums').innerHTML = `<button class="btn link" data-back-album style="padding-left:0">${icon('left')}<span>${esc(MO.album || t('mNoAlbum'))}</span></button>` + grid(list);
+  } else {
+    const al = {}; MO.items.forEach(m => (al[m.album || ''] = al[m.album || ''] || []).push(m));
+    $('vAlbums').innerHTML = `<div class="albums">${Object.entries(al).sort((a, b) => (a[0] === '') - (b[0] === '') || b[1].length - a[1].length).map(([k, list]) =>
+      `<button type="button" class="album" data-album="${esc(k)}"><div class="cv">${img(list[0]) || icon('photo')}</div><b>${esc(k || t('mNoAlbum'))}</b><small>${t('mPhotos', list.length)}</small></button>`).join('')}</div>`;
+  }
+  if (MO.view === 'map') drawMap();
+}
+async function drawMap(){
+  const geo = MO.items.filter(m => m.lat != null && m.lng != null);
+  $('mapHint').textContent = geo.length ? t('mMapN', geo.length) : t('mMapEmpty');
+  if (!window.L) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+  if (!MO.map) { MO.map = L.map('map', { zoomControl:false, attributionControl:true }).setView([55.75, 37.62], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap' }).addTo(MO.map); }
+  setTimeout(() => MO.map.invalidateSize(), 50);
+  (MO.layer && MO.layer.remove()); MO.layer = L.layerGroup().addTo(MO.map);
+  geo.forEach(m => L.marker([m.lat, m.lng], { icon:L.divIcon({ className:'', html:`<div class="pin">${img(m)}</div>`, iconSize:[44, 44] }) }).on('click', () => openViewer(m.id)).addTo(MO.layer));
+  if (geo.length) MO.map.fitBounds(L.latLngBounds(geo.map(m => [m.lat, m.lng])).pad(0.3), { maxZoom:12 });
+}
+document.querySelectorAll('#viewSeg button').forEach(b => b.onclick = () => { MO.view = b.dataset.v; setPref('momentsView', MO.view); render(); });
+document.addEventListener('click', e => {
+  const v = e.target.closest('[data-view]')?.dataset.view; if (v) return openViewer(v);
+  const a = e.target.closest('[data-album]'); if (a) { MO.album = a.dataset.album; render(); return; }
+  if (e.target.closest('[data-back-album]')) { MO.album = null; render(); }
+});
+
+// ---- viewer
+async function openViewer(id){
+  const m = MO.items.find(x => x.id === id); if (!m) return; MO.cur = m;
+  $('vImg').src = MO.urls[thumbOf(m.path)] || '';
+  $('vCap').textContent = m.caption || ''; $('vMeta').textContent = [fmtDay(parseYmd(m.taken_on), true), m.album].filter(Boolean).join(' · ');
+  $('vDel').classList.toggle('hidden', m.created_by !== MO.ctx.user.id);
+  $('viewer').showModal();
+  const { data } = await sb.storage.from('moments').createSignedUrl(m.path, 3600); if (data?.signedUrl && MO.cur === m) $('vImg').src = data.signedUrl;
+}
+$('vClose').onclick = () => $('viewer').close();
+$('vDel').onclick = async () => {
+  const m = MO.cur; if (!m || !confirm(t('mConfirmDel'))) return;
+  $('viewer').close();
+  await sb.from('moments').delete().eq('id', m.id);
+  await sb.storage.from('moments').remove([m.path, thumbOf(m.path)]);
+  load();
+};
+
+// ---- add
+let getAlbum, getEv;
+$('addBtn').onclick = () => $('file').click();
+$('file').onchange = async () => {
+  const files = [...$('file').files].slice(0, 20); $('file').value = ''; if (!files.length) return;
+  MO.files = [];
+  for (const f of files) { let ex = {}; try { ex = readExif(await f.slice(0, 256 * 1024).arrayBuffer()); } catch(_){} MO.files.push({ f, ex, url:URL.createObjectURL(f) }); }
+  const d0 = MO.files.find(x => x.ex.date)?.ex.date;
+  setDate($('nDate'), d0 || ymd(new Date(files[0].lastModified || Date.now())));
+  $('nDateHint').textContent = d0 ? t('mFromPhoto') : '';
+  $('prev').innerHTML = MO.files.slice(0, 8).map(x => `<div><img src="${x.url}" alt=""></div>`).join('');
+  $('nCaption').value = ''; $('nAlbumNew').value = ''; $('nAlbumNew').classList.add('hidden');
+  const albums = [...new Set(MO.items.map(m => m.album).filter(Boolean))].slice(0, 8);
+  getAlbum = chipPicker($('nAlbums'), [['', t('mNoAlbum')], ...albums.map(a => [a, a]), ['__new', t('mNewAlbum')]], '');
+  const orig = $('nAlbums').onclick; $('nAlbums').onclick = ev => { orig(ev); $('nAlbumNew').classList.toggle('hidden', getAlbum() !== '__new'); if (getAlbum() === '__new') $('nAlbumNew').focus(); };
+  await pickEvents(); $('nDate').addEventListener('change', pickEvents);
+  $('newSheet').showModal();
+};
+async function pickEvents(){
+  if (!MO.events.length) { const { data } = await sb.from('events').select('id,title,starts_at,repeat,kind').order('starts_at', { ascending:false }).limit(300); MO.events = data || []; }
+  const d = parseYmd(getDate($('nDate')) || ymd(today()));
+  const near = MO.events.filter(e => e.repeat === 'none' && Math.abs(dayDiff(new Date(new Date(e.starts_at).setHours(0,0,0,0)), d)) <= 3).slice(0, 5);
+  $('nEvWrap').classList.toggle('hidden', !near.length);
+  getEv = chipPicker($('nEvents'), [['', t('mNone')], ...near.map(e => [e.id, `${e.title} · ${fmtDay(new Date(e.starts_at))}`])], '');
+}
+$('newSheet').onclose = async () => {
+  if ($('newSheet').returnValue !== 'ok' || !MO.files.length) return;
+  let album = getAlbum(); if (album === '__new') album = $('nAlbumNew').value.trim();
+  const base = { couple_id:MO.ctx.couple.id, caption:$('nCaption').value.trim() || null, album:album || null, event_id:getEv() || null };
+  const day = getDate($('nDate')) || ymd(today());
+  const note = document.createElement('div'); note.className = 'upl'; document.body.appendChild(note);
+  let i = 0;
+  for (const x of MO.files) {
+    note.textContent = t('mUploading', ++i, MO.files.length);
+    try {
+      const id = crypto.randomUUID(), path = `${MO.ctx.couple.id}/${id}.jpg`;
+      const big = await resize(x.f, 1600, .85), small = await resize(x.f, 480, .8);
+      const u1 = await sb.storage.from('moments').upload(path, big.blob, { contentType:'image/jpeg' }); if (u1.error) throw u1.error;
+      await sb.storage.from('moments').upload(thumbOf(path), small.blob, { contentType:'image/jpeg' });
+      const { error } = await sb.from('moments').insert({ ...base, path, taken_on: MO.files.length > 1 && x.ex.date ? x.ex.date : day, lat:x.ex.lat ?? null, lng:x.ex.lng ?? null, w:big.w, h:big.h });
+      if (error) throw error;
+    } catch(e) { console.error(e); alert(errText(e)); break; }
+  }
+  note.remove(); MO.files.forEach(x => URL.revokeObjectURL(x.url)); MO.files = [];
+  load();
+};
+
+(async () => {
+  applyI18n(); setupBack();
+  MO.ctx = await requireCouple(); applyI18n();
+  await load(); show('page', ['loading','page']);
+  sb.channel('moments-' + MO.ctx.couple.id).on('postgres_changes', { event:'*', schema:'public', table:'moments', filter:`couple_id=eq.${MO.ctx.couple.id}` }, () => load()).subscribe();
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (MO.ctx) render(); });
+</script>
+</body>
+</html>

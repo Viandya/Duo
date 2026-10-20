@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Бюджет</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=16">
+<style>
+.topbar .add-btn{margin-left:auto}
+.hero{border-radius:24px;padding:18px 16px 14px;background:linear-gradient(150deg,var(--grad-a),var(--grad-b));color:#fff;margin-bottom:14px}
+.hero .mh{display:flex;align-items:center;justify-content:space-between;font-size:14px;opacity:.95}
+.hero .mh button{border:0;background:rgba(255,255,255,.18);color:#fff;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.hero .sum{font-family:Lora,serif;font-size:40px;font-weight:600;line-height:1;margin-top:8px}
+.split{display:grid;grid-template-columns:1fr 1fr;margin-top:14px;background:rgba(255,255,255,.15);border-radius:14px;padding:9px 0;text-align:center;font-size:12.5px}
+.split b{display:block;font-size:17px}
+.owe{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:14px}
+.owe button{border:0;border-radius:99px;background:#fff;color:#2f5a45;font-weight:700;padding:7px 14px;cursor:pointer;flex:none}
+.card.k{box-shadow:inset 0 0 0 1px var(--line);padding:16px}
+.cbar{display:flex;gap:3px;height:10px;border-radius:6px;overflow:hidden}
+.cleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--muted)}
+.cleg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer}
+.row:first-child{border-top:0;padding-top:0}.row:last-child{padding-bottom:0}
+.row .grow{flex:1;min-width:0;font-weight:600}
+.row .grow div{font-size:13px;color:var(--muted);font-weight:500;margin-top:1px}
+.row .amt{font-weight:700;white-space:nowrap}
+.sq{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.sq .ic{width:19px;height:19px}
+.goal{box-shadow:inset 0 0 0 1px var(--line);padding:16px;cursor:pointer}
+.goal .hd{display:flex;align-items:center;gap:12px}
+.goal .hd .grow{flex:1;min-width:0;font-weight:600}
+.goal .hd .grow div{font-size:13px;color:var(--muted);font-weight:500}
+.goal .nums{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px}
+.goal .nums b{font-family:Lora,serif;font-size:24px;font-weight:600}
+.prog{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;border-radius:9px;background:var(--accent)}
+.goal .tip{font-size:13px;color:var(--muted);margin-top:8px}
+.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c1{background:var(--accent-soft);color:var(--accent)}.c2{background:var(--warm);color:var(--warm-ink)}.c3{background:var(--rose);color:var(--rose-ink)}.c4{background:var(--blue-s);color:var(--blue)}.c5{background:var(--violet-s);color:var(--violet)}
+.amount-in{font-family:Lora,serif;font-size:28px;font-weight:600;text-align:center}
+.del-link{color:#c0564f;margin:14px auto 0;display:flex}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar">
+    <button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button>
+    <h1 data-t="bTitle"></h1>
+    <button class="add-btn" id="addBtn" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
+  </div>
+  <div class="seg" id="viewSeg" style="margin-bottom:14px"><button data-v="spend" class="on" data-t="vSpend"></button><button data-v="goals" data-t="vGoals"></button></div>
+  <div id="vSpend">
+    <div class="hero" id="hero"></div>
+    <div class="card k" id="catCard"></div>
+    <div class="card k" id="listCard"></div>
+  </div>
+  <div id="vGoals" class="hidden"></div>
+</main>
+
+<dialog id="exSheet"><form class="sheet" method="dialog" id="exForm">
+  <h2 id="exTitle"></h2>
+  <input id="exAmount" class="amount-in" inputmode="decimal" placeholder="0 ₽" required>
+  <label data-t="bWhat"></label><input id="exName" required maxlength="80" data-tp="bWhatPh">
+  <label data-t="bCat"></label><div class="chips" id="exCat"></div>
+  <label data-t="bPaid"></label><div class="chips" id="exPaid"></div>
+  <label data-t="bSplit"></label><div class="chips" id="exSplit"></div>
+  <label data-t="date"></label><button type="button" class="field" data-date id="exDate"></button>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+  <button type="button" class="btn link del-link hidden" id="exDel" data-t="delete"></button>
+</form></dialog>
+
+<dialog id="goalSheet"><form class="sheet" method="dialog" id="goalForm">
+  <h2 id="gsTitle"></h2>
+  <label data-t="gName"></label><input id="gName" required maxlength="60" data-tp="gNamePh">
+  <label data-t="gTarget"></label><input id="gTarget" inputmode="decimal" required placeholder="150 000">
+  <label data-t="gDeadline"></label><button type="button" class="field" data-date id="gDeadline"></button>
+  <label data-t="gIcon"></label><div class="icon-pick" id="gIcon"></div>
+  <div id="gTripWrap"><label data-t="gTrip"></label><div class="chips" id="gTrip"></div></div>
+  <label class="toggle"><input type="checkbox" id="gSecret"><span data-t="gSecret"></span></label>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+  <button type="button" class="btn link del-link hidden" id="gDel" data-t="delete"></button>
+</form></dialog>
+
+<dialog id="depSheet"><form class="sheet" method="dialog" id="depForm">
+  <h2 id="depTitle"></h2>
+  <p class="muted small" id="depSub" style="margin:2px 0 8px"></p>
+  <input id="depAmount" class="amount-in" inputmode="decimal" placeholder="0 ₽" required>
+  <div class="chips" id="depDir" style="margin-top:10px"></div>
+  <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
+  <button type="button" class="btn link" id="depEdit" style="margin:12px auto 0;display:flex" data-t="gEditGoal"></button>
+</form></dialog>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=16"></script>
+<script>
+addT({
+ru: { bTitle:'Бюджет', date:'Дата', vSpend:'Траты', vGoals:'Копилки', bMonthSpent:'общие траты', bNew:'Новая трата', bEdit:'Трата', bWhat:'На что', bWhatPh:'Продукты',
+  bCat:'Категория', bPaid:'Кто платил', bSplit:'Как делим', bMe:'Я', splits:[['half','Пополам'],['payer','Только для себя'],['other','Целиком за другого']],
+  cats:[['food','Продукты','cart'],['cafe','Кафе','glass'],['home','Дом','home'],['fun','Развлечения','ticket'],['transport','Транспорт','map'],['gifts','Подарки','gift'],['trip','Поездки','plane'],['other','Другое','coins']],
+  owesYou:(n, s) => `${n} вернёт вам ${s}`, youOwe:(n, s) => `Вы вернёте ${s}`, even:'Вы в расчёте', settle:'Рассчитаться', settled:'Расчёт',
+  confirmSettle:s => `Отметить, что долг ${s} закрыт?`, bEmpty:'Добавьте первую трату: нажмите +', bFromTrip:t => `из поездки «${t}»`, paidBy:n => `оплата: ${n}`,
+  paidMe:'оплата: вы', splitShort:{ half:'пополам', payer:'для себя', other:'за другого' }, confirmDelEx:'Удалить эту трату?',
+  gNew:'Новая цель', gEdit:'Цель', gName:'Цель', gNamePh:'Отпуск в Турции', gTarget:'Сколько нужно', gDeadline:'К какой дате', gIcon:'Значок', gTrip:'Связать с поездкой', gNoTrip:'Не связывать',
+  gSecret:'Секретная копилка: видна только мне', gEmpty:'Заведите общую цель: отпуск, ремонт, подарок', gOf:s => `из ${s}`, gPerMonth:s => `Откладывайте по ${s} в месяц, чтобы успеть`,
+  gDone:'Цель достигнута', gNoDeadline:'без срока', gBy:d => `к ${d}`, gOnlyYou:'видно только вам', gLinked:t => `поездка «${t}»`, gAdd:'Пополнить', gNewBtn:'Новая цель',
+  depAdd:'Пополнить', depTake:'Взять', gEditGoal:'Изменить цель', confirmDelGoal:'Удалить эту цель?' },
+en: { bTitle:'Budget', date:'Date', vSpend:'Spending', vGoals:'Savings', bMonthSpent:'shared spending', bNew:'New expense', bEdit:'Expense', bWhat:'What for', bWhatPh:'Groceries',
+  bCat:'Category', bPaid:'Who paid', bSplit:'How to split', bMe:'Me', splits:[['half','Split in half'],['payer','Just for themselves'],['other','Fully for the other']],
+  cats:[['food','Groceries','cart'],['cafe','Eating out','glass'],['home','Home','home'],['fun','Fun','ticket'],['transport','Transport','map'],['gifts','Gifts','gift'],['trip','Trips','plane'],['other','Other','coins']],
+  owesYou:(n, s) => `${n} owes you ${s}`, youOwe:(n, s) => `You owe ${n} ${s}`, even:'You\'re all square', settle:'Settle up', settled:'Settlement',
+  confirmSettle:s => `Mark the ${s} debt as settled?`, bEmpty:'Add your first expense: tap +', bFromTrip:t => `from the trip “${t}”`, paidBy:n => `paid by ${n}`,
+  paidMe:'paid by you', splitShort:{ half:'split', payer:'for themselves', other:'for the other' }, confirmDelEx:'Delete this expense?',
+  gNew:'New goal', gEdit:'Goal', gName:'Goal', gNamePh:'Holiday in Turkey', gTarget:'How much you need', gDeadline:'By what date', gIcon:'Icon', gTrip:'Link to a trip', gNoTrip:'Don\'t link',
+  gSecret:'Secret goal: only I can see it', gEmpty:'Create a shared goal: a holiday, a renovation, a gift', gOf:s => `of ${s}`, gPerMonth:s => `Save ${s} a month to make it`,
+  gDone:'Goal reached', gNoDeadline:'no deadline', gBy:d => `by ${d}`, gOnlyYou:'only you can see it', gLinked:t => `trip “${t}”`, gAdd:'Add money', gNewBtn:'New goal',
+  depAdd:'Add', depTake:'Take out', gEditGoal:'Edit goal', confirmDelGoal:'Delete this goal?' }
+});
+const B = { ctx:null, view:pref('budgetView', 'spend'), month:null, ex:[], tripEx:[], trips:[], goals:[], editEx:null, editGoal:null, depGoal:null };
+const CAT_COLORS = { food:'#8cc4a2', cafe:'#e6c58a', home:'#9cc3dc', fun:'#f0b5c2', transport:'#c3b2e6', gifts:'#e89aab', trip:'#6fa384', other:'#a9b8ae' };
+const GOAL_ICONS = ['star','plane','home','gift','heart','ring','suitcase','book','game','leaf'];
+const money = n => `${fmtMoney(Math.round(Number(n) || 0))} ${LANG === 'en' ? '₽' : '₽'}`;
+const num = s => Number(String(s || '').replace(/\s/g, '').replace(',', '.')) || 0;
+const me = () => B.ctx.user.id, pid = () => B.ctx.partner?.id, pname = () => B.ctx.partner?.display_name || t('partner');
+const catOf = k => t('cats').find(c => c[0] === k) || t('cats')[7];
+
+async function load(){
+  const [ex, ti, tr, go] = await Promise.all([
+    sb.from('expenses').select('*').order('spent_on', { ascending:false }).order('created_at', { ascending:false }),
+    sb.from('trip_items').select('id,trip_id,title,amount,created_by,day,created_at').eq('kind', 'expense'),
+    sb.from('trips').select('id,title,start_date,end_date,budget'),
+    sb.from('goals').select('*').order('created_at')
+  ]);
+  if (ex.error) throw ex.error;
+  B.ex = ex.data || []; B.trips = tr.data || []; B.goals = go.data || [];
+  B.tripEx = (ti.data || []).filter(x => Number(x.amount) > 0).map(x => ({ id:'t' + x.id, trip:true, trip_id:x.trip_id, title:x.title, amount:Number(x.amount), paid_by:x.created_by,
+    split:'half', category:'trip', spent_on:x.day || (B.trips.find(y => y.id === x.trip_id)?.start_date) || x.created_at.slice(0, 10) }));
+  render();
+}
+// positive: partner owes me; negative: I owe the partner
+function balance(){
+  let b = 0;
+  for (const e of [...B.ex, ...B.tripEx]) {
+    const a = Number(e.amount), share = e.split === 'half' ? a / 2 : e.split === 'other' ? a : 0;
+    if (e.paid_by === me()) b += share; else if (e.paid_by === pid()) b -= share;
+  }
+  return Math.round(b * 100) / 100;
+}
+function render(){
+  document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === B.view));
+  $('vSpend').classList.toggle('hidden', B.view !== 'spend'); $('vGoals').classList.toggle('hidden', B.view !== 'goals');
+  renderSpend(); renderGoals();
+}
+function renderSpend(){
+  if (!B.month) { const d = today(); B.month = new Date(d.getFullYear(), d.getMonth(), 1); }
+  const key = ymd(B.month).slice(0, 7);
+  const list = [...B.ex.filter(e => !e.is_settle), ...B.tripEx].filter(e => String(e.spent_on).slice(0, 7) === key).sort((a, b) => String(b.spent_on).localeCompare(String(a.spent_on)));
+  const total = list.reduce((s, e) => s + Number(e.amount), 0);
+  const mine = list.filter(e => e.paid_by === me()).reduce((s, e) => s + Number(e.amount), 0);
+  const bal = balance();
+  $('hero').innerHTML = `<div class="mh"><button type="button" id="mPrev" aria-label="prev">${icon('left')}</button><span>${t('months')[B.month.getMonth()]} ${B.month.getFullYear()} · ${t('bMonthSpent')}</span><button type="button" id="mNext" aria-label="next">${icon('right')}</button></div>
+    <div class="sum">${money(total)}</div>
+    ${B.ctx.partner ? `<div class="split"><div><b>${money(mine)}</b>${esc(B.ctx.profile.display_name)}</div><div><b>${money(total - mine)}</b>${esc(pname())}</div></div>
+    <div class="owe"><span>${bal > 0.5 ? esc(t('owesYou', pname(), money(bal))) : bal < -0.5 ? esc(t('youOwe', pname(), money(-bal))) : t('even')}</span>${Math.abs(bal) > 0.5 ? `<button type="button" id="settleBtn">${t('settle')}</button>` : ''}</div>` : ''}`;
+  $('mPrev').onclick = () => { B.month = new Date(B.month.getFullYear(), B.month.getMonth() - 1, 1); renderSpend(); };
+  $('mNext').onclick = () => { B.month = new Date(B.month.getFullYear(), B.month.getMonth() + 1, 1); renderSpend(); };
+  if ($('settleBtn')) $('settleBtn').onclick = async () => {
+    if (!confirm(t('confirmSettle', money(Math.abs(bal))))) return;
+    const debtor = bal < 0 ? me() : pid();
+    const { error } = await sb.from('expenses').insert({ couple_id:B.ctx.couple.id, title:t('settled'), amount:Math.abs(bal), paid_by:debtor, split:'other', category:'other', is_settle:true, spent_on:ymd(today()) });
+    if (error) return alert(errText(error)); load();
+  };
+  const byCat = {}; list.forEach(e => byCat[e.category] = (byCat[e.category] || 0) + Number(e.amount));
+  const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+  $('catCard').classList.toggle('hidden', !cats.length);
+  $('catCard').innerHTML = `<div class="cbar">${cats.map(([k, v]) => `<i style="flex:${v};background:${CAT_COLORS[k] || CAT_COLORS.other}"></i>`).join('')}</div>
+    <div class="cleg">${cats.map(([k, v]) => `<span><i style="background:${CAT_COLORS[k] || CAT_COLORS.other}"></i>${esc(catOf(k)[1])} ${Math.round(v / total * 100)}%</span>`).join('')}</div>`;
+  $('listCard').innerHTML = list.length ? list.map(e => {
+    const c = catOf(e.category), trip = e.trip && B.trips.find(x => x.id === e.trip_id);
+    const sub = [fmtDay(parseYmd(String(e.spent_on).slice(0, 10))), e.paid_by === me() ? t('paidMe') : t('paidBy', pname()), t('splitShort')[e.split], trip ? t('bFromTrip', trip.title) : ''].filter(Boolean).join(' · ');
+    return `<div class="row" ${e.trip ? `data-trip="${e.trip_id}"` : `data-ex="${e.id}"`}><span class="sq" style="background:color-mix(in srgb,${CAT_COLORS[e.category] || CAT_COLORS.other} 25%,var(--card));color:${CAT_COLORS[e.category] || CAT_COLORS.other}">${icon(c[2])}</span>
+      <div class="grow">${esc(e.title)}<div>${esc(sub)}</div></div><span class="amt">${money(e.amount)}</span></div>`; }).join('') : `<div class="empty">${t('bEmpty')}</div>`;
+}
+function renderGoals(){
+  const tripName = id => B.trips.find(x => x.id === id)?.title;
+  $('vGoals').innerHTML = (B.goals.length ? B.goals.map(g => {
+    const saved = Number(g.saved), target = Number(g.target), pct = Math.min(100, saved / target * 100);
+    let tip = '';
+    if (saved >= target) tip = t('gDone');
+    else if (g.deadline) { const months = Math.max(1, Math.ceil(dayDiff(today(), parseYmd(g.deadline)) / 30.4)); tip = t('gPerMonth', money((target - saved) / months)); }
+    const sub = [g.deadline ? t('gBy', fmtDay(parseYmd(g.deadline), true)) : t('gNoDeadline'), g.trip_id && tripName(g.trip_id) ? t('gLinked', tripName(g.trip_id)) : '', g.secret ? t('gOnlyYou') : ''].filter(Boolean).join(' · ');
+    return `<div class="card goal" data-goal="${g.id}"><div class="hd"><span class="sq ${g.secret ? 'c3' : 'c4'}">${icon(GOAL_ICONS.includes(g.icon) ? g.icon : 'star')}</span><div class="grow">${esc(g.title)}<div>${esc(sub)}</div></div>${g.secret ? `<span class="muted">${icon('lock')}</span>` : ''}</div>
+      <div class="nums"><b>${money(saved)}</b><span class="muted small">${t('gOf', money(target))}</span></div>
+      <div class="prog"><i style="width:${pct}%;${g.secret ? 'background:var(--rose-ink)' : ''}"></i></div>${tip ? `<div class="tip">${esc(tip)}</div>` : ''}</div>`;
+  }).join('') : `<div class="card empty">${t('gEmpty')}</div>`) +
+  `<div class="two-btn">${B.goals.length ? `<button class="btn" id="gAddBtn">${t('gAdd')}</button>` : ''}<button class="btn ghost" id="gNewBtn" style="${B.goals.length ? '' : 'grid-column:span 2'}">${t('gNewBtn')}</button></div>`;
+  if ($('gAddBtn')) $('gAddBtn').onclick = () => openDep(B.goals[0]);
+  $('gNewBtn').onclick = () => openGoal(null);
+}
+document.querySelectorAll('#viewSeg button').forEach(b => b.onclick = () => { B.view = b.dataset.v; setPref('budgetView', B.view); render(); });
+document.addEventListener('click', e => {
+  const x = e.target.closest('[data-ex]')?.dataset.ex; if (x) return openEx(B.ex.find(y => y.id === x));
+  const tr = e.target.closest('[data-trip]')?.dataset.trip; if (tr) return location.href = 'trips.html';
+  const g = e.target.closest('[data-goal]')?.dataset.goal; if (g) return openDep(B.goals.find(y => y.id === g));
+});
+$('addBtn').onclick = () => B.view === 'goals' ? openGoal(null) : openEx(null);
+
+// ---- expenses
+let getCat, getPaid, getSplit;
+function openEx(e){
+  B.editEx = e || null; $('exForm').reset();
+  $('exTitle').textContent = e ? t('bEdit') : t('bNew'); $('exDel').classList.toggle('hidden', !e);
+  $('exAmount').value = e ? String(Number(e.amount)) : ''; $('exName').value = e?.title || '';
+  getCat = chipPicker($('exCat'), t('cats').filter(c => c[0] !== 'trip').map(c => [c[0], c[1]]), e?.category || 'food');
+  getPaid = chipPicker($('exPaid'), [[me(), t('bMe')], ...(pid() ? [[pid(), pname()]] : [])], e?.paid_by || me());
+  getSplit = chipPicker($('exSplit'), t('splits'), e?.split || 'half');
+  setDate($('exDate'), e?.spent_on || ymd(today()));
+  $('exSheet').showModal(); if (!e) setTimeout(() => $('exAmount').focus(), 60);
+}
+$('exSheet').onclose = async () => {
+  if ($('exSheet').returnValue !== 'ok') return;
+  const amount = num($('exAmount').value); if (!(amount > 0)) return;
+  const row = { title:$('exName').value.trim() || catOf(getCat())[1], amount, category:getCat(), paid_by:getPaid(), split:getSplit(), spent_on:getDate($('exDate')) || ymd(today()) };
+  const { error } = B.editEx ? await sb.from('expenses').update(row).eq('id', B.editEx.id) : await sb.from('expenses').insert({ ...row, couple_id:B.ctx.couple.id });
+  if (error) alert(errText(error)); load();
+};
+$('exDel').onclick = async () => { if (!B.editEx || !confirm(t('confirmDelEx'))) return; $('exSheet').close('cancel'); await sb.from('expenses').delete().eq('id', B.editEx.id); load(); };
+
+// ---- goals
+let getGoalIcon, getTrip;
+function openGoal(g){
+  B.editGoal = g || null; $('goalForm').reset();
+  $('gsTitle').textContent = g ? t('gEdit') : t('gNew'); $('gDel').classList.toggle('hidden', !g);
+  $('gName').value = g?.title || ''; $('gTarget').value = g ? String(Number(g.target)) : '';
+  setDate($('gDeadline'), g?.deadline || ''); $('gSecret').checked = !!g?.secret;
+  getGoalIcon = iconPicker($('gIcon'), GOAL_ICONS, g?.icon && GOAL_ICONS.includes(g.icon) ? g.icon : 'star');
+  const trips = B.trips.filter(x => !x.end_date || x.end_date >= ymd(today()));
+  $('gTripWrap').classList.toggle('hidden', !trips.length);
+  getTrip = chipPicker($('gTrip'), [['', t('gNoTrip')], ...trips.map(x => [x.id, x.title])], g?.trip_id || '');
+  $('goalSheet').showModal();
+}
+$('goalSheet').onclose = async () => {
+  if ($('goalSheet').returnValue !== 'ok') return;
+  const target = num($('gTarget').value); if (!(target > 0)) return;
+  const row = { title:$('gName').value.trim(), target, deadline:getDate($('gDeadline')) || null, icon:getGoalIcon(), trip_id:getTrip() || null, secret:$('gSecret').checked };
+  const { error } = B.editGoal ? await sb.from('goals').update(row).eq('id', B.editGoal.id) : await sb.from('goals').insert({ ...row, couple_id:B.ctx.couple.id });
+  if (error) alert(errText(error)); load();
+};
+$('gDel').onclick = async () => { if (!B.editGoal || !confirm(t('confirmDelGoal'))) return; $('goalSheet').close('cancel'); await sb.from('goals').delete().eq('id', B.editGoal.id); load(); };
+let getDir;
+function openDep(g){
+  if (!g) return; B.depGoal = g; $('depForm').reset();
+  $('depTitle').textContent = g.title; $('depSub').textContent = `${money(g.saved)} ${t('gOf', money(g.target))}`;
+  getDir = chipPicker($('depDir'), [['add', t('depAdd')], ['take', t('depTake')]], 'add');
+  $('depSheet').showModal(); setTimeout(() => $('depAmount').focus(), 60);
+}
+$('depEdit').onclick = () => { const g = B.depGoal; $('depSheet').close('cancel'); setTimeout(() => openGoal(g), 50); };
+$('depSheet').onclose = async () => {
+  if ($('depSheet').returnValue !== 'ok' || !B.depGoal) return;
+  const a = num($('depAmount').value); if (!(a > 0)) return;
+  const saved = Math.max(0, Number(B.depGoal.saved) + (getDir() === 'take' ? -a : a));
+  const { error } = await sb.from('goals').update({ saved }).eq('id', B.depGoal.id); if (error) alert(errText(error)); load();
+};
+
+(async () => {
+  applyI18n(); setupBack();
+  B.ctx = await requireCouple(); applyI18n();
+  await load(); show('page', ['loading','page']);
+  const ch = sb.channel('budget-' + B.ctx.couple.id);
+  ['expenses','goals'].forEach(tb => ch.on('postgres_changes', { event:'*', schema:'public', table:tb, filter:`couple_id=eq.${B.ctx.couple.id}` }, () => load()));
+  ch.subscribe();
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (B.ctx) render(); });
+</script>
+</body>
+</html>
