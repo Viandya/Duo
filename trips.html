@@ -13,12 +13,34 @@
 <link rel="stylesheet" href="common.css?v=18">
 <style>
 .trip-card{display:block;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);margin-bottom:14px;cursor:pointer;border:0;width:100%;text-align:left;padding:0;color:var(--ink)}
-.trip-card .cover{height:96px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));display:flex;align-items:flex-end;padding:14px 16px;color:#fff}
-.trip-card .cover h2{font-size:24px}
+.trip-card .cover{height:150px;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));display:flex;align-items:flex-end;padding:14px 16px;color:#fff;position:relative;overflow:hidden}
+.trip-card.past .cover{height:104px}
+.trip-card .cover img,.hero-trip img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s}
+.trip-card .cover img.ok,.hero-trip img.bg.ok{opacity:1}
+.trip-card .cover.ph:after,.hero-trip.ph:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.62))}
+.trip-card .cover h2,.trip-card .cover .bdg{position:relative;z-index:1}
+.trip-card .cover h2{font-size:25px;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+.trip-card .cover .bdg{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.9);color:#1f2b24;border-radius:99px;padding:4px 10px;font-size:12.5px;font-weight:700}
 .trip-card .info{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;gap:10px}
-.hero-trip{border-radius:var(--radius);background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff;padding:18px;margin-bottom:14px}
-.hero-trip h1{font-size:28px}
+.hero-trip{border-radius:var(--radius);background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end}
+.hero-trip.ph{min-height:230px}
+.hero-trip>*{position:relative;z-index:1}
+.hero-trip h1{font-size:30px;text-shadow:0 1px 8px rgba(0,0,0,.25)}
 .hero-trip .sub{opacity:.92;margin-top:4px}
+.hero-trip .cv{position:absolute;right:12px;top:12px;z-index:2;border:0;background:rgba(0,0,0,.35);color:#fff;border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;gap:6px;align-items:center}
+.hero-trip .cv .ic{width:15px;height:15px}
+.sug{background:var(--card);border-radius:14px;box-shadow:var(--shadow),inset 0 0 0 1px var(--line);margin-top:6px;padding:2px 12px}
+.sug button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:8px 0;border-top:1px solid var(--line);text-align:left;cursor:pointer;color:var(--ink)}
+.sug button:first-child{border-top:0}
+.sug img,.sug i{width:40px;height:40px;border-radius:10px;object-fit:cover;background:var(--accent-soft);flex:none}
+.sug b{display:block;font-size:15px}.sug small{color:var(--muted);font-size:12.5px}
+.cprev{height:120px;border-radius:16px;margin-top:8px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--grad-a),var(--grad-b))}
+.cprev img{width:100%;height:100%;object-fit:cover}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cgrid button{aspect-ratio:1;border:0;padding:0;border-radius:12px;overflow:hidden;background:var(--accent-soft);cursor:pointer;position:relative}
+.cgrid button.on{box-shadow:0 0 0 3px var(--accent)}
+.cgrid img{width:100%;height:100%;object-fit:cover;display:block}
+.lbl3{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:16px 2px 8px}
 .dayhead{font-family:Lora,serif;font-weight:600;font-size:17px;margin:4px 0 2px}
 .dayblock+.dayblock{border-top:1px solid var(--line);margin-top:10px;padding-top:12px}
 .pl{display:flex;gap:12px;padding:8px 0;align-items:flex-start}
@@ -54,7 +76,7 @@ details summary::-webkit-details-marker{display:none}
       <h1></h1>
       <button class="icon-btn" id="editTrip" aria-label="edit"><svg class="ic"><use href="#i-edit"/></svg></button>
     </div>
-    <div class="hero-trip"><h1 id="tvTitle"></h1><div class="sub" id="tvDates"></div></div>
+    <div class="hero-trip" id="tvHero"><img class="bg" id="tvImg" alt="" onload="this.classList.add('ok')" onerror="this.classList.remove('ok')"><button type="button" class="cv" id="coverBtn"><svg class="ic"><use href="#i-photo"/></svg><span data-t="cvChange"></span></button><h1 id="tvTitle"></h1><div class="sub" id="tvDates"></div></div>
     <div class="seg" style="margin-bottom:14px" id="tabSeg">
       <button data-k="plan" class="on" data-t="kPlan"></button><button data-k="pack" data-t="kPack"></button><button data-k="expense" data-t="kBudget"></button><button data-k="booking" data-t="kBook"></button>
     </div>
@@ -93,12 +115,24 @@ details summary::-webkit-details-marker{display:none}
 
 <dialog id="tripSheet"><form class="sheet" method="dialog" id="tripForm">
   <h2 id="tsTitle"></h2>
-  <label data-t="where"></label><input id="tTitle" required data-tp="wherePh">
+  <label data-t="where"></label><input id="tTitle" required data-tp="wherePh" autocomplete="off"><div class="sug hidden" id="tSug"></div><div class="cprev hidden" id="tPrev"><img alt=""></div>
   <div class="two"><div><label data-t="from"></label><button type="button" class="field" data-date id="tStart"></button></div><div><label data-t="to"></label><button type="button" class="field" data-date id="tEnd"></button></div></div>
   <label data-t="budget"></label><input id="tBudget" inputmode="decimal" data-tp="budgetPh">
   <label data-t="note"></label><textarea id="tNote" data-tp="optional" style="min-height:64px"></textarea>
   <div class="actions"><button class="btn ghost" value="cancel" formnovalidate data-t="cancel"></button><button class="btn" value="ok" data-t="save"></button></div>
   <button type="button" class="btn link hidden" id="tDelete" style="margin:12px auto 0;color:#c0564f"><svg class="ic"><use href="#i-trash"/></svg><span data-t="delTrip"></span></button>
+</form></dialog>
+
+<dialog id="coverSheet"><form class="sheet" method="dialog">
+  <h2 data-t="cvTitle"></h2>
+  <div id="cvWikiWrap"><div class="cgrid" id="cvWiki" style="margin-top:12px"></div></div>
+  <div class="lbl3" id="cvMomLbl" data-t="cvMoments"></div>
+  <div class="cgrid" id="cvMom"></div>
+  <div class="k-list" style="margin-top:14px">
+    <button type="button" class="btn ghost" id="cvUpload"><svg class="ic"><use href="#i-camera"/></svg><span data-t="cvUpload"></span></button>
+    <button type="button" class="btn link" id="cvNone" style="margin:8px auto 0" data-t="cvNone"></button>
+  </div>
+  <input type="file" id="cvFile" accept="image/*" class="hidden">
 </form></dialog>
 
 <dialog id="itemSheet"><form class="sheet" method="dialog" id="itemForm">
@@ -125,9 +159,9 @@ ru: { trTitle:'Поездки', trEmpty:'Здесь будут ваши поез
   packed:'Собрано', packPh:'Паспорт', packTemplate:'Добавить базовый список вещей', ownShared:'Общее', ownMine:'Моё', packEmpty:'Список вещей пуст',
   packBase:['Паспорт','Билеты','Зарядки','Аптечка','Наличные и карты','Зубные щётки','Пауэрбанк','Солнцезащитный крем','Удобная обувь','Адаптер для розеток'],
   spent:'Потрачено', ofBudget:(b) => `из ${b}`, noBudget:'Бюджет не задан. Укажите его в настройках поездки.', over:n => `Перерасход ${n}`, left:n => `Осталось ${n}`,
-  expEmpty:'Пока трат нет', paidBy:n => `платил(а) ${n}`, bookEmpty:'Добавьте билеты, отель, аренду машины: номера бронирований будут под рукой.',
+  expEmpty:'Пока трат нет', paidBy:n => `оплата: ${n}`, bookEmpty:'Добавьте билеты, отель, аренду машины: номера бронирований будут под рукой.',
   newPlan:'В план', newExp:'Трата', newBook:'Бронь', iDay:'День', iTime:'Время', iAmount:'Сумма', planDet:'Подробности', bookDet:'Номер брони, адрес, ссылка', expDet:'Комментарий',
-  noTime:'без времени', confirmDelItem:'Удалить?' },
+  noTime:'без времени', confirmDelItem:'Удалить?', cvChange:'Сменить обложку', cvTitle:'Обложка', cvMoments:'Из «Моментов»', cvUpload:'Загрузить своё фото', cvNone:'Без фото, цветной фон', cvNoMom:'В «Моментах» пока нет фото' },
 en: { trTitle:'Trips', trEmpty:'Your trips will live here: a day-by-day plan, packing, budget and bookings. Tap + to start.', past:n => `Past trips (${n})`,
   now:'now', noDates:'no dates yet', newTrip:'New trip', editTrip:'Trip', where:'Where to', wherePh:'Istanbul', from:'From', to:'To', budget:'Budget', budgetPh:'1,000',
   delTrip:'Delete trip', confirmDelTrip:'Delete this trip with all plans and expenses?',
@@ -138,7 +172,7 @@ en: { trTitle:'Trips', trEmpty:'Your trips will live here: a day-by-day plan, pa
   spent:'Spent', ofBudget:(b) => `of ${b}`, noBudget:'No budget set. Add one in the trip settings.', over:n => `Over by ${n}`, left:n => `${n} left`,
   expEmpty:'No expenses yet', paidBy:n => `paid by ${n}`, bookEmpty:'Add tickets, hotel, car rental: booking numbers will be at hand.',
   newPlan:'Plan item', newExp:'Expense', newBook:'Booking', iDay:'Day', iTime:'Time', iAmount:'Amount', planDet:'Details', bookDet:'Booking number, address, link', expDet:'Comment',
-  noTime:'no time', confirmDelItem:'Delete?' }
+  noTime:'no time', confirmDelItem:'Delete?', cvChange:'Change cover', cvTitle:'Cover', cvMoments:'From Moments', cvUpload:'Upload a photo', cvNone:'No photo, colour background', cvNoMom:'No photos in Moments yet' }
 });
 const TR = { ctx:null, trips:[], items:[], open:null, tab:'plan', packOwner:'shared', editingTrip:null, editingItem:null, itemKind:'plan' };
 const nameOf = id => id === TR.ctx.user.id ? t('you') : (TR.ctx.partner?.id === id ? TR.ctx.partner.display_name : '');
@@ -146,7 +180,7 @@ const nameOf = id => id === TR.ctx.user.id ? t('you') : (TR.ctx.partner?.id === 
 async function loadTrips(){
   const { data, error } = await sb.from('trips').select('*').order('start_date', { ascending:true, nullsFirst:false });
   if (error) throw error;
-  TR.trips = data; renderList();
+  TR.trips = data; await signCovers(); renderList();
   if (TR.open) { const tr = TR.trips.find(x => x.id === TR.open); if (tr) await loadItems(); else closeTrip(); }
 }
 async function loadItems(){
@@ -159,8 +193,9 @@ function tripCard(tr){
     const s = parseYmd(tr.start_date), e = parseYmd(tr.end_date || tr.start_date);
     badge = s <= td && e >= td ? `<span class="badge">${t('now')}</span>` : s > td ? `<span class="badge">${untilLabel(s)}</span>` : '';
   }
-  return `<button class="trip-card" data-trip="${tr.id}"><div class="cover"><h2>${esc(tr.title)}</h2></div>
-    <div class="info"><span class="muted">${tr.start_date ? fmtRange(tr.start_date, tr.end_date) : t('noDates')}</span>${badge}</div></button>`;
+  const src = coverSrc(tr), past = tr.start_date && parseYmd(tr.end_date || tr.start_date) < td;
+  return `<button class="trip-card ${past ? 'past' : ''}" data-trip="${tr.id}"><div class="cover ${src ? 'ph' : ''}">${src ? `<img src="${esc(src)}" alt="" onload="this.classList.add('ok')" onerror="this.remove()">` : ''}<h2>${esc(tripTitle(tr))}</h2>${badge ? `<span class="bdg">${badge.replace(/<[^>]+>/g, '')}</span>` : ''}</div>
+    <div class="info"><span class="muted">${tr.start_date ? fmtRange(tr.start_date, tr.end_date) : t('noDates')}</span></div></button>`;
 }
 function renderList(){
   const td = ymd(today());
@@ -190,7 +225,9 @@ function tripDays(tr){
 
 function renderTrip(){
   const tr = TR.trips.find(x => x.id === TR.open); if (!tr) return;
-  $('tvTitle').textContent = tr.title;
+  $('tvTitle').textContent = tripTitle(tr);
+  const src = coverSrc(tr); $('tvHero').classList.toggle('ph', !!src);
+  if (src) { if ($('tvImg').getAttribute('src') !== src) { $('tvImg').classList.remove('ok'); $('tvImg').src = src; } } else { $('tvImg').removeAttribute('src'); $('tvImg').classList.remove('ok'); }
   $('tvDates').textContent = tr.start_date ? fmtRange(tr.start_date, tr.end_date) + (parseYmd(tr.start_date) > today() ? ' · ' + untilLabel(parseYmd(tr.start_date)) : '') : t('noDates');
   document.querySelectorAll('#tabSeg button').forEach(b => b.classList.toggle('on', b.dataset.k === TR.tab));
   document.querySelectorAll('.kv').forEach(v => v.classList.toggle('hidden', v.id !== 'kv-' + TR.tab));
@@ -272,12 +309,129 @@ document.addEventListener('click', async e => {
   if (it) { const row = TR.items.find(i => i.id === it); if (row) openItem(row.kind, row); }
 });
 
+// ===== Covers: city photos from Wikipedia (Wikidata finds the place in Russian or English) =====
+const WIKI = {
+  lang: q => /[а-яё]/i.test(q) ? 'ru' : 'en',
+  get: u => fetch(u).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+  file: (f, w) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(String(f).replace(/^File:/, '').replace(/ /g, '_'))}?width=${w}`,
+  bad: /collage|montage|coat|flag|map|logo|emblem|seal|locator|location|karte|wappen|signature|diagram|chart|plan_of|scheme|lccn|sentinel|satellite|portrait|19[0-6]\ds|18\d\ds|\d{4}s\b|stamp|banknote|press_conference/i,
+  async search(q){
+    q = q.trim(); if (q.length < 2) return [];
+    const l = WIKI.lang(q);
+    const r = await WIKI.get(`https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&type=item&limit=6&language=${l}&uselang=${LANG}&search=${encodeURIComponent(q)}`);
+    const list = r.search || []; if (!list.length) return [];
+    const e = await WIKI.get(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims|sitelinks|labels|descriptions&languages=ru|en&sitefilter=enwiki|ruwiki&ids=${list.map(x => x.id).join('|')}`);
+    return list.map(x => { const en = e.entities?.[x.id] || {};
+      return { id:x.id, label: en.labels?.[LANG]?.value || en.labels?.ru?.value || en.labels?.en?.value || x.label, desc: en.descriptions?.[LANG]?.value || x.description || '',
+        img: en.claims?.P18?.[0]?.mainsnak?.datavalue?.value, geo: !!en.claims?.P625, en: en.sitelinks?.enwiki?.title, ru: en.sitelinks?.ruwiki?.title }; })
+      .filter(x => x.geo && (x.en || x.ru)).slice(0, 4);
+  },
+  async photos(p){
+    for (const [l, title] of [['en', p.en], ['ru', p.ru]]) {
+      if (!title) continue;
+      const r = await WIKI.get(`https://${l}.wikipedia.org/api/rest_v1/page/media-list/${encodeURIComponent(title.replace(/ /g, '_'))}`);
+      const files = (r.items || []).filter(i => i.type === 'image' && /\.jpe?g$/i.test(i.title) && !WIKI.bad.test(i.title)).map(i => i.title.replace(/^File:/, ''));
+      if (files.length) return [...new Set(files)].slice(0, 6);
+    }
+    return p.img && /\.jpe?g$/i.test(p.img) && !WIKI.bad.test(p.img) ? [p.img] : [];
+  }
+};
+TR.urls = {};
+const placeRow = (p, photos) => photos?.length ? { place_qid:p.id, place_name:p.label, cover_kind:'wiki', cover_url:WIKI.file(photos[0], 1200), cover_alts:photos }
+  : { place_qid:p.id, place_name:p.label, cover_kind:'none', cover_url:null, cover_alts:[] };
+function coverSrc(tr){
+  if (tr.cover_kind === 'wiki') return tr.cover_url;
+  if ((tr.cover_kind === 'moment' || tr.cover_kind === 'upload') && tr.cover_path) return TR.urls[tr.cover_path] || null;
+  return null;
+}
+// the place name in the app's language when the trip title is just the place
+const tripTitle = tr => tr.place_name && tr.title && tr.title.trim().toLowerCase() !== tr.place_name.toLowerCase() && WIKI.lang(tr.title) !== WIKI.lang(tr.place_name) && WIKI.lang(tr.place_name) === (LANG === 'ru' ? 'ru' : 'en') ? tr.place_name : tr.title;
+async function signCovers(){
+  const need = TR.trips.filter(x => x.cover_path && !TR.urls[x.cover_path]).map(x => x.cover_path);
+  if (!need.length) return;
+  const { data } = await sb.storage.from('moments').createSignedUrls(need, 3600);
+  (data || []).forEach(u => { if (u.signedUrl) TR.urls[u.path] = u.signedUrl; });
+}
+// trips without a cover look their place up once, then the result is saved for both partners
+let autoBusy = false;
+async function autoCovers(){
+  if (autoBusy) return; autoBusy = true;
+  try {
+    for (const tr of TR.trips.filter(x => !x.cover_kind && x.title)) {
+      const p = (await WIKI.search(tr.title))[0];
+      const row = p ? placeRow(p, await WIKI.photos(p)) : { cover_kind:'none' };
+      Object.assign(tr, row); renderList(); if (TR.open === tr.id) renderTrip();
+      await sb.from('trips').update(row).eq('id', tr.id);
+    }
+  } finally { autoBusy = false; }
+}
+// suggestions while typing the place
+let sugTimer, sugSeq = 0;
+$('tTitle').addEventListener('input', () => {
+  TR.pick = null; clearTimeout(sugTimer);
+  const q = $('tTitle').value, my = ++sugSeq;
+  sugTimer = setTimeout(async () => {
+    const res = await WIKI.search(q); if (my !== sugSeq) return;
+    TR.sug = res;
+    $('tSug').innerHTML = res.map((p, i) => `<button type="button" data-sug="${i}">${p.img ? `<img src="${esc(WIKI.file(p.img, 120))}" alt="" onerror="this.replaceWith(document.createElement('i'))">` : '<i></i>'}<span><b>${esc(p.label)}</b><small>${esc(p.desc)}</small></span></button>`).join('');
+    $('tSug').classList.toggle('hidden', !res.length);
+  }, 300);
+});
+$('tSug').onclick = async e => {
+  const i = e.target.closest('[data-sug]')?.dataset.sug; if (i == null) return;
+  const p = TR.sug[+i]; TR.pick = p; ++sugSeq; $('tTitle').value = p.label; $('tSug').classList.add('hidden');
+  TR.pickPhotos = await WIKI.photos(p);
+  if (TR.pick === p && TR.pickPhotos.length) { $('tPrev').querySelector('img').src = WIKI.file(TR.pickPhotos[0], 800); $('tPrev').classList.remove('hidden'); }
+  else $('tPrev').classList.add('hidden');
+};
+// cover sheet
+async function openCover(){
+  const tr = TR.trips.find(x => x.id === TR.open); if (!tr) return;
+  let alts = tr.cover_alts || [];
+  const drawWiki = () => { $('cvWikiWrap').classList.toggle('hidden', !alts.length);
+    $('cvWiki').innerHTML = alts.map(f => `<button type="button" data-wiki="${esc(f)}" class="${tr.cover_kind === 'wiki' && tr.cover_url === WIKI.file(f, 1200) ? 'on' : ''}"><img src="${esc(WIKI.file(f, 300))}" alt="" loading="lazy"></button>`).join(''); };
+  drawWiki();
+  $('coverSheet').showModal();
+  if (!alts.length && tr.title) { const p = tr.place_qid ? null : (await WIKI.search(tr.title))[0]; if (p) { alts = await WIKI.photos(p); tr.cover_alts = alts; drawWiki(); } }
+  // moments: photos from the trip dates first
+  const { data: ms } = await sb.from('moments').select('path,taken_on').order('taken_on', { ascending:false }).limit(60);
+  const inTrip = m => tr.start_date && m.taken_on >= tr.start_date && m.taken_on <= (tr.end_date || tr.start_date);
+  const list = (ms || []).sort((a, b) => (inTrip(b) - inTrip(a))).slice(0, 12);
+  if (!list.length) { $('cvMom').innerHTML = `<div class="muted small" style="grid-column:1/-1">${t('cvNoMom')}</div>`; return; }
+  const { data: su } = await sb.storage.from('moments').createSignedUrls(list.map(m => m.path.replace(/\.jpg$/, '_t.jpg')), 3600);
+  $('cvMom').innerHTML = list.map((m, i) => `<button type="button" data-mom="${esc(m.path)}" class="${tr.cover_path === m.path ? 'on' : ''}"><img src="${esc(su?.[i]?.signedUrl || '')}" alt="" loading="lazy"></button>`).join('');
+}
+async function setCover(row){
+  const tr = TR.trips.find(x => x.id === TR.open); if (!tr) return;
+  Object.assign(tr, row); await signCovers(); renderTrip(); renderList(); $('coverSheet').close();
+  const { error } = await sb.from('trips').update(row).eq('id', tr.id); if (error) alert(errText(error));
+}
+$('coverBtn').onclick = openCover;
+$('cvWiki').onclick = e => { const f = e.target.closest('[data-wiki]')?.dataset.wiki; if (f) setCover({ cover_kind:'wiki', cover_url:WIKI.file(f, 1200), cover_path:null }); };
+$('cvMom').onclick = e => { const p = e.target.closest('[data-mom]')?.dataset.mom; if (p) setCover({ cover_kind:'moment', cover_path:p, cover_url:null }); };
+$('cvNone').onclick = () => setCover({ cover_kind:'none', cover_url:null, cover_path:null });
+$('cvUpload').onclick = () => $('cvFile').click();
+$('cvFile').onchange = async () => {
+  const f = $('cvFile').files[0]; $('cvFile').value = ''; if (!f) return;
+  try {
+    const bmp = await createImageBitmap(f, { imageOrientation:'from-image' });
+    const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .85));
+    const path = `${TR.ctx.couple.id}/covers/${crypto.randomUUID()}.jpg`;
+    const { error } = await sb.storage.from('moments').upload(path, blob, { contentType:'image/jpeg' }); if (error) throw error;
+    await setCover({ cover_kind:'upload', cover_path:path, cover_url:null });
+  } catch(e) { alert(errText(e)); }
+};
+
 // ===== Trip sheet =====
 function openTripSheet(tr){
   TR.editingTrip = tr || null; $('tripForm').reset();
   $('tsTitle').textContent = tr ? t('editTrip') : t('newTrip');
   $('tTitle').value = tr?.title || ''; $('tBudget').value = tr?.budget ?? ''; $('tNote').value = tr?.note || '';
   setDate($('tStart'), tr?.start_date || ''); setDate($('tEnd'), tr?.end_date || '');
+  TR.pick = null; TR.pickPhotos = null; $('tSug').classList.add('hidden'); $('tPrev').classList.add('hidden');
+  if (tr && coverSrc(tr)) { $('tPrev').querySelector('img').src = coverSrc(tr); $('tPrev').classList.remove('hidden'); }
   $('tDelete').classList.toggle('hidden', !tr);
   $('tripSheet').showModal();
 }
@@ -289,9 +443,12 @@ $('tripSheet').onclose = async () => {
   const s = getDate($('tStart')) || null; let e = getDate($('tEnd')) || null; if (s && e && e < s) e = s;
   const budget = $('tBudget').value.replace(/[^\d.,]/g, '').replace(',', '.');
   const row = { title:$('tTitle').value.trim(), start_date:s, end_date:e, budget:budget ? Number(budget) : null, note:$('tNote').value.trim() || null };
+  const old = TR.editingTrip, keepOwn = old && (old.cover_kind === 'moment' || old.cover_kind === 'upload');
+  if (TR.pick && !keepOwn) Object.assign(row, placeRow(TR.pick, TR.pickPhotos));
+  else if (old && row.title !== old.title && !keepOwn) Object.assign(row, { cover_kind:null, cover_url:null, cover_alts:null, place_qid:null, place_name:null });
   if (TR.editingTrip) await sb.from('trips').update(row).eq('id', TR.editingTrip.id);
-  else { const { data, error } = await sb.from('trips').insert({ ...row, couple_id:TR.ctx.couple.id }).select().single(); if (error) return alert(errText(error)); await loadTrips(); return openTrip(data.id); }
-  loadTrips();
+  else { const { data, error } = await sb.from('trips').insert({ ...row, couple_id:TR.ctx.couple.id }).select().single(); if (error) return alert(errText(error)); await loadTrips(); openTrip(data.id); autoCovers(); return; }
+  loadTrips().then(autoCovers);
 };
 $('tDelete').onclick = async () => {
   if (!TR.editingTrip || !confirm(t('confirmDelTrip'))) return;
@@ -349,6 +506,7 @@ $('iDelete').onclick = async () => {
   await loadTrips();
   const m = location.hash.match(/trip=([0-9a-f-]{36})/); if (m && TR.trips.some(x => x.id === m[1])) { TR.open = m[1]; $('listView').classList.add('hidden'); $('tripView').classList.remove('hidden'); loadItems(); }
   show('page', ['loading','page']);
+  autoCovers();
   sb.channel('trips-' + TR.ctx.couple.id)
     .on('postgres_changes', { event:'*', schema:'public', table:'trips', filter:`couple_id=eq.${TR.ctx.couple.id}` }, () => loadTrips())
     .on('postgres_changes', { event:'*', schema:'public', table:'trip_items', filter:`couple_id=eq.${TR.ctx.couple.id}` }, () => { if (TR.open) loadItems(); })
