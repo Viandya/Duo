@@ -377,6 +377,9 @@ applyTheme();
     if (!dn || !dn.d.open || Math.abs(e.clientX - dn.x) > 12 || Math.abs(e.clientY - dn.y) > 12) return;
     if (outside(dn.d, e.clientX, e.clientY)) { e.preventDefault(); dn.d.close('cancel'); swallowUntil = Date.now() + 500; }
   }, true);
+  // a link inside a sheet leaves the page: close the sheet so it isn't still open after "back"
+  document.addEventListener('click', e => { const a = e.target.closest('dialog[open] a[href]'); if (a && !a.getAttribute('href').startsWith('#')) { const d = a.closest('dialog'); setTimeout(() => d.open && d.close('cancel'), 0); } });
+  window.addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('dialog[open]').forEach(d => { if (d.querySelector('a[href]')) d.close('cancel'); }); });
   // the tap must not fall through to whatever is under the closed sheet
   let swallowUntil = 0;
   document.addEventListener('click', e => { if (Date.now() < swallowUntil) { swallowUntil = 0; e.preventDefault(); e.stopPropagation(); } }, true);
@@ -385,10 +388,13 @@ applyTheme();
   document.addEventListener('touchstart', e => {
     const s = e.target.closest?.('dialog[open] .sheet'); if (!s || s.scrollTop > 0) return;
     if (e.target.closest('input,textarea,select,.mcard,canvas,[data-noswipe]')) return;
-    drag = { s, y: e.touches[0].clientY, dy: 0 };
+    drag = { s, x: e.touches[0].clientX, y: e.touches[0].clientY, dy: 0 };
   }, { passive: true });
   document.addEventListener('touchmove', e => {
     if (!drag) return;
+    // a sideways gesture (a row of days, chips) is not a swipe to close
+    const ax = Math.abs(e.touches[0].clientX - drag.x), ay = Math.abs(e.touches[0].clientY - drag.y);
+    if (ax > 10 && ax > ay) { drag.s.style.transform = ''; drag = null; return; }
     drag.dy = Math.max(0, e.touches[0].clientY - drag.y);
     if (drag.dy > 0 && drag.s.scrollTop <= 0) { drag.s.style.transition = 'none'; drag.s.style.transform = `translateY(${drag.dy}px)`; }
   }, { passive: true });
