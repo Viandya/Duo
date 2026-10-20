@@ -84,7 +84,21 @@ function renderOv(){
       <div class="kpi gold"><div class="lb">Звёзды</div><div class="n">${nf(s.stars)} ★</div><div class="s">${A.tg?.balance != null ? `баланс бота: ${nf(A.tg.balance)} ★` : `${nf(s.stars_period)} ★ ${period()}`}</div></div></div>
     <div class="box"><div class="hd"><span class="lb">Новые и активные</span><span class="muted small">по дням</span></div>${chart(s.series || [])}</div>
     <div class="box"><div class="lb" style="margin-bottom:10px">Воронка</div><div class="fun">${f.map((v, i) => `<div class="r"><span class="bar" style="width:${Math.round(v / mx * 150)}px;opacity:${1 - i * .15}"></span><b>${nf(v)}</b><span class="t">${steps[i][0]}</span></div>`).join('')}</div></div>
-    <p class="muted small" style="margin:0 4px">«Заходили» считается с 20 октября 2026, когда появилась отметка о входе.</p>`;
+    ${botBox()}
+    <p class="muted small" style="margin:0 4px">«Заходили» считается с 20 октября 2026, «Старт» в боте с 20 октября 2026, 17:20.</p>`;
+  $('srcMk') && ($('srcMk').oninput = () => { const v = $('srcMk').value.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 30); $('srcOut').textContent = v ? `t.me/${BOT}?start=s_${v}` : ''; });
+  $('srcOut') && ($('srcOut').onclick = () => { const v = $('srcOut').textContent; if (v) { try { navigator.clipboard.writeText('https://' + v); toast('Ссылка скопирована'); } catch(_){} } });
+}
+function botBox(){
+  const b = A.b; if (!b) return '';
+  const conv = b.starts ? Math.round(b.starts_reg / b.starts * 100) : 0;
+  const src = (b.sources || []).map(x => `<div class="row"><span class="grow">${x.source === 'direct' ? 'без метки' : esc(x.source)}<div>зарегистрировались ${nf(x.reg)} · в паре ${nf(x.couple)} · оплатили ${nf(x.paid)}</div></span><b>${nf(x.starts)}</b></div>`).join('');
+  return `<div class="box"><div class="hd"><span class="lb">Бот</span><span class="muted small">${period()}</span></div>
+    <div class="kpis" style="margin-bottom:6px"><div class="kpi" style="box-shadow:none;background:var(--bg)"><div class="lb">Нажали «Старт»</div><div class="n">${nf(b.starts)}</div><div class="s">зарегистрировались ${nf(b.starts_reg)} · ${conv}%</div></div>
+      <div class="kpi" style="box-shadow:none;background:var(--bg)"><div class="lb">Сразу в приложение</div><div class="n">${nf(b.app_only)}</div><div class="s">без «Старта» · сообщений боту ${nf(b.messages)}</div></div></div>
+    <div class="lb" style="margin:12px 0 2px">Откуда пришли</div>${src || '<div class="empty">Пока никто не нажимал «Старт»</div>'}
+    <label>Ссылка с меткой для рекламы</label><input id="srcMk" placeholder="например kanal1" autocapitalize="none" autocomplete="off">
+    <div id="srcOut" class="code" style="font-size:14px;letter-spacing:0;cursor:pointer;min-height:44px"></div></div>`;
 }
 function renderSt(){
   const s = A.s, tg = A.tg;
@@ -122,8 +136,8 @@ async function life(on){ const id = $('cpl').value; if (!id) return; if (!confir
   const { error } = await sb.rpc('admin_grant_lifetime', { p_couple:id, p_on:on }); if (error) return alert(errText(error)); toast(on ? 'Готово, Plus навсегда' : 'Готово'); load(); }
 function render(){ if (!A.s) return; renderOv(); renderSt(); if (A.tab === 'pp' || !$('vPp').innerHTML) renderPp(); }
 async function load(){
-  const [{ data, error }, tg] = await Promise.all([sb.rpc('admin_stats', { p_days:A.d }), A.tg ? Promise.resolve({ data:A.tg }) : sb.functions.invoke('admin', { body:{} })]);
-  if (error) throw error; A.s = data; if (tg?.data && !A.tg) A.tg = tg.data;
+  const [{ data, error }, tg, bt] = await Promise.all([sb.rpc('admin_stats', { p_days:A.d }), A.tg ? Promise.resolve({ data:A.tg }) : sb.functions.invoke('admin', { body:{} }), sb.rpc('admin_bot_stats', { p_days:A.d })]);
+  if (error) throw error; A.s = data; A.b = bt.data || null; if (tg?.data && !A.tg) A.tg = tg.data;
   const keep = $('cpl')?.value; renderOv(); renderSt(); renderPp(); if (keep && $('cpl')) $('cpl').value = keep;
 }
 $('tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; A.tab = b.dataset.tab; [...$('tabs').children].forEach(x => x.classList.toggle('on', x === b));
