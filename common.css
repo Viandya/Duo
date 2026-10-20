@@ -132,3 +132,22 @@ dialog{cursor:pointer}dialog>*{cursor:auto}
 .spinner{display:grid;place-items:center;min-height:60dvh}
 .spinner img{width:72px;height:72px;border-radius:18px;animation:pulse 1.2s infinite}
 @keyframes pulse{50%{transform:scale(1.08)}}
+
+/* Seasonal themes (Halloween): always dark, with their own decorations */
+:root[data-palette="pumpkin"],:root[data-theme][data-palette="pumpkin"]{--bg:#120c1f;--card:#1d1530;--ink:#f1e9ff;--muted:#a99cc0;--line:#30264a;--accent:#ff8a2a;--accent-soft:#3a2440;--accent-ink:#1a0f00;--ok:#ff8a2a;--sel-bg:#ffb070;--sel-ink:#120c1f;--grad-a:#ef7a2c;--grad-b:#7a2f86;--warm:#33223a;--warm-ink:#ffc27a;--rose:#3d2236;--rose-ink:#ffb3c8;--blue:#a9b8ff;--blue-s:#22233f;--violet:#c9b2ff;--violet-s:#2b2145;--shadow:0 6px 24px rgba(0,0,0,.35);--backdrop:rgba(5,2,12,.6);color-scheme:dark}
+:root[data-palette="gothic"],:root[data-theme][data-palette="gothic"]{--bg:#0b0909;--card:#161111;--ink:#efe6e1;--muted:#8d7c78;--line:#2c1d1d;--accent:#d64545;--accent-soft:#2a1414;--accent-ink:#fff;--ok:#d64545;--sel-bg:#e8b4b4;--sel-ink:#0b0909;--grad-a:#7a1414;--grad-b:#2a0909;--warm:#231a14;--warm-ink:#e0c08a;--rose:#2e1616;--rose-ink:#f2a8a8;--blue:#b8b8d8;--blue-s:#1a1a22;--violet:#c8a8d8;--violet-s:#221a26;--shadow:0 6px 24px rgba(0,0,0,.45);--backdrop:rgba(0,0,0,.65);color-scheme:dark}
+:root[data-palette="pumpkin"] body,:root[data-palette="gothic"] body{background:transparent}
+.decor{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.decor svg{position:absolute}
+@keyframes dcFly{0%{transform:translate(-40px,0) scale(.9)}50%{transform:translate(45vw,-24px) scale(1)}100%{transform:translate(100vw,10px) scale(.9)}}
+@keyframes dcTw{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes dcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(14px)}}
+@keyframes dcFlick{0%,100%{filter:drop-shadow(0 0 6px #ff9a3d)}50%{filter:drop-shadow(0 0 1px #ff9a3d)}}
+@media (prefers-reduced-motion: reduce){.decor *{animation:none!important}}
+.flick{animation:dcFlick 2.2s ease-in-out infinite}
+.bob{animation:dcBob 3s ease-in-out infinite}
+/* Plus badge */
+.plus-seal{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:3px 9px;font-size:11px;font-weight:800;letter-spacing:.08em;color:#8a6420;background:linear-gradient(120deg,#f6ead0,#fbf4e4);box-shadow:inset 0 0 0 1px #e6d2a6}
+.gold-text{background:linear-gradient(120deg,#b98a3c,#e9cf93 45%,#c99a3b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn.plus{background:#1f2a24;color:#f6ead0}
+:root[data-theme="dark"] .btn.plus,:root[data-palette="pumpkin"] .btn.plus,:root[data-palette="gothic"] .btn.plus{background:linear-gradient(135deg,#d8b56a,#f6e3b4);color:#2a2112}

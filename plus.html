@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo Plus</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=18">
+<style>
+.hero{position:relative;border-radius:26px;overflow:hidden;padding:30px 18px 24px;text-align:center;margin-bottom:14px;
+  background:radial-gradient(circle at 20% 25%,color-mix(in srgb,var(--accent-soft) 90%,transparent),transparent 60%),radial-gradient(circle at 85% 15%,color-mix(in srgb,#f6e3c4 70%,transparent),transparent 55%),radial-gradient(circle at 60% 100%,color-mix(in srgb,#f3dbe2 60%,transparent),transparent 60%),var(--card)}
+:root[data-theme="dark"] .hero,:root[data-palette="pumpkin"] .hero,:root[data-palette="gothic"] .hero{background:radial-gradient(circle at 20% 25%,rgba(140,196,162,.18),transparent 60%),radial-gradient(circle at 85% 15%,rgba(233,207,147,.2),transparent 55%),radial-gradient(circle at 60% 100%,rgba(240,181,194,.14),transparent 60%),var(--card)}
+.emb{width:84px;height:84px;border-radius:50%;background:var(--card);display:grid;place-items:center;margin:0 auto;box-shadow:0 10px 30px rgba(185,138,60,.3),inset 0 0 0 1.5px #ead9b2;animation:fl 4s ease-in-out infinite}
+.emb svg{width:50px;height:36px;fill:none;stroke:url(#gg);stroke-width:2;stroke-linejoin:round}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){.emb{animation:none}}
+.hero h1{font-size:30px;margin-top:14px}
+.hero p{color:var(--muted);margin:4px 0 0}
+.status{display:inline-flex;margin-top:12px}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.feats div{background:var(--card);border-radius:16px;padding:14px;box-shadow:inset 0 0 0 1px var(--line)}
+.feats .ic{width:22px;height:22px}
+.feats b{display:block;font-size:14px;margin-top:6px}
+.feats small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.35}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plans button{position:relative;border:0;background:var(--card);border-radius:16px;padding:14px;text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink)}
+.plans button.on{box-shadow:inset 0 0 0 2.5px var(--ink)}
+.plans .k{font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.plans b{display:block;font-size:20px;margin-top:4px}
+.plans small{color:var(--muted);font-size:12.5px}
+.plans .off{position:absolute;top:-9px;right:10px;background:#c99a3b;color:#fff;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:800}
+.fine{color:var(--muted);text-align:center;font-size:12.5px;margin:10px 4px 0;line-height:1.45}
+.grp{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:24px 6px 8px}
+.code-row{display:flex;gap:8px;margin-top:4px}
+.code-row input{text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.code-row .btn{width:auto;flex:none}
+.toast{position:fixed;left:50%;bottom:calc(30px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9cf93"/><stop offset="1" stop-color="#b98a3c"/></linearGradient></defs></svg>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar"><button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button><h1></h1></div>
+  <div class="hero">
+    <div class="emb"><svg viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg></div>
+    <h1>Duo <span class="gold-text">Plus</span></h1>
+    <p data-t="pSub"></p>
+    <div id="status"></div>
+  </div>
+  <div class="feats" id="feats"></div>
+  <div id="buy">
+    <div class="plans" id="plans"></div>
+    <button class="btn plus" id="buyBtn" style="margin-top:12px"></button>
+    <p class="fine" data-t="pFine"></p>
+  </div>
+  <div class="grp" id="gift" data-t="pGiftT"></div>
+  <div class="card k-list" style="box-shadow:inset 0 0 0 1px var(--line)">
+    <p class="muted small" style="margin:0 0 10px;line-height:1.45" data-t="pGiftX"></p>
+    <div class="two"><button class="btn ghost" data-code="code_month"></button><button class="btn ghost" data-code="code_year"></button></div>
+  </div>
+  <div class="grp" data-t="pCodeT"></div>
+  <div class="card" style="box-shadow:inset 0 0 0 1px var(--line)">
+    <form class="code-row" id="codeForm"><input id="code" maxlength="14" autocomplete="off" autocapitalize="characters" placeholder="ABCD2345EF"><button class="btn" data-t="pCodeGo"></button></form>
+    <div class="error" id="codeErr"></div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=18"></script>
+<script>
+addT({
+ru: { pSub:'Больше места для вас двоих', pOn:d => `Подключено до ${d}`, pLife:'Подключено навсегда', pTrial:n => `Пробный период: ещё ${n} ${plural(n,'день','дня','дней')}`, pOff:'Сейчас бесплатная версия',
+  f1:'Фото без лимита', f1x:'В бесплатной версии 10 фото', f2:'Особые темы', f2x:'Тыквенная ночь, Готика и новые сезонные', f3:'Итоги года', f3x:'История вашего года вместе', f4:'Анализ цикла', f4x:'Вся история и все циклы',
+  year:'Год', month:'Месяц', perMonth:n => `≈ ${n} ★ в месяц`, renews:'продлевается сама', buy:n => `Подключить за ${n} ★`, extend:n => `Продлить за ${n} ★`,
+  pFine:'Одна подписка на двоих. Оплата звёздами Telegram. Месячную подписку можно отменить в любой момент в настройках Telegram.',
+  pGiftT:'Подарить другой паре', pGiftX:'Купите код и отправьте его друзьям. Код придёт сюда, в чат с ботом Duo.', codeM:'Месяц · 99 ★', codeY:'Год · 799 ★',
+  pCodeT:'Промокод', pCodeGo:'Ввести', badCode:'Код не найден или уже использован', tooFast:'Подождите пару секунд', codeOk:'Готово, Duo Plus подключён',
+  paid:'Оплата прошла, Duo Plus подключён', codeSent:'Оплата прошла. Код пришёл в чат с ботом', notTg:'Оплата открылась в Telegram. Вернитесь сюда после оплаты' },
+en: { pSub:'More room for the two of you', pOn:d => `Active until ${d}`, pLife:'Active forever', pTrial:n => `Free trial: ${n} ${n === 1 ? 'day' : 'days'} left`, pOff:'You are on the free version',
+  f1:'Unlimited photos', f1x:'The free version keeps 10 photos', f2:'Special themes', f2x:'Pumpkin night, Gothic and new seasonal ones', f3:'Year in review', f3x:'The story of your year together', f4:'Cycle analysis', f4x:'Full history and every cycle',
+  year:'Year', month:'Month', perMonth:n => `≈ ${n} ★ a month`, renews:'renews automatically', buy:n => `Get it for ${n} ★`, extend:n => `Extend for ${n} ★`,
+  pFine:'One subscription for both of you. Paid with Telegram Stars. You can cancel the monthly subscription any time in Telegram settings.',
+  pGiftT:'Give it to another couple', pGiftX:'Buy a code and send it to friends. The code arrives here, in the chat with the Duo bot.', codeM:'Month · 99 ★', codeY:'Year · 799 ★',
+  pCodeT:'Promo code', pCodeGo:'Apply', badCode:'Code not found or already used', tooFast:'Wait a couple of seconds', codeOk:'Done, Duo Plus is on',
+  paid:'Payment done, Duo Plus is on', codeSent:'Payment done. The code is in the chat with the bot', notTg:'The payment opened in Telegram. Come back here afterwards' }
+});
+const P = { ctx:null, plan:'plus_year' };
+const toast = m => { const el = $('toast'); el.textContent = m; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 3200); };
+const loc = () => LANG === 'en' ? 'en-GB' : 'ru-RU';
+function render(){
+  const c = P.ctx.couple, on = plusOn(c);
+  $('status').innerHTML = `<span class="plus-seal status">${esc(c.plus_lifetime ? t('pLife') : on ? (plusTrial(c) ? t('pTrial', plusDaysLeft(c)) : t('pOn', new Date(c.plus_until).toLocaleDateString(loc()))) : t('pOff'))}</span>`;
+  $('feats').innerHTML = [['photo','f1','#b8506a'],['sparkle','f2','#6a4fa8'],['star','f3','#c0674b'],['droplet','f4','var(--accent)']]
+    .map(([i, k, col]) => `<div>${icon(i, 'color:' + col)}<b>${t(k)}</b><small>${t(k + 'x')}</small></div>`).join('');
+  $('buy').classList.toggle('hidden', !!c.plus_lifetime);
+  $('plans').innerHTML = `<button type="button" data-plan="plus_year" class="${P.plan === 'plus_year' ? 'on' : ''}"><span class="off">−33%</span><span class="k">${t('year')}</span><b>799 ★</b><small>${t('perMonth', 67)}</small></button>
+    <button type="button" data-plan="plus_month" class="${P.plan === 'plus_month' ? 'on' : ''}"><span class="k">${t('month')}</span><b>99 ★</b><small>${t('renews')}</small></button>`;
+  const price = P.plan === 'plus_year' ? 799 : 99;
+  $('buyBtn').textContent = on && !plusTrial(c) ? t('extend', price) : t('buy', price);
+  document.querySelector('[data-code="code_month"]').textContent = t('codeM');
+  document.querySelector('[data-code="code_year"]').textContent = t('codeY');
+}
+$('plans').onclick = e => { const b = e.target.closest('[data-plan]'); if (b) { P.plan = b.dataset.plan; render(); } };
+async function reloadCouple(){ const { data } = await sb.from('couples').select('*').eq('id', P.ctx.couple.id).single(); if (data) P.ctx.couple = data; render(); return data; }
+async function buy(kind, btn){
+  btn.disabled = true;
+  try {
+    const before = P.ctx.couple.plus_until;
+    const st = await payStars(kind);
+    if (st === 'external') toast(t('notTg'));
+    if (st !== 'paid') return;
+    if (kind.startsWith('code')) { toast(t('codeSent')); return; }
+    toast(t('payWait'));
+    await waitFor(async () => { const c = await reloadCouple(); return c && c.plus_until !== before; });
+    toast(t('paid'));
+  } catch(e) { alert(t('payErr') + errText(e)); }
+  finally { btn.disabled = false; }
+}
+$('buyBtn').onclick = () => buy(P.plan, $('buyBtn'));
+document.querySelectorAll('[data-code]').forEach(b => b.onclick = () => buy(b.dataset.code, b));
+$('codeForm').onsubmit = async e => {
+  e.preventDefault(); $('codeErr').textContent = '';
+  const code = $('code').value.trim(); if (!code) return;
+  const { error } = await sb.rpc('redeem_code', { p_code: code });
+  if (error) { $('codeErr').textContent = error.message.includes('too_fast') ? t('tooFast') : t('badCode'); return; }
+  $('code').value = ''; await reloadCouple(); toast(t('codeOk'));
+};
+(async () => {
+  applyI18n(); setupBack();
+  P.ctx = await requireCouple(); applyI18n();
+  render(); show('page', ['loading','page']);
+  if (location.hash === '#gift') setTimeout(() => $('gift').scrollIntoView({ behavior:'smooth' }), 100);
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (P.ctx) render(); });
+</script>
+</body>
+</html>

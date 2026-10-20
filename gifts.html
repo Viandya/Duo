@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Подарки</title>
+<meta name="theme-color" content="#eef3ee">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=18">
+<style>
+.lb{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:18px 4px 8px}
+.shop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gc{border:0;border-radius:18px;padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:150px;text-align:center;position:relative;overflow:hidden;color:#fff;font-weight:700;font-size:13px;cursor:pointer;line-height:1.2}
+.gc svg{width:58px;height:58px;display:block;margin:2px auto 6px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.3))}
+.gc .pr{display:inline-block;margin-top:auto;background:rgba(0,0,0,.25);border-radius:99px;padding:2px 9px;font-size:12px}
+.gc .sh{position:absolute;top:0;bottom:0;width:30%;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shine 3.5s ease-in-out infinite}
+.gc:active{transform:scale(.97)}
+@keyframes shine{0%{transform:translateX(-120%)}100%{transform:translateX(380%)}}
+.gc small{display:block;font-weight:500;font-size:11px;opacity:.85;margin-top:2px}
+.box-it{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.box-it:first-child{border-top:0;padding-top:2px}.box-it:last-child{padding-bottom:2px}
+.box-it .th{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;flex:none}
+.box-it .th svg{width:34px;height:34px}
+.box-it .grow{flex:1;min-width:0;font-weight:600}
+.box-it .grow div{font-size:13px;color:var(--muted);font-weight:500;margin-top:2px}
+.box-it .newdot{width:9px;height:9px;border-radius:50%;background:#c99a3b;flex:none}
+.sky{border-radius:24px;overflow:hidden;background:radial-gradient(ellipse at 50% 20%,#24305a,#0b0f22 72%);color:#eef0ff;padding:18px 14px;position:relative}
+.sky h2{font-size:20px;text-align:center}
+.sky .sub{text-align:center;font-size:13px;color:#8f9ad0;margin-top:2px}
+.sky svg{display:block;width:100%;height:auto}
+@keyframes tw{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+/* compose */
+.cmp-art{display:grid;place-items:center;height:110px;border-radius:20px;margin:6px 0 4px}
+.cmp-art svg{width:84px;height:84px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.3))}
+.pay{margin-top:18px}
+/* viewer */
+#viewer .sheet{min-height:88dvh;padding-top:30px;text-align:center}
+.v-from{font-size:12px;letter-spacing:.12em;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.v-big{width:170px;height:170px;margin:22px auto 12px}
+.v-big.pop{animation:pop .9s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes pop{0%{transform:scale(.4) rotate(-10deg);opacity:0}100%{transform:none;opacity:1}}
+.v-msg{font-family:Lora,serif;font-style:italic;font-size:18px;line-height:1.4;margin:8px 10px 0}
+.v-state{color:var(--muted);font-size:14px;margin-top:10px}
+.v-acts{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.conf{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.conf i{position:absolute;top:-20px;width:8px;height:12px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+/* coupon */
+.coupon{display:flex;background:#fffaf3;color:#5a2f1e;border-radius:18px;box-shadow:0 12px 26px rgba(150,80,40,.2);position:relative;overflow:hidden;text-align:left;margin:18px 0 0}
+.coupon .main{flex:1;padding:20px 16px 18px 22px}
+.coupon .k{font-size:11px;letter-spacing:.14em;color:#c0674b;font-weight:800}
+.coupon h3{font-family:Lora,serif;font-size:24px;line-height:1.15;margin:8px 0 6px}
+.coupon .s{font-size:13px;color:#9a7a66;font-style:italic}
+.coupon .stub{width:74px;border-left:2px dashed #e8c9b2;display:flex;align-items:center;justify-content:center;background:#fdf1e5;color:#c0674b;font-weight:800;font-size:12px;letter-spacing:.1em;writing-mode:vertical-rl;transform:rotate(180deg)}
+.coupon .stamp{position:absolute;right:90px;bottom:12px;border:2.5px solid #c0392b;color:#c0392b;border-radius:8px;padding:3px 8px;font-size:13px;font-weight:800;transform:rotate(-12deg);letter-spacing:.08em}
+/* ticket */
+.ticket{background:linear-gradient(160deg,#f6e3b4,#e2b866);color:#3a2a10;border-radius:16px;position:relative;box-shadow:0 14px 30px rgba(0,0,0,.3);text-align:left;margin-top:18px}
+.ticket:before,.ticket:after{content:"";position:absolute;top:122px;width:24px;height:24px;border-radius:50%;background:var(--card)}
+.ticket:before{left:-12px}.ticket:after{right:-12px}
+.ticket .top{padding:18px 18px 14px}
+.ticket .hd{display:flex;justify-content:space-between;font-size:10px;font-weight:800;letter-spacing:.14em}
+.ticket h3{font-family:Lora,serif;font-size:26px;line-height:1.08;margin:12px 0 6px}
+.ticket .info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:14px 18px 16px;border-top:2px dashed rgba(58,42,16,.3);margin:0 0}
+.ticket .info span{display:block;font-size:9.5px;opacity:.6;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.ticket .info b{font-size:14px}
+/* scratch */
+.scr{position:relative;height:280px;border-radius:22px;overflow:hidden;margin-top:18px;box-shadow:0 12px 26px rgba(90,60,160,.25)}
+.scr .under{position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,#ffd3a8,transparent 50%),linear-gradient(160deg,#e4a87c,#a35466 60%,#5b2a86);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:22px;text-align:center}
+.scr .under b{font-family:Lora,serif;font-size:24px;line-height:1.25;font-weight:500}
+.scr canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
+/* letter */
+.env{position:relative;height:190px;margin:26px 6px 0;background:linear-gradient(170deg,#f3e3c8,#e2cba6);border-radius:10px;box-shadow:0 18px 34px rgba(0,0,0,.25)}
+.env svg.flap{position:absolute;inset:0;width:100%;height:100%}
+.env .seal{position:absolute;left:50%;top:104px;transform:translate(-50%,-50%);width:64px;height:64px;transition:transform .5s,opacity .5s}
+.env.open .seal{transform:translate(-50%,-50%) scale(1.4) rotate(20deg);opacity:0}
+.env .to{position:absolute;left:16px;bottom:12px;font-family:Lora,serif;font-style:italic;color:#7a5a3a;font-size:14px}
+.cd{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.cd div{background:var(--bg);border-radius:12px;padding:8px 12px;min-width:56px}
+.cd b{font-family:Lora,serif;font-size:24px;display:block}
+.cd span{font-size:11px;color:var(--muted)}
+.paper{background:#fffdf6;color:#3a2e26;border-radius:6px;padding:22px 20px;text-align:left;font-family:Lora,serif;font-size:17px;line-height:1.55;box-shadow:0 10px 24px rgba(0,0,0,.18);margin-top:18px;white-space:pre-wrap;background-image:repeating-linear-gradient(0deg,transparent 0 26px,#f0ebe0 26px 27px)}
+/* flower */
+.days7{display:flex;justify-content:center;gap:5px;margin:10px 0}
+.days7 i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.days7 i.on{background:#3d8a63}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.plant{transform-origin:115px 205px;animation:sway 4s ease-in-out infinite}
+.plant.wilt{animation:none;transform:rotate(14deg)}
+/* vinyl */
+.rec{width:220px;height:220px;margin:24px auto 0;animation:spin 6s linear infinite}
+.rec.paused{animation-play-state:paused}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.rec,.plant,.gc .sh,.v-big.pop{animation:none!important}}
+.note-pap{background:#fff8e6;color:#3a2a6a;transform:rotate(-3deg);width:84%;margin:30px auto 0;padding:24px 20px;box-shadow:0 12px 24px rgba(0,0,0,.25);font-family:'Segoe Script','Comic Sans MS',cursive;font-size:19px;line-height:1.45;position:relative;text-align:left;white-space:pre-wrap}
+.note-pap:before{content:"";position:absolute;top:-8px;left:42%;width:60px;height:18px;background:rgba(255,220,160,.85);transform:rotate(3deg)}
+.toast{position:fixed;left:50%;bottom:calc(30px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:200;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner"><img src="icons/icon-192.png" alt=""></div>
+<main id="page" class="wrap sub hidden">
+  <div class="topbar"><button class="icon-btn" data-back aria-label="back"><svg class="ic"><use href="#i-left"/></svg></button><h1 data-t="gfTitle"></h1></div>
+  <div class="seg" id="tabs" style="margin-bottom:6px"><button data-tab="shop" class="on" data-t="tShop"></button><button data-tab="box" id="tabBox"></button><button data-tab="sky" data-t="tSky"></button></div>
+  <div id="vShop"></div>
+  <div id="vBox" class="hidden"></div>
+  <div id="vSky" class="hidden"></div>
+</main>
+
+<dialog id="cmp"><form class="sheet" method="dialog" id="cmpForm">
+  <div class="cmp-art" id="cArt"></div>
+  <h2 id="cTitle"></h2><p class="muted small" id="cHint" style="margin:2px 0 0;line-height:1.45"></p>
+  <div id="cFields"></div>
+  <div class="error" id="cErr"></div>
+  <button class="btn pay" value="ok" id="cPay"></button>
+  <button class="btn link" value="cancel" formnovalidate style="margin:6px auto 0" data-t="cancel"></button>
+</form></dialog>
+
+<dialog id="viewer"><div class="sheet" id="vBody"></div></dialog>
+<div class="toast" id="toast"></div>
+
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=18"></script>
+<script src="gift-art.js?v=2"></script>
+<script>
+addT({
+ru: { gfTitle:'Подарки', tShop:'Подарить', tBox:'Шкатулка', tSky:'Небо',
+  gAct:'Подарки, которые что-то делают', gLove:'Просто от души', gSeason:'Хеллоуин, до 7 ноября',
+  n:{ coupon:'Купон', ticket:'Билет на свидание', scratch:'Скретч-карта', letter:'Письмо с сургучом', flower:'Цветок', note:'Записка под подушкой', vinyl:'Песня на пластинке', star:'Звезда на небе', heart:'Сердце', bouquet:'Букет', box:'Сюрприз', pumpkin:'Тыква', ghost:'Привидение' },
+  hs:{ coupon:'на что-то настоящее', ticket:'попадёт в календарь', scratch:'сотри и узнай', letter:'откроется в нужный день', flower:'растёт 7 дней', note:'придёт утром', vinyl:'ваша песня', star:'ваше созвездие' },
+  hl:{ coupon:'Купон на что-то настоящее. Партнёр нажмёт «Использовать», и вам придёт сообщение.', ticket:'Приглашение на свидание. После «Принимаю» оно появится в календаре у вас обоих.',
+    scratch:'Под серебристым слоем ваш сюрприз. Партнёр сотрёт его пальцем.', letter:'Письмо нельзя открыть до выбранного дня. Или пусть ждёт момента, когда станет грустно.',
+    flower:'Семечко растёт 7 дней, если его поливать. Расцветёт и покажет вашу подпись.', note:'Записка придёт в Telegram в то время, которое вы выберете.',
+    vinyl:'Ссылка на песню на крутящейся пластинке. Все песни соберутся в ваш плейлист.', star:'Звезда загорится на вашем небе и останется навсегда.',
+    heart:'Маленький знак внимания.', bouquet:'Цветы без повода.', box:'Коробка с бантом. Просто так.', pumpkin:'Светящаяся тыква к Хеллоуину.', ghost:'Милое привидение к Хеллоуину.' },
+  forP:n => `Для: ${n}`, msg:'Подпись', msgPh:'Например: просто так, люблю', payN:n => `Подарить за ${n} ★`,
+  cpWhat:'Купон на', cpOwn:'Свой вариант', cpOwnPh:'Например, ужин, который готовлю я', cpSub:'Уточнение', cpSubPh:'Например: с блинчиками', cpUntil:'Действует до',
+  cpPre:[['Завтрак в постель'],['Массаж 20 минут'],['Фильм выбираешь ты'],['Обнимашки без лимита'],['День без споров'],['Свидание моей мечты']],
+  tkWhat:'Куда идём', tkWhatPh:'Например, ужин на крыше', tkSub:'Подробности', tkSubPh:'и прогулка по набережной', tkDate:'Дата', tkTime:'Время', tkPlace:'Место', tkDress:'Дресс-код', tkDressPh:'красиво',
+  scWhat:'Что под слоем', scWhatPh:'Например: купон на поездку на выходные. Куда скажешь',
+  ltText:'Письмо', ltTextPh:'Напишите всё, что хочется сказать', ltMode:'Когда можно открыть', ltDate:'В выбранный день', ltSad:'Когда станет грустно', ltOn:'Дата', ltEnv:'На конверте', ltEnvPh:'Например: к нашей годовщине',
+  ntText:'Записка', ntTextPh:'Доброе утро, соня. Я уже скучаю', ntWhen:'Когда прислать', ntMorning:'утром в 7:00', ntLunch:'в обед', ntNight:'перед сном', ntOwn:'своё время',
+  vnUrl:'Ссылка на песню', vnSong:'Название', vnArtist:'Исполнитель', vnWhy:'Чем она вам дорога', vnWhyPh:'Играла в машине по дороге в Сочи',
+  stName:'Имя звезды', stNamePh:'Например: Сочи, 2026', flMsg:'Подпись, которая появится, когда цветок расцветёт',
+  need:'Заполните, пожалуйста', paid:'Подарок отправлен', payWait2:'Оплата прошла, отправляем…', notTg:'Оплата открылась в Telegram. Вернитесь сюда после оплаты', noPartner:'Подарки можно дарить, когда в паре двое',
+  forYou:'Вам', fromYou:'От вас', boxEmpty:'Здесь будут подарки, которые вы дарите друг другу', from:n => `Подарок от: ${n}`, to:n => `Для: ${n}`,
+  sUnused:'не использован', sUsed:d => `использован ${d}`, sTkWait:'ждёт ответа', sTkOk:'приглашение принято', sTkOther:'просит другую дату', sScr:'ещё не стёрта', sScrOk:'стёрта',
+  sLock:d => `откроется ${d}`, sSad:'ждёт грустного дня', sOpen:'открыто', sFl:n => `день ${n} из 7`, sFlBloom:'расцвёл', sNoteAt:d => `придёт ${d}`, sThanks:'вас поблагодарили', sNew:'новый',
+  useC:'Использовать купон', usedStamp:'ПОГАШЕН', accept:'Принимаю', other:'Другая дата', scrHint:'Сотрите пальцем', openL:'Открыть письмо', openSad:'Открыть сейчас', sealed:'Пока запечатано',
+  daysW:'дней', hoursW:'часа', minW:'мин', water:'Полить', watered:'Сегодня уже полито', wilt:'Цветок поник. Полейте, и он оживёт', bloom:'Цветок расцвёл', listen:'Слушать', thanks:'Спасибо', thanked:'Спасибо отправлено',
+  skyT:'Созвездие «Мы»', skyN:n => `${n} ${plural(n,'звезда','звезды','звёзд')}`, skyEmpty:'Подарите первую звезду, и она загорится здесь', skyGive:'Зажечь звезду', close:'Закрыть', toCal:'Событие добавлено в календарь', sentAsk:'Отправили просьбу выбрать другую дату' },
+en: { gfTitle:'Gifts', tShop:'Give', tBox:'Gift box', tSky:'Sky',
+  gAct:'Gifts that do something', gLove:'Just because', gSeason:'Halloween, until 7 November',
+  n:{ coupon:'Coupon', ticket:'Date ticket', scratch:'Scratch card', letter:'Sealed letter', flower:'Flower', note:'Note under the pillow', vinyl:'Song on vinyl', star:'Star in the sky', heart:'Heart', bouquet:'Bouquet', box:'Surprise', pumpkin:'Pumpkin', ghost:'Ghost' },
+  hs:{ coupon:'for something real', ticket:'goes to the calendar', scratch:'scratch to see', letter:'opens on the day', flower:'grows for 7 days', note:'arrives in the morning', vinyl:'your song', star:'your constellation' },
+  hl:{ coupon:'A coupon for something real. Your partner taps “Use” and you get a message.', ticket:'A date invitation. Once accepted, it appears in both your calendars.',
+    scratch:'Your surprise is under a silver layer. Your partner scratches it off.', letter:'The letter can\'t be opened before the chosen day. Or it waits for a sad moment.',
+    flower:'A seed that grows for 7 days if watered. It blooms and shows your message.', note:'The note arrives in Telegram at the time you choose.',
+    vinyl:'A song link on a spinning record. All songs make your playlist.', star:'The star lights up in your sky and stays forever.',
+    heart:'A small sign of love.', bouquet:'Flowers for no reason.', box:'A box with a bow. Just because.', pumpkin:'A glowing Halloween pumpkin.', ghost:'A cute Halloween ghost.' },
+  forP:n => `For: ${n}`, msg:'Message', msgPh:'For example: just because, love you', payN:n => `Give for ${n} ★`,
+  cpWhat:'Coupon for', cpOwn:'Your own', cpOwnPh:'For example, a dinner I cook', cpSub:'Details', cpSubPh:'For example: with pancakes', cpUntil:'Valid until',
+  cpPre:[['Breakfast in bed'],['20-minute massage'],['You pick the film'],['Unlimited hugs'],['A day without arguments'],['My dream date']],
+  tkWhat:'Where we go', tkWhatPh:'For example, dinner on a rooftop', tkSub:'Details', tkSubPh:'and a walk by the river', tkDate:'Date', tkTime:'Time', tkPlace:'Place', tkDress:'Dress code', tkDressPh:'dress up',
+  scWhat:'What is under the layer', scWhatPh:'For example: a weekend trip coupon. You choose where',
+  ltText:'Letter', ltTextPh:'Write everything you want to say', ltMode:'When it can be opened', ltDate:'On a chosen day', ltSad:'When feeling sad', ltOn:'Date', ltEnv:'On the envelope', ltEnvPh:'For example: for our anniversary',
+  ntText:'Note', ntTextPh:'Good morning, sleepyhead. Missing you already', ntWhen:'When to send', ntMorning:'morning, 7:00', ntLunch:'at lunch', ntNight:'before bed', ntOwn:'pick a time',
+  vnUrl:'Song link', vnSong:'Title', vnArtist:'Artist', vnWhy:'Why it matters', vnWhyPh:'It played in the car on our way to the sea',
+  stName:'Star name', stNamePh:'For example: Sochi, 2026', flMsg:'A message that appears when the flower blooms',
+  need:'Please fill this in', paid:'Gift sent', payWait2:'Payment done, sending…', notTg:'The payment opened in Telegram. Come back here afterwards', noPartner:'Gifts work once there are two of you',
+  forYou:'For you', fromYou:'From you', boxEmpty:'Gifts you give each other will be here', from:n => `From: ${n}`, to:n => `For: ${n}`,
+  sUnused:'not used yet', sUsed:d => `used ${d}`, sTkWait:'waiting for an answer', sTkOk:'accepted', sTkOther:'asks for another date', sScr:'not scratched yet', sScrOk:'scratched',
+  sLock:d => `opens ${d}`, sSad:'waiting for a sad day', sOpen:'opened', sFl:n => `day ${n} of 7`, sFlBloom:'bloomed', sNoteAt:d => `arrives ${d}`, sThanks:'you were thanked', sNew:'new',
+  useC:'Use the coupon', usedStamp:'USED', accept:'Accept', other:'Another date', scrHint:'Scratch with your finger', openL:'Open the letter', openSad:'Open now', sealed:'Still sealed',
+  daysW:'days', hoursW:'hours', minW:'min', water:'Water', watered:'Already watered today', wilt:'The flower is drooping. Water it and it will recover', bloom:'The flower has bloomed', listen:'Listen', thanks:'Thank you', thanked:'Thank you sent',
+  skyT:'Our constellation', skyN:n => `${n} ${n === 1 ? 'star' : 'stars'}`, skyEmpty:'Give the first star and it will light up here', skyGive:'Light a star', close:'Close', toCal:'Added to the calendar', sentAsk:'Asked for another date' }
+});
+const G = { ctx:null, list:[], tab:'shop', kind:null, get:{} };
+const nm = k => t('n')[k] || k;
+const pname = () => G.ctx.partner?.display_name || t('partner');
+const loc = () => LANG === 'en' ? 'en-GB' : 'ru-RU';
+const toast = m => { const el = $('toast'); el.textContent = m; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 3000); };
+const mskToday = () => { const d = new Date(Date.now() + 3 * 3600e3); return d.toISOString().slice(0, 10); }; // the server counts flower days in Moscow time
+const dayStr = s => fmtDay(parseYmd(s), parseYmd(s).getFullYear() !== today().getFullYear());
+
+// ===== Tabs =====
+$('tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); };
+function setTab(k){ G.tab = k; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === k));
+  ['shop','box','sky'].forEach(x => $('v' + x[0].toUpperCase() + x.slice(1)).classList.toggle('hidden', x !== k)); render(); }
+
+// ===== Shop =====
+function card(k){ const [p, bg] = GIFT_CAT[k], hs = t('hs')[k];
+  return `<button type="button" class="gc" data-k="${k}" style="background:${bg}">${['star','heart','pumpkin','letter'].includes(k) ? '<span class="sh"></span>' : ''}${giftSvg(k, 58)}${esc(nm(k))}${hs ? `<small>${esc(hs)}</small>` : ''}<span class="pr">★ ${p}</span></button>`; }
+function renderShop(){
+  const by = g => Object.keys(GIFT_CAT).filter(k => GIFT_CAT[k][2] === g);
+  $('vShop').innerHTML = `<div class="lb">${t('gAct')}</div><div class="shop">${by('act').map(card).join('')}</div>
+    ${giftSeason() ? `<div class="lb">${t('gSeason')}</div><div class="shop">${by('season').map(card).join('')}</div>` : ''}
+    <div class="lb">${t('gLove')}</div><div class="shop">${by('love').map(card).join('')}</div>`;
+}
+$('vShop').onclick = e => { const k = e.target.closest('[data-k]')?.dataset.k; if (k) compose(k); };
+
+// ===== Compose =====
+const F = {
+  text:(id, lab, ph, req, ml = 400) => `<label>${lab}</label><input id="${id}" maxlength="${ml}" ${ph ? `placeholder="${esc(ph)}"` : ''} ${req ? 'data-req' : ''}>`,
+  area:(id, lab, ph, req, ml = 400) => `<label>${lab}</label><textarea id="${id}" maxlength="${ml}" ${ph ? `placeholder="${esc(ph)}"` : ''} ${req ? 'data-req' : ''} style="min-height:80px"></textarea>`,
+  date:(id, lab) => `<label>${lab}</label><button type="button" class="field" data-date id="${id}"></button>`,
+};
+const hours = () => Array.from({ length:24 }, (_, h) => `<option value="${h}">${pad(h)}</option>`).join('');
+const mins = () => [0, 15, 30, 45].map(m => `<option value="${m}">${pad(m)}</option>`).join('');
+function compose(k){
+  if (!G.ctx.partner) return alert(t('noPartner'));
+  G.kind = k; G.get = {};
+  $('cArt').style.background = GIFT_CAT[k][1]; $('cArt').innerHTML = giftSvg(k, 84);
+  $('cTitle').textContent = nm(k); $('cHint').textContent = t('hl')[k] + ' ' + t('forP', pname()) + '.';
+  $('cPay').textContent = t('payN', GIFT_CAT[k][0]); $('cErr').textContent = '';
+  let h = '';
+  if (k === 'coupon') h = `<label>${t('cpWhat')}</label><div class="chips" id="cpPick"></div><div id="cpOwnW" class="hidden" style="margin-top:8px"><input id="cpOwn" maxlength="60" placeholder="${esc(t('cpOwnPh'))}"></div>`
+    + F.text('cSub', t('cpSub'), t('cpSubPh')) + F.date('cUntil', t('cpUntil'));
+  else if (k === 'ticket') h = F.text('cT', t('tkWhat'), t('tkWhatPh'), true, 60) + F.text('cSub', t('tkSub'), t('tkSubPh')) + F.date('cDate', t('tkDate'))
+    + `<label>${t('tkTime')}</label><div class="two"><select id="cH">${hours()}</select><select id="cM">${mins()}</select></div>` + F.text('cPlace', t('tkPlace'), '') + F.text('cDress', t('tkDress'), t('tkDressPh'), false, 40);
+  else if (k === 'scratch') h = F.area('cText', t('scWhat'), t('scWhatPh'), true, 300);
+  else if (k === 'letter') h = F.area('cText', t('ltText'), t('ltTextPh'), true, 4000) + F.text('cMsg', t('ltEnv'), t('ltEnvPh'), false, 60)
+    + `<label>${t('ltMode')}</label><div class="chips" id="ltMode"></div><div id="ltDateW">${F.date('cOpen', t('ltOn'))}</div>`;
+  else if (k === 'note') h = F.area('cText', t('ntText'), t('ntTextPh'), true, 300) + `<label>${t('ntWhen')}</label><div class="chips" id="ntWhen"></div><div id="ntOwnW" class="hidden" style="margin-top:8px"><div class="two"><select id="cH">${hours()}</select><select id="cM">${mins()}</select></div></div>`;
+  else if (k === 'vinyl') h = F.text('cUrl', t('vnUrl'), 'https://', true, 300) + `<div class="two"><div>${F.text('cSong', t('vnSong'), '', true, 80)}</div><div>${F.text('cArtist', t('vnArtist'), '', false, 80)}</div></div>` + F.text('cMsg', t('vnWhy'), t('vnWhyPh'));
+  else if (k === 'star') h = F.text('cName', t('stName'), t('stNamePh'), true, 40) + F.text('cMsg', t('msg'), t('msgPh'));
+  else if (k === 'flower') h = F.text('cMsg', t('flMsg'), t('msgPh'));
+  else h = F.text('cMsg', t('msg'), t('msgPh'));
+  $('cFields').innerHTML = h;
+  document.querySelectorAll('#cFields .field[data-date]').forEach(el => setDate(el, ''));
+  if (k === 'coupon') { const opts = [...t('cpPre').map(([x]) => [x, x]), ['__own', t('cpOwn')]];
+    G.get.cp = chipPicker($('cpPick'), opts, opts[0][0]);
+    const o = $('cpPick').onclick; $('cpPick').onclick = ev => { o(ev); $('cpOwnW').classList.toggle('hidden', G.get.cp() !== '__own'); }; }
+  if (k === 'ticket') { setDate($('cDate'), ymd(addDays(today(), 3))); $('cH').value = 19; $('cM').value = 30; }
+  if (k === 'letter') { G.get.mode = chipPicker($('ltMode'), [['date', t('ltDate')], ['sad', t('ltSad')]], 'date');
+    const o = $('ltMode').onclick; $('ltMode').onclick = ev => { o(ev); $('ltDateW').classList.toggle('hidden', G.get.mode() !== 'date'); };
+    setDate($('cOpen'), ymd(addDays(today(), 7))); }
+  if (k === 'note') { G.get.when = chipPicker($('ntWhen'), [['7', t('ntMorning')], ['13', t('ntLunch')], ['22', t('ntNight')], ['own', t('ntOwn')]], '7');
+    const o = $('ntWhen').onclick; $('ntWhen').onclick = ev => { o(ev); $('ntOwnW').classList.toggle('hidden', G.get.when() !== 'own'); }; $('cH').value = 8; }
+  $('cmp').showModal();
+}
+const val = id => ($(id)?.value || '').trim();
+function nextAt(h, m){ const d = new Date(); d.setHours(h, m, 0, 0); if (d <= new Date()) d.setDate(d.getDate() + 1); return d; }
+function collect(){
+  const k = G.kind, d = { kind:k };
+  for (const el of document.querySelectorAll('#cFields [data-req]')) if (!el.value.trim()) { el.focus(); throw new Error(t('need')); }
+  const m = val('cMsg'); if (m) d.msg = m;
+  if (k === 'coupon') { const c = G.get.cp(); d.title = c === '__own' ? val('cpOwn') : c; if (!d.title) throw new Error(t('need'));
+    if (val('cSub')) d.sub = val('cSub'); if (getDate($('cUntil'))) d.until = getDate($('cUntil')); }
+  if (k === 'ticket') { d.title = val('cT'); if (val('cSub')) d.sub = val('cSub'); if (val('cPlace')) d.place = val('cPlace'); if (val('cDress')) d.dress = val('cDress');
+    const day = getDate($('cDate')) || ymd(addDays(today(), 1)), dt = parseYmd(day); dt.setHours(+$('cH').value, +$('cM').value, 0, 0); d.starts_at = dt.toISOString(); }
+  if (k === 'scratch') d.reveal = val('cText');
+  if (k === 'letter') { d.text = val('cText'); d.mode = G.get.mode(); if (d.mode === 'date') d.open_at = getDate($('cOpen')) || ymd(addDays(today(), 7)); }
+  if (k === 'note') { d.text = val('cText'); const w = G.get.when(); const at = w === 'own' ? nextAt(+$('cH').value, +$('cM').value) : nextAt(+w, 0); d.deliver_at = at.toISOString(); }
+  if (k === 'vinyl') { d.url = val('cUrl'); if (!/^https?:\/\//i.test(d.url)) d.url = 'https://' + d.url; d.song = val('cSong'); if (val('cArtist')) d.artist = val('cArtist'); }
+  if (k === 'star') d.name = val('cName');
+  return d;
+}
+$('cmpForm').onsubmit = async e => {
+  if (e.submitter?.value !== 'ok') return;
+  e.preventDefault(); $('cErr').textContent = '';
+  let d; try { d = collect(); } catch(err) { $('cErr').textContent = err.message; return; }
+  $('cPay').disabled = true;
+  try {
+    const n0 = G.list.length, st = await payStars('gift', d);
+    if (st === 'external') toast(t('notTg'));
+    if (st !== 'paid') return;
+    $('cmp').close('ok'); toast(t('payWait2'));
+    await waitFor(async () => { await load(); return G.list.length > n0; });
+    toast(t('paid')); setTab('box');
+  } catch(err) { $('cErr').textContent = t('payErr') + errText(err); }
+  finally { $('cPay').disabled = false; }
+};
+
+// ===== Gift box =====
+function stateLine(g){
+  const s = g.state || {}, mine = g.to_user === G.ctx.user.id, dt = v => new Date(v).toLocaleDateString(loc());
+  switch (g.kind) {
+    case 'coupon': return s.used_at ? t('sUsed', dt(s.used_at)) : t('sUnused');
+    case 'ticket': return s.accepted_at ? t('sTkOk') : s.asked_other ? t('sTkOther') : t('sTkWait');
+    case 'scratch': return s.scratched_at ? t('sScrOk') : t('sScr');
+    case 'letter': return s.opened_at ? t('sOpen') : g.data.mode === 'sad' ? t('sSad') : t('sLock', dayStr(g.data.open_at));
+    case 'flower': return s.bloomed_at ? t('sFlBloom') : t('sFl', (s.waters || []).length);
+    case 'note': return new Date(g.deliver_at) > new Date() ? t('sNoteAt', new Date(g.deliver_at).toLocaleString(loc(), { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })) : (g.data.text || '').slice(0, 60);
+    case 'vinyl': return [g.data.song, g.data.artist].filter(Boolean).join(' · ');
+    case 'star': return g.data.name || '';
+    default: return s.thanked_at && !mine ? t('sThanks') : (g.data.msg || '');
+  }
+}
+const titleOf = g => (g.kind === 'coupon' || g.kind === 'ticket') && g.data.title ? g.data.title : nm(g.kind);
+function boxRow(g){ const mine = g.to_user === G.ctx.user.id;
+  return `<div class="box-it" data-id="${g.id}"><span class="th" style="background:${GIFT_CAT[g.kind]?.[1] || 'var(--accent-soft)'}">${giftSvg(g.kind, 34)}</span>
+    <span class="grow">${esc(titleOf(g))}<div>${esc(stateLine(g))}</div></span>${mine && !g.seen_at ? '<span class="newdot"></span>' : '<svg class="ic" style="color:var(--muted);width:18px;height:18px"><use href="#i-chev"/></svg>'}</div>`; }
+function renderBox(){
+  const me = G.ctx.user.id, inn = G.list.filter(g => g.to_user === me), out = G.list.filter(g => g.from_user === me);
+  if (!G.list.length) { $('vBox').innerHTML = `<div class="card empty" style="margin-top:14px">${t('boxEmpty')}</div>`; return; }
+  $('vBox').innerHTML = (inn.length ? `<div class="lb">${t('forYou')}</div><div class="card k-list" style="padding:14px 16px">${inn.map(boxRow).join('')}</div>` : '')
+    + (out.length ? `<div class="lb">${t('fromYou')}</div><div class="card k-list" style="padding:14px 16px">${out.map(boxRow).join('')}</div>` : '');
+}
+$('vBox').onclick = e => { const id = e.target.closest('[data-id]')?.dataset.id; if (id) openGift(id); };
+
+// ===== Sky =====
+function hash(s){ let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; }
+function renderSky(){
+  const stars = G.list.filter(g => g.kind === 'star').slice().sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const W = 320, H = 380, pts = stars.map((g, i) => ({ g, x: 34 + ((i * 0.381966 + hash(g.id) * 0.25) % 1) * (W - 68), y: 40 + ((i * 0.618 + hash(g.id + 'y') * .5) % 1) * (H - 90) }));
+  const bg = Array.from({ length:40 }, (_, i) => `<circle cx="${hash('x' + i) * W}" cy="${hash('y' + i) * H}" r="${.5 + hash('r' + i)}" fill="#fff" style="animation:tw ${2 + hash('a' + i) * 3}s ease-in-out ${hash('d' + i) * 3}s infinite"/>`).join('');
+  const path = pts.length > 1 ? `<path d="M${pts.map(p => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L')}" stroke="#8f9ad0" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".7"/>` : '';
+  const last = pts[pts.length - 1];
+  const dots = pts.map(p => `<g data-id="${p.g.id}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="14" fill="transparent"/>${p === last ? `<circle cx="${p.x}" cy="${p.y}" r="11" fill="#ffd36b" style="animation:pulse 2.4s ease-in-out infinite"/>` : ''}<circle cx="${p.x}" cy="${p.y}" r="${p === last ? 4.5 : 3.4}" fill="#fff4d6"/>
+    <text x="${p.x}" y="${p.y + 20}" text-anchor="middle" font-family="Lora,serif" font-size="10.5" fill="${p === last ? '#ffe7a8' : '#aab3e0'}">${esc(p.g.data.name || '')}</text></g>`).join('');
+  $('vSky').innerHTML = `<div class="sky" style="margin-top:14px"><h2>${t('skyT')}</h2><div class="sub">${stars.length ? t('skyN', stars.length) : t('skyEmpty')}</div>
+    <svg viewBox="0 0 ${W} ${H}">${bg}${path}${dots}</svg>
+    <button class="btn" id="skyGive" style="background:#ffd36b;color:#2a2112;margin-top:6px">${t('skyGive')} · ★ 25</button></div>`;
+  $('skyGive').onclick = () => compose('star');
+}
+$('vSky').addEventListener('click', e => { const id = e.target.closest('g[data-id]')?.dataset.id; if (id) openGift(id); });
+
+// ===== Viewer =====
+function confetti(){ const c = document.createElement('div'); c.className = 'conf'; const cols = ['#ffd36b','#ff7a9a','#8cc4a2','#c3b2e6','#ff9a3d'];
+  c.innerHTML = Array.from({ length:42 }, (_, i) => `<i style="left:${Math.random() * 100}%;background:${cols[i % 5]};animation-duration:${2 + Math.random() * 1.6}s;animation-delay:${Math.random() * .6}s"></i>`).join('');
+  document.body.appendChild(c); setTimeout(() => c.remove(), 4500); }
+async function act(g, a){ const { data, error } = await sb.rpc('gift_action', { p_id: g.id, p_action: a }); if (error) { alert(errText(error)); return false; } g.state = data.state; g.data = data.data; return true; }
+function countdown(to){ const ms = Math.max(0, to - Date.now()), d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+  return `<div class="cd"><div><b>${d}</b><span>${t('daysW')}</span></div><div><b>${pad(h)}</b><span>${t('hoursW')}</span></div><div><b>${pad(m)}</b><span>${t('minW')}</span></div></div>`; }
+function plantSvg(n, wilt, bloom){
+  const st = bloom ? 7 : n;
+  const leaves = (st >= 2 ? '<path d="M115 170c-20-2-32-14-34-28 18 0 30 10 34 28z" fill="#5da97a"/>' : '') + (st >= 3 ? '<path d="M116 145c18-4 28-16 28-30-16 2-26 12-28 30z" fill="#6bbb88"/>' : '') + (st >= 5 ? '<path d="M115 125c-14-3-22-12-23-22 12 1 21 9 23 22z" fill="#5da97a"/>' : '');
+  const top = st >= 7 ? (st >= 7 ? Array.from({ length:6 }, (_, i) => `<ellipse cx="115" cy="78" rx="10" ry="20" fill="${i % 2 ? '#ff9fb4' : '#ff7896'}" transform="rotate(${i * 60} 115 98)"/>`).join('') + '<circle cx="115" cy="98" r="9" fill="#ffd36b"/>' : '')
+    : st >= 4 ? '<path d="M115 100c-10-6-12-22-4-32 2 10 10 14 4 32zm0 0c10-6 12-22 4-32-2 10-10 14-4 32z" fill="#ff9fb4"/><path d="M115 100c-4-10-2-24 0-34 2 10 4 24 0 34z" fill="#ff7896"/>' : '';
+  const stemTop = st >= 4 ? 100 : st >= 1 ? 150 : 190;
+  return `<svg viewBox="0 0 230 260" width="230" height="260" style="display:block;margin:6px auto 0"><g class="plant ${wilt ? 'wilt' : ''}"><path d="M115 205C113 180 117 ${stemTop + 30} 115 ${stemTop}" stroke="#3d8a63" stroke-width="4" fill="none" stroke-linecap="round"/>${leaves}${top}</g>
+    <path d="M78 200h74l-8 50H86z" fill="#c0674b"/><rect x="72" y="194" width="86" height="14" rx="4" fill="#d98263"/><ellipse cx="115" cy="198" rx="36" ry="4" fill="#6b4a3a"/></svg>`;
+}
+function scratchSetup(g){
+  const cv = $('scr'); if (!cv) return; const x = cv.getContext('2d'), r = cv.getBoundingClientRect();
+  cv.width = r.width * 2; cv.height = r.height * 2; x.scale(2, 2);
+  const gr = x.createLinearGradient(0, 0, r.width, r.height); gr.addColorStop(0, '#d9d9e3'); gr.addColorStop(.5, '#f4f4fa'); gr.addColorStop(1, '#b8b8c8');
+  x.fillStyle = gr; x.fillRect(0, 0, r.width, r.height);
+  for (let i = 0; i < 700; i++) { x.fillStyle = `rgba(255,255,255,${Math.random() * .5})`; x.fillRect(Math.random() * r.width, Math.random() * r.height, 1.5, 1.5); }
+  x.fillStyle = '#8a86a0'; x.font = '600 18px Lora, Georgia, serif'; x.textAlign = 'center'; x.fillText(t('scrHint'), r.width / 2, r.height / 2);
+  x.globalCompositeOperation = 'destination-out'; x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = 38;
+  let d = false, lx, ly, done = false, moves = 0;
+  const p = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  cv.onpointerdown = e => { d = true; [lx, ly] = p(e); cv.setPointerCapture(e.pointerId); };
+  cv.onpointermove = e => { if (!d) return; const [nx, ny] = p(e); x.beginPath(); x.moveTo(lx, ly); x.lineTo(nx, ny); x.stroke(); lx = nx; ly = ny;
+    if (++moves % 25 === 0 && !done) { const px = x.getImageData(0, 0, cv.width, cv.height).data; let clear = 0; for (let i = 3; i < px.length; i += 64) if (px[i] === 0) clear++;
+      if (clear / (px.length / 64) > .5) { done = true; cv.style.transition = 'opacity .6s'; cv.style.opacity = 0; confetti(); if (g.to_user === G.ctx.user.id) act(g, 'scratch').then(render); } } };
+  cv.onpointerup = () => d = false;
+}
+function openGift(id, reveal){
+  const g = G.list.find(x => x.id === id); if (!g) return;
+  const mine = g.to_user === G.ctx.user.id, s = g.state || {}, dd = g.data || {};
+  const fresh = mine && !g.seen_at;
+  const who = mine ? t('from', pname()) : t('to', pname());
+  let body = '', acts = '';
+  const big = `<div class="v-big ${fresh || reveal ? 'pop' : ''}">${giftSvg(g.kind, 170)}</div>`;
+  if (g.kind === 'coupon') {
+    body = `<div class="coupon"><div class="main"><div class="k">${dd.until ? (LANG === 'en' ? 'VALID UNTIL ' : 'ДЕЙСТВУЕТ ДО ') + parseYmd(dd.until).toLocaleDateString(loc()) : (LANG === 'en' ? 'COUPON' : 'КУПОН')}</div><h3>${esc(dd.title)}</h3>${dd.sub ? `<div class="s">«${esc(dd.sub)}»</div>` : ''}</div><div class="stub">№ ${g.id.slice(0, 3).toUpperCase()}</div>${s.used_at ? `<span class="stamp">${t('usedStamp')}</span>` : ''}</div>`;
+    if (mine && !s.used_at) acts = `<button class="btn" data-a="use" style="background:#c0674b;color:#fff">${t('useC')}</button>`;
+  } else if (g.kind === 'ticket') {
+    const at = dd.starts_at ? new Date(dd.starts_at) : null;
+    body = `<div class="ticket"><div class="top"><div class="hd"><span>ADMIT TWO</span><span>№ ${g.id.slice(0, 4).toUpperCase()}</span></div><h3>${esc(dd.title)}</h3>${dd.sub ? `<div style="font-size:13px;opacity:.75">${esc(dd.sub)}</div>` : ''}</div>
+      <div class="info"><div><span>${t('tkDate')}</span><b>${at ? at.getDate() + ' ' + t('monthsShort')[at.getMonth()] : '—'}</b></div><div><span>${t('tkTime')}</span><b>${at ? pad(at.getHours()) + ':' + pad(at.getMinutes()) : '—'}</b></div><div><span>${dd.place ? t('tkPlace') : t('tkDress')}</span><b>${esc(dd.place || dd.dress || '—')}</b></div></div></div>`;
+    if (mine && !s.accepted_at) acts = `<button class="btn" data-a="accept" style="background:#e2b866;color:#3a2a10">${t('accept')}</button>${s.asked_other ? '' : `<button class="btn ghost" data-a="other">${t('other')}</button>`}`;
+  } else if (g.kind === 'scratch') {
+    body = `<div class="scr"><div class="under"><b>${esc(dd.reveal || '')}</b></div>${s.scratched_at || !mine ? '' : '<canvas id="scr"></canvas>'}</div>`;
+  } else if (g.kind === 'letter') {
+    const locked = !s.opened_at && dd.mode !== 'sad' && dd.open_at && dd.open_at > mskToday();
+    if (s.opened_at || !mine) body = (mine || !s.opened_at ? '' : '') + `<div class="paper">${esc(dd.text || '')}</div>`;
+    else body = `<div class="env" id="env"><svg class="flap" viewBox="0 0 220 170" preserveAspectRatio="none"><path d="M0 0L110 95L220 0" fill="#ead7b8" stroke="#cdb38c" stroke-width="1"/><path d="M0 170L90 82M220 170L130 82" stroke="#cdb38c" stroke-width="1" fill="none"/></svg>
+      <svg class="seal" viewBox="0 0 60 60"><path d="M30 2c5 0 7 4 11 5s8-1 10 3 0 8 2 12 5 6 4 10-5 5-6 9 1 8-3 11-8 0-12 2-6 5-10 5-6-4-10-5-8 1-10-3 0-8-2-12-5-6-4-10 5-5 6-9-1-8 3-11 8 0 12-2 6-5 9-5z" fill="#a8232b"/><circle cx="30" cy="30" r="17" fill="#8e1b22"/><path d="M30 39s-8-4.8-8-10a4.2 4.2 0 0 1 8-2 4.2 4.2 0 0 1 8 2c0 5.2-8 10-8 10z" fill="#c94a4f"/></svg>
+      <div class="to">${esc(dd.msg || '')}</div></div>${locked ? `<div class="v-state" style="margin-top:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px">${t('sLock', dayStr(dd.open_at))}</div>${countdown(new Date(parseYmd(dd.open_at).getTime()))}` : ''}`;
+    if (mine && !s.opened_at) acts = locked ? `<button class="btn ghost" disabled>${icon('lock')}${t('sealed')}</button>` : `<button class="btn" data-a="open" style="background:#8e1b22;color:#fff">${dd.mode === 'sad' ? t('openSad') : t('openL')}</button>`;
+    if (!mine && dd.msg) body = `<div class="v-msg">«${esc(dd.msg)}»</div>` + body;
+  } else if (g.kind === 'flower') {
+    const w = s.waters || [], bloom = !!s.bloomed_at, last = w[w.length - 1], td = mskToday();
+    const y = new Date(Date.now() + 3 * 3600e3 - 864e5).toISOString().slice(0, 10), wilt = !bloom && w.length && last < y;
+    body = `<div class="days7">${Array.from({ length:7 }, (_, i) => `<i class="${i < w.length || bloom ? 'on' : ''}"></i>`).join('')}</div>${plantSvg(w.length, wilt, bloom)}
+      <div class="v-state">${bloom ? t('bloom') : wilt ? t('wilt') : t('sFl', w.length)}</div>${bloom && dd.msg ? `<div class="v-msg">«${esc(dd.msg)}»</div>` : ''}`;
+    if (mine && !bloom) acts = w.includes(td) ? `<button class="btn ghost" disabled>${t('watered')}</button>` : `<button class="btn" data-a="water" style="background:#3d8a63;color:#fff">${icon('droplet')}${t('water')}</button>`;
+  } else if (g.kind === 'note') {
+    body = `<div class="note-pap">${esc(dd.text || '')}</div>`;
+  } else if (g.kind === 'vinyl') {
+    body = `<svg class="rec" viewBox="0 0 210 210"><circle cx="105" cy="105" r="100" fill="#0e0c10"/><g fill="none" stroke="#2a2630" stroke-width="1"><circle cx="105" cy="105" r="92"/><circle cx="105" cy="105" r="84"/><circle cx="105" cy="105" r="76"/><circle cx="105" cy="105" r="68"/><circle cx="105" cy="105" r="60"/><circle cx="105" cy="105" r="52"/></g><path d="M40 60a80 80 0 0 1 50-36" stroke="rgba(255,255,255,.18)" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="105" cy="105" r="38" fill="url(#gLabel)"/><text x="105" y="101" text-anchor="middle" font-family="Lora,Georgia,serif" font-size="11" fill="#fff">${esc((G.ctx.profile.display_name || '?')[0] + ' + ' + (pname() || '?')[0])}</text><text x="105" y="120" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#fff" opacity=".8">SIDE A</text><circle cx="105" cy="105" r="3.5" fill="#0e0c10"/></svg>
+      <h2 style="margin-top:16px">${esc(dd.song || '')}</h2><div class="muted">${esc(dd.artist || '')}</div>${dd.msg ? `<div class="v-msg">«${esc(dd.msg)}»</div>` : ''}`;
+    acts = `<button class="btn" data-a="listen">${t('listen')}</button>`;
+  } else if (g.kind === 'star') {
+    body = big + `<h2>${esc(dd.name || nm('star'))}</h2>${dd.msg ? `<div class="v-msg">«${esc(dd.msg)}»</div>` : ''}`;
+    acts = `<button class="btn ghost" data-a="sky">${t('tSky')}</button>`;
+  } else {
+    body = big + `<h2>${esc(nm(g.kind))}</h2>${dd.msg ? `<div class="v-msg">«${esc(dd.msg)}»</div>` : ''}`;
+  }
+  if (mine && !['coupon','ticket'].includes(g.kind) && !s.thanked_at) acts += `<button class="btn ghost" data-a="thanks">${t('thanks')}</button>`;
+  else if (mine && s.thanked_at && !['coupon','ticket'].includes(g.kind)) acts += `<div class="v-state">${t('thanked')}</div>`;
+  if (!mine) acts += `<div class="v-state">${esc(stateLine(g))}</div>`;
+  acts += `<button class="btn link" data-a="close" style="margin:0 auto">${t('close')}</button>`;
+  $('vBody').innerHTML = `<div class="v-from">${esc(who)} · ${new Date(g.created_at).toLocaleDateString(loc())}</div>${['heart','bouquet','box','pumpkin','ghost','star'].includes(g.kind) ? '' : `<h2 style="margin-top:6px">${esc(titleOf(g))}</h2>`}${body}<div class="v-acts">${acts}</div>`;
+  $('vBody').onclick = async e => {
+    const a = e.target.closest('[data-a]')?.dataset.a; if (!a) return;
+    if (a === 'close') return $('viewer').close();
+    if (a === 'listen') return openLink(dd.url);
+    if (a === 'sky') { $('viewer').close(); return setTab('sky'); }
+    if (a === 'open') { $('env')?.classList.add('open'); await new Promise(r => setTimeout(r, 450)); }
+    e.target.closest('button').disabled = true;
+    if (await act(g, a)) {
+      if (a === 'accept') toast(t('toCal')); if (a === 'other') toast(t('sentAsk')); if (a === 'thanks') toast(t('thanked'));
+      if (a === 'use' || a === 'open' || (a === 'water' && g.state.bloomed_at)) confetti();
+      haptic(); openGift(g.id); render();
+    }
+  };
+  if (!$('viewer').open) $('viewer').showModal();
+  if (g.kind === 'scratch' && mine && !s.scratched_at) requestAnimationFrame(() => scratchSetup(g));
+  if (fresh) { confetti(); haptic(); act(g, 'seen').then(() => { g.seen_at = new Date().toISOString(); render(); }); }
+}
+function haptic(){ try { tgApp()?.HapticFeedback?.impactOccurred('light'); } catch(_){} }
+
+// ===== Data =====
+async function load(){ const { data, error } = await sb.rpc('gifts_list'); if (error) throw error; G.list = data || []; render(); }
+function render(){
+  const nNew = G.list.filter(g => g.to_user === G.ctx.user.id && !g.seen_at).length;
+  $('tabBox').textContent = t('tBox') + (nNew ? ` · ${nNew}` : '');
+  if (G.tab === 'shop') renderShop(); else if (G.tab === 'box') renderBox(); else renderSky();
+}
+(async () => {
+  applyI18n(); setupBack();
+  G.ctx = await requireCouple(); applyI18n();
+  await load(); show('page', ['loading','page']);
+  const q = new URLSearchParams(location.search);
+  if (q.get('tab')) setTab(q.get('tab'));
+  if (q.get('open')) { setTab(q.get('open') && G.list.find(g => g.id === q.get('open'))?.kind === 'star' ? 'sky' : 'box'); openGift(q.get('open'), true); }
+  else if (G.list.some(g => g.to_user === G.ctx.user.id && !g.seen_at)) setTab('box');
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+langHooks.push(() => { if (G.ctx) render(); });
+</script>
+</body>
+</html>

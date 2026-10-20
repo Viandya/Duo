@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duo · Итоги года</title>
+<meta name="theme-color" content="#2d4b3c">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';}catch(e){}})();</script>
+<link rel="stylesheet" href="common.css?v=18">
+<style>
+html,body{background:#000;overflow:hidden;height:100%}
+.L{font-family:Lora,Georgia,serif;font-weight:500}
+#st{position:fixed;inset:0;max-width:520px;margin:0 auto;overflow:hidden;color:#fff;user-select:none;-webkit-user-select:none;background:#000}
+.sl{position:absolute;inset:0;padding:calc(54px + var(--safe-t)) 24px calc(96px + var(--safe-b));display:flex;flex-direction:column;opacity:0;transition:opacity .45s ease;pointer-events:none}
+.sl.on{opacity:1;pointer-events:auto}
+#st.locked .sl{padding-bottom:calc(270px + var(--safe-b))}
+.k{font-size:12px;letter-spacing:.16em;font-weight:800;opacity:.75;text-transform:uppercase}
+.grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sl>*{position:relative}
+.bars{position:absolute;left:12px;right:12px;top:calc(12px + var(--safe-t));display:flex;gap:4px;z-index:5}
+.bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden}
+.bars i b{display:block;height:100%;width:0;background:#fff}
+.x{position:absolute;right:10px;top:calc(22px + var(--safe-t));z-index:6;border:0;background:none;color:#fff;padding:8px;cursor:pointer;opacity:.85}
+.x .ic{width:24px;height:24px}
+.sl.on .up{animation:up .7s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .up2{animation:up .7s .15s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .up3{animation:up .7s .3s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .up4{animation:up .7s .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.pol{position:absolute;background:#fff;padding:7px 7px 24px;box-shadow:0 12px 24px rgba(0,0,0,.35);border-radius:3px}
+.pol img,.pol i{display:block;width:min(36vw,150px);height:min(36vw,150px);object-fit:cover;border-radius:2px;background:#ddd}
+.pol span{position:absolute;left:0;right:0;bottom:5px;text-align:center;font-family:'Segoe Script','Comic Sans MS',cursive;color:#3a3a3a;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.sl.on .pol{animation:drop .7s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes drop{from{opacity:0;transform:translateY(-40px) scale(1.1)}}
+.stats3{display:flex;gap:22px;flex-wrap:wrap}
+.stats3 b{display:block;font-family:Lora,serif;font-size:40px;font-weight:500;line-height:1.05}
+.stats3 span{font-size:12px;opacity:.75}
+.wbtn{border:0;border-radius:16px;padding:13px;text-align:center;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.share{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="loading" class="spinner" style="color:#fff"><img src="icons/icon-192.png" alt=""></div>
+<div id="st" class="hidden"><div class="bars" id="bars"></div><button class="x" data-back aria-label="close"><svg class="ic"><use href="#i-x"/></svg></button><div id="slides"></div></div>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="common.js?v=18"></script>
+<script src="gift-art.js?v=2"></script>
+<script>
+addT({
+ru: { wK:'Duo · итоги', wStart:'Ваш год, по-честному. Нажмите, чтобы начать', wDaysK:'Время вместе', wOf:'дней из 365', wDaysX:h => `Это <b>${h} часов</b>. Каждый день этого года вы были парой.`,
+  wCalK:'Ваш календарь', wTop:m => `Самый насыщенный<br>месяц: <i style="color:#ffcfa8">${m}</i>`, wEv:(n, m, k) => `${plural(n,'общее событие','общих события','общих событий')} за год. В ${['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'][m]} их было ${k}.`,
+  wQK:'Вопросы дня', wQBy:(n, q) => `${n}, на вопрос «${q}»`, wBoth:'раз ответили оба', wStreak:'дней подряд, рекорд',
+  wMK:'Кино', wFilms:n => `${n} ${plural(n,'фильм','фильма','фильмов')}`, wFilmX:(h, g) => `Около ${h} часов на одном диване.${g ? ` Чаще всего совпадали <b>${g}</b>.` : ''}`, wFilmYear:'фильм года',
+  wTK:'Поездки', wTrips:n => plural(n,'поездка','поездки','поездок'), wTripDays:'дней в пути', wCities:'мест',
+  wPK:'Моменты', wPhotos:n => `${plural(n,'фото','фото','фото')} за год. Вот несколько из разных месяцев.`,
+  wGK:'Подарки', wSky:n => `Ваше созвездие:<br>${n} ${plural(n,'звезда','звезды','звёзд')}`, wGifts:n => `${n} ${plural(n,'подарок','подарка','подарков')} друг другу`,
+  wGiftsX:g => [g.coupons ? `${g.coupons} ${plural(g.coupons,'купон','купона','купонов')} (${g.coupons_used} использовано)` : '', g.letters ? `${g.letters} ${plural(g.letters,'письмо','письма','писем')}` : '', g.flowers ? `${g.flowers} ${plural(g.flowers,'цветок','цветка','цветов')}` : '', g.songs ? `${g.songs} ${plural(g.songs,'песня','песни','песен')}` : ''].filter(Boolean).join(', '),
+  wEndK:'Спасибо за год', wNext:y => `Пусть ${y}<br>будет ещё теплее`, wStory:'В историю', wSave:'Сохранить', wDays:'дней', wFilmsS:'фильмов', wTripsS:'поездок', wPhotosS:'фото', wAnsS:'ответов',
+  wLocked:'Откройте историю вашего года вместе', wBuy:'Открыть за 100 ★', wPlus:'С Duo Plus бесплатно', wPreparing:'Готовим картинку…', wNotTg:'Оплата открылась в Telegram. Вернитесь сюда после оплаты', gen:['комедии','драмы','мелодрамы','фантастика','триллеры','ужасы','мультфильмы','боевики'] },
+en: { wK:'Duo · year in review', wStart:'Your year, honestly. Tap to begin', wDaysK:'Time together', wOf:'days of 365', wDaysX:h => `That's <b>${h} hours</b>. You were a couple every single day of it.`,
+  wCalK:'Your calendar', wTop:m => `The busiest<br>month: <i style="color:#ffcfa8">${m}</i>`, wEv:(n, m, k) => `${n === 1 ? 'shared event' : 'shared events'} this year. ${k} of them in ${m}.`,
+  wQK:'Questions of the day', wQBy:(n, q) => `${n}, answering “${q}”`, wBoth:'times you both answered', wStreak:'days in a row, your record',
+  wMK:'Movies', wFilms:n => `${n} ${n === 1 ? 'film' : 'films'}`, wFilmX:(h, g) => `About ${h} hours on one sofa.${g ? ` You matched on <b>${g}</b> most of all.` : ''}`, wFilmYear:'film of the year',
+  wTK:'Trips', wTrips:n => n === 1 ? 'trip' : 'trips', wTripDays:'days away', wCities:'places',
+  wPK:'Moments', wPhotos:n => `${n === 1 ? 'photo' : 'photos'} this year. Here are a few from different months.`,
+  wGK:'Gifts', wSky:n => `Your constellation:<br>${n} ${n === 1 ? 'star' : 'stars'}`, wGifts:n => `${n} ${n === 1 ? 'gift' : 'gifts'} to each other`,
+  wGiftsX:g => [g.coupons ? `${g.coupons} coupons (${g.coupons_used} used)` : '', g.letters ? `${g.letters} letters` : '', g.flowers ? `${g.flowers} flowers` : '', g.songs ? `${g.songs} songs` : ''].filter(Boolean).join(', '),
+  wEndK:'Thank you for this year', wNext:y => `May ${y}<br>be even warmer`, wStory:'Share to story', wSave:'Save', wDays:'days', wFilmsS:'films', wTripsS:'trips', wPhotosS:'photos', wAnsS:'answers',
+  wLocked:'Open the story of your year together', wBuy:'Open for 100 ★', wPlus:'Free with Duo Plus', wPreparing:'Preparing the image…', wNotTg:'The payment opened in Telegram. Come back here afterwards', gen:[] }
+});
+const W = { ctx:null, d:null, i:0, tm:null, year:0, onShow:[] };
+const BG = {
+  cover:'radial-gradient(circle at 20% 15%,#ffcfa8 0,transparent 45%),radial-gradient(circle at 85% 40%,#c9b6f2 0,transparent 50%),radial-gradient(circle at 40% 95%,#9cd3b0 0,transparent 55%),#2d4b3c',
+  days:'linear-gradient(170deg,#f6efe3,#ead9c4)', cal:'#14201a', q:'linear-gradient(165deg,#3b2366,#7a2f6e 65%,#c0674b)', mov:'#101418',
+  trip:'linear-gradient(175deg,#e9f1f5,#cfe0ea)', ph:'#2a2420', gift:'radial-gradient(ellipse at 50% 30%,#24305a,#0b0f22 70%)'
+};
+const nf = n => Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU');
+const genre = g => { if (!g) return ''; const ru = { 'комедия':'комедии','драма':'драмы','мелодрама':'мелодрамы','ужасы':'ужасы','триллер':'триллеры','мультфильм':'мультфильмы','боевик':'боевики','фантастика':'фантастика' };
+  return LANG === 'en' ? (trD(g) || g) : (ru[String(g).toLowerCase()] || g); };
+function names(){ const a = W.ctx.profile.display_name || '', b = W.ctx.partner?.display_name || ''; return b ? (LANG === 'en' ? `${a}<br>&amp; ${b}` : `${esc(a)}<br>и ${esc(b)}`) : esc(a); }
+function slides(){
+  const d = W.d, y = W.year, out = [], sl = (bg, html, ink) => out.push(`<div class="sl" style="background:${bg};${ink ? 'color:' + ink : ''}"><div class="grain" ${ink ? 'style="opacity:.3"' : ''}></div>${html}</div>`);
+  sl(BG.cover, `<div class="k up">${t('wK')}</div><div style="margin-top:auto"><div class="L up2" style="font-size:min(30vw,128px);line-height:.85;font-style:italic;letter-spacing:-2px">${y}</div>
+    <div class="L up3" style="font-size:28px;margin-top:16px;line-height:1.15">${names()}</div><div class="up4" style="font-size:14px;opacity:.85;margin-top:12px">${t('wStart')}</div></div>`);
+  if (d.locked) return out;
+  if (d.days > 0) { W.onShow[out.length] = () => { const r = $('ring'), c = $('cnt'); if (!r) return; r.style.strokeDashoffset = 540 * (1 - Math.min(1, d.days / 365)); const s = performance.now();
+      (function f(tm){ const p = Math.min(1, (tm - s) / 1500); c.textContent = nf(Math.round(d.days * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(f); })(s); };
+    sl(BG.days, `<div class="k up" style="color:#a0603f">${t('wDaysK')}</div><div style="margin:auto 0;text-align:center;position:relative">
+      <svg viewBox="0 0 200 200" width="230" height="230" style="display:block;margin:0 auto"><circle cx="100" cy="100" r="86" fill="none" stroke="#e3d2bd" stroke-width="10"/><circle id="ring" cx="100" cy="100" r="86" fill="none" stroke="#c0674b" stroke-width="10" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="540" transform="rotate(-90 100 100)" style="transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)"/></svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div class="L" id="cnt" style="font-size:64px;line-height:1">0</div><div style="font-size:13px;color:#8a6a56">${t('wOf')}</div></div></div>
+      <div class="up3" style="font-size:15px;line-height:1.5">${t('wDaysX', nf(d.days * 24))}</div>`, '#2b2420'); }
+  const ev = (d.months || []).reduce((a, b) => a + b, 0);
+  if (ev > 0) { const mx = Math.max(...d.months), mi = d.months.indexOf(mx), M = t('monthsShort');
+    const rows = d.months.map((v, i) => `<span>${M[i]}</span><div style="display:flex;gap:2px">${Array.from({ length:20 }, (_, j) => `<i style="flex:1;height:8px;border-radius:2px;background:${j < Math.ceil(v / mx * 20) ? (i === mi ? '#ffcfa8' : `rgba(140,196,162,${.4 + v / mx * .5})`) : 'rgba(255,255,255,.06)'}"></i>`).join('')}</div>`).join('');
+    sl(BG.cal, `<div class="k up" style="color:#8cc4a2">${t('wCalK')}</div><div class="L up2" style="font-size:28px;margin-top:12px;line-height:1.15">${t('wTop', t('months')[mi].toLowerCase())}</div>
+      <div class="up3" style="margin-top:20px;display:grid;grid-template-columns:30px 1fr;row-gap:6px;font-size:10px;color:#7d9486;align-items:center">${rows}</div>
+      <div class="up4" style="margin-top:auto;font-size:15px;line-height:1.45;opacity:.92"><b class="L" style="font-size:38px;color:#ffcfa8;font-weight:500">${ev}</b> ${t('wEv', ev, LANG === 'en' ? t('months')[mi] : mi, mx)}</div>`); }
+  if (d.answers_both > 0) { const b = d.best, who = b?.by === W.ctx.user.id ? W.ctx.profile.display_name : W.ctx.partner?.display_name;
+    sl(BG.q, `<div class="k up">${t('wQK')}</div>${b ? `<div class="L up2" style="font-size:130px;line-height:.6;margin-top:36px;opacity:.35">“</div>
+      <div class="L up3" style="font-size:24px;line-height:1.32;font-style:italic">${esc(String(b.a).slice(0, 180))}</div>
+      <div class="up3" style="font-size:13px;opacity:.8;margin-top:14px">${esc(t('wQBy', who || '', LANG === 'en' && b.q_en ? b.q_en : b.q))}</div>` : ''}
+      <div class="up4 stats3" style="margin-top:auto"><div><b>${d.answers_both}</b><span>${t('wBoth')}</span></div>${d.streak > 1 ? `<div><b>${d.streak}</b><span>${t('wStreak')}</span></div>` : ''}</div>`); }
+  if (d.movies?.n > 0) { const f = d.movies.film, title = f ? (LANG === 'en' && f.title_en ? f.title_en : f.title) : '';
+    sl(BG.mov, `<div class="k up" style="color:#9cc4e0">${t('wMK')}</div><div style="position:relative;height:250px;margin-top:22px">
+      <div class="pol" style="left:4%;top:34px;transform:rotate(-12deg);padding:0;border-radius:10px;overflow:hidden;animation-delay:.1s"><i style="width:min(30vw,120px);height:min(45vw,180px);background:linear-gradient(170deg,#e4a87c,#7a2f3a)"></i></div>
+      <div class="pol" style="right:4%;top:34px;transform:rotate(12deg);padding:0;border-radius:10px;overflow:hidden;animation-delay:.25s"><i style="width:min(30vw,120px);height:min(45vw,180px);background:linear-gradient(170deg,#6aa6c9,#1f3a5a)"></i></div>
+      <div class="pol" style="left:50%;margin-left:min(-17vw,-68px);top:8px;padding:0;border-radius:10px;overflow:hidden;animation-delay:.4s;z-index:2">${f?.poster ? `<img src="${esc(f.poster)}" alt="" style="width:min(34vw,136px);height:min(51vw,204px)">` : `<i style="width:min(34vw,136px);height:min(51vw,204px);background:linear-gradient(170deg,#ffd36b,#c0674b 60%,#4a1f3a)"></i>`}</div></div>
+      ${title ? `<div class="up3" style="text-align:center;font-size:12px;opacity:.7;margin-top:6px;letter-spacing:.1em;text-transform:uppercase">${t('wFilmYear')}: ${esc(title)}</div>` : ''}
+      <div class="L up3" style="font-size:52px;line-height:1;margin-top:auto">${t('wFilms', d.movies.n)}</div>
+      <div class="up4" style="font-size:15px;opacity:.85;margin-top:8px;line-height:1.45">${t('wFilmX', d.movies.n * 2, esc(genre(d.movies.genre)))}</div>`); }
+  if (d.trips?.length) { const tr = d.trips.slice(0, 5), days = d.trips.reduce((a, x) => a + (x.days || 1), 0);
+    const P = [[40, 40], [185, 95], [55, 160], [180, 210], [90, 240]].slice(0, tr.length), path = P.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ');
+    sl(BG.trip, `<div class="k up" style="color:#2d6a8a">${t('wTK')}</div><svg viewBox="0 0 230 260" width="100%" style="height:46vh;margin-top:10px">
+      <path id="route" d="${path}" fill="none" stroke="#2d6a8a" stroke-width="2" stroke-dasharray="5 5"/>${tr.length > 1 ? '<circle r="5" fill="#c0674b"><animateMotion dur="4s" repeatCount="indefinite"><mpath href="#route"/></animateMotion></circle>' : ''}
+      ${tr.map((x, i) => `<circle cx="${P[i][0]}" cy="${P[i][1]}" r="5" fill="#fff" stroke="#2d6a8a" stroke-width="2"/><text x="${P[i][0] + (P[i][0] > 140 ? -10 : 10)}" y="${P[i][1] + 22}" text-anchor="${P[i][0] > 140 ? 'end' : 'start'}" font-family="Lora,serif" font-size="15" fill="#1f2f3a">${esc(x.title)}</text>`).join('')}</svg>
+      <div class="up3 stats3" style="margin-top:auto"><div><b>${d.trips.length}</b><span>${t('wTrips', d.trips.length)}</span></div><div><b>${days}</b><span>${t('wTripDays')}</span></div></div>`, '#1f2f3a'); }
+  if (d.photos?.n > 0) { const pk = d.photos.pick.slice(0, 4), pos = [['4%', '0', -8], ['50%', '8px', 7], ['8%', '46%', 5], ['52%', '50%', -6]];
+    sl(BG.ph, `<div class="k up" style="color:#e6c58a">${t('wPK')}</div><div style="position:relative;flex:1;margin-top:14px;max-height:52vh">${pk.map((p, i) => `<div class="pol" style="left:${pos[i][0]};top:${pos[i][1]};transform:rotate(${pos[i][2]}deg);animation-delay:${i * .15}s"><img data-path="${esc(p.path)}" alt=""><span>${esc(p.caption || '')}</span></div>`).join('')}</div>
+      <div class="up4" style="margin-top:auto;font-size:15px;line-height:1.45"><b class="L" style="font-size:38px;color:#e6c58a;font-weight:500">${d.photos.n}</b> ${t('wPhotos', d.photos.n)}</div>`); }
+  if (d.gifts?.n > 0) { const g = d.gifts, sn = (g.star_names || []).slice(0, 9);
+    const pts = sn.map((_, i) => [30 + ((i * 71) % 170), 30 + ((i * 47) % 150)]);
+    const sky = sn.length ? `<svg viewBox="0 0 230 200" width="100%" style="max-height:34vh;margin-top:10px"><path d="${pts.map((p, i) => (i ? 'L' : 'M') + p.join(' ')).join(' ')}" stroke="#8f9ad0" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+      ${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 4.5 : 3.2}" fill="#fff4d6"/><text x="${p[0]}" y="${p[1] - 9}" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#aab3e0">${esc(sn[i] || '')}</text>`).join('')}</svg>`
+      : `<div style="display:flex;margin-top:30px">${(g.kinds || []).slice(0, 5).map((k, i) => `<span style="margin-left:${i ? -12 : 0}px">${giftSvg(k, 64)}</span>`).join('')}</div>`;
+    sl(BG.gift, `<div class="k up" style="color:#b8c2ff">${t('wGK')}</div>${sky}<div class="L up3" style="font-size:28px;line-height:1.2;margin-top:12px">${sn.length ? t('wSky', g.stars) : t('wGifts', g.n)}</div>
+      <div class="up4" style="margin-top:auto;font-size:15px;line-height:1.5;opacity:.9">${sn.length ? t('wGifts', g.n) + (t('wGiftsX', g) ? ': ' : '') : ''}${esc(t('wGiftsX', g))}</div>`); }
+  const st = [[d.days, 'wDays'], [d.movies?.n, 'wFilmsS'], [d.trips?.length, 'wTripsS'], [d.photos?.n, 'wPhotosS'], [d.answers_both, 'wAnsS']].filter(x => x[0] > 0).slice(0, 4);
+  sl(BG.cover, `<div class="k up">${t('wEndK')}</div><div class="up2" id="final" style="margin:26px auto 0;width:min(72vw,240px);background:#fbf8f1;color:#1f2a24;border-radius:18px;padding:18px;box-shadow:0 20px 40px rgba(0,0,0,.35);transform:rotate(-3deg)">
+      <div style="font-size:10px;letter-spacing:.14em;font-weight:800;color:#3d6f55">DUO · ${y}</div><div class="L" style="font-size:20px;margin-top:6px;line-height:1.15">${names()}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">${st.map(([n, k]) => `<div><div class="L" style="font-size:26px">${nf(n)}</div><div style="font-size:11px;color:#6b7a70">${t(k)}</div></div>`).join('')}</div></div>
+    <div class="L up3" style="font-size:24px;text-align:center;margin-top:auto;line-height:1.25">${t('wNext', y + 1)}</div>
+    <div class="up4 share"><button class="wbtn" data-share="story" style="background:#fff;color:#1f2a24">${t('wStory')}</button><button class="wbtn" data-share="save" style="background:rgba(255,255,255,.18);color:#fff">${t('wSave')}</button></div>`);
+  return out;
+}
+function lockedPanel(){
+  return `<div style="position:absolute;left:24px;right:24px;bottom:calc(96px + var(--safe-b));z-index:7;text-align:center"><div style="font-size:15px;opacity:.9;margin-bottom:14px">${t('wLocked')}</div>
+    <button class="wbtn" id="wBuy" style="width:100%;background:linear-gradient(135deg,#d8b56a,#f6e3b4);color:#2a2112">${t('wBuy')}</button>
+    <a class="wbtn" href="plus.html" style="display:block;margin-top:8px;background:rgba(255,255,255,.18);color:#fff;text-decoration:none">${t('wPlus')}</a></div>`;
+}
+const D = 6500;
+function go(n){
+  const S_ = [...document.querySelectorAll('.sl')], B = [...document.querySelectorAll('.bars b')];
+  if (n >= S_.length) n = S_.length - 1; if (n < 0) n = 0;
+  W.i = n; S_.forEach((s, k) => s.classList.toggle('on', k === n));
+  B.forEach((b, k) => { b.style.transition = 'none'; b.style.width = k < n ? '100%' : '0'; });
+  clearTimeout(W.tm);
+  if (W.d.locked) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => { if (!B[n]) return; B[n].style.transition = `width ${D}ms linear`; B[n].style.width = '100%'; }));
+  W.onShow[n]?.();
+  if (n < S_.length - 1) W.tm = setTimeout(() => go(n + 1), D);
+}
+async function draw(){
+  const s = slides(); W.slides = s.length;
+  $('slides').innerHTML = s.join('') + (W.d.locked ? lockedPanel() : ''); $('st').classList.toggle('locked', !!W.d.locked);
+  $('bars').innerHTML = W.d.locked ? '' : s.map(() => '<i><b></b></i>').join('');
+  const imgs = [...document.querySelectorAll('img[data-path]')];
+  if (imgs.length) { const { data } = await sb.storage.from('moments').createSignedUrls(imgs.map(i => i.dataset.path.replace(/\.jpg$/, '_t.jpg')), 3600);
+    (data || []).forEach((u, i) => { if (u.signedUrl) imgs[i].src = u.signedUrl; }); }
+  if ($('wBuy')) $('wBuy').onclick = async () => {
+    try { const st = await payStars('wrapped', { year:W.year }); if (st === 'external') return alert(t('wNotTg')); if (st !== 'paid') return;
+      await waitFor(async () => { W.d = (await sb.rpc('wrapped_stats', { p_year:W.year })).data; return W.d && !W.d.locked; }); draw(); go(0);
+    } catch(e) { alert(t('payErr') + errText(e)); } };
+  go(0);
+}
+$('st').addEventListener('click', e => {
+  if (e.target.closest('button,a')) return;
+  const r = $('st').getBoundingClientRect(); go(W.i + (e.clientX - r.left < r.width / 3 ? -1 : 1));
+});
+// final card as a 1080×1920 image
+async function storyImage(){
+  await document.fonts.ready;
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 1080, 1920); g.addColorStop(0, '#3d6f55'); g.addColorStop(1, '#1d3328'); x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
+  const blob = (cx, cy, r, col) => { const rg = x.createRadialGradient(cx, cy, 0, cx, cy, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = rg; x.fillRect(0, 0, 1080, 1920); };
+  blob(220, 300, 700, 'rgba(255,207,168,.75)'); blob(940, 800, 700, 'rgba(201,182,242,.6)'); blob(420, 1820, 800, 'rgba(156,211,176,.6)');
+  x.fillStyle = '#fff'; x.font = '800 34px Manrope, sans-serif'; x.fillText('DUO', 90, 160);
+  x.font = 'italic 500 300px Lora, Georgia, serif'; x.fillText(String(W.year), 70, 620);
+  const nA = W.ctx.profile.display_name || '', nB = W.ctx.partner?.display_name || '';
+  x.font = '500 76px Lora, Georgia, serif'; x.fillText(nA, 90, 780); if (nB) x.fillText((LANG === 'en' ? '& ' : 'и ') + nB, 90, 880);
+  const d = W.d, st = [[d.days, 'wDays'], [d.movies?.n, 'wFilmsS'], [d.trips?.length, 'wTripsS'], [d.photos?.n, 'wPhotosS'], [d.answers_both, 'wAnsS']].filter(q => q[0] > 0).slice(0, 4);
+  x.fillStyle = 'rgba(251,248,241,.96)'; x.beginPath(); x.roundRect(90, 1040, 900, 560, 48); x.fill();
+  st.forEach(([n, k], i) => { const cx = 160 + (i % 2) * 430, cy = 1200 + Math.floor(i / 2) * 230; x.fillStyle = '#1f2a24'; x.font = '500 120px Lora, Georgia, serif'; x.fillText(nf(n), cx, cy); x.fillStyle = '#6b7a70'; x.font = '600 40px Manrope, sans-serif'; x.fillText(t(k), cx, cy + 62); });
+  x.fillStyle = '#fff'; x.font = '600 40px Manrope, sans-serif'; x.fillText('t.me/' + BOT, 90, 1800);
+  return new Promise(r => c.toBlob(r, 'image/png'));
+}
+document.addEventListener('click', async e => {
+  const k = e.target.closest('[data-share]')?.dataset.share; if (!k) return;
+  e.target.closest('button').disabled = true;
+  try {
+    const blob = await storyImage(), path = `${W.ctx.couple.id}/wrapped/${W.year}-${Date.now()}.png`;
+    const up = await sb.storage.from('moments').upload(path, blob, { contentType:'image/png' }); if (up.error) throw up.error;
+    const { data: su } = await sb.storage.from('moments').createSignedUrl(path, 3600); const url = su?.signedUrl; if (!url) throw new Error('url');
+    const a = tgApp();
+    if (k === 'story' && inTG && a?.shareToStory) a.shareToStory(url, { text: `${LANG === 'en' ? 'Our' : 'Наш'} ${W.year} · Duo` });
+    else if (inTG && a?.downloadFile) a.downloadFile({ url, file_name: `duo-${W.year}.png` });
+    else if (navigator.canShare?.({ files:[new File([blob], 'duo.png', { type:'image/png' })] })) await navigator.share({ files:[new File([blob], `duo-${W.year}.png`, { type:'image/png' })] });
+    else { const l = document.createElement('a'); l.href = URL.createObjectURL(blob); l.download = `duo-${W.year}.png`; l.click(); }
+  } catch(err) { console.error(err); alert(errText(err)); }
+  finally { e.target.closest('button').disabled = false; }
+});
+(async () => {
+  applyI18n(); setupBack();
+  W.ctx = await requireCouple(); applyI18n();
+  const q = +new URLSearchParams(location.search).get('y'), now = today();
+  W.year = q || (now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear());
+  const { data, error } = await sb.rpc('wrapped_stats', { p_year:W.year }); if (error) throw error;
+  W.d = data; show('st', ['loading','st']); draw();
+})().catch(e => { console.error(e); alert(t('loadErr') + errText(e)); });
+</script>
+</body>
+</html>

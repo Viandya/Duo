@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=17">
+<link rel="stylesheet" href="common.css?v=18">
 <style>
 .hero{text-align:center;padding:40px 10px 20px}
 .hero h1{font-size:34px;margin-top:10px}
@@ -132,6 +132,45 @@
 .me-hero .since{font-size:14px;opacity:.9;margin-top:4px}
 .me-hero .stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;background:rgba(255,255,255,.15);border-radius:16px;padding:10px 0;font-size:12.5px}
 .me-hero .stats b{display:block;font-family:Lora,serif;font-size:22px;font-weight:600;line-height:1.15}
+.club{position:relative;border-radius:22px;padding:18px 18px 16px;overflow:hidden;color:#3a2a10;margin:4px 0 12px;min-height:178px;display:flex;flex-direction:column;
+  background:linear-gradient(125deg,#f4e4bd,#e2c385 45%,#f7ecd0 60%,#d4ae68);box-shadow:0 14px 28px rgba(160,120,50,.28)}
+.club.basic{color:#2f3a33;background:linear-gradient(125deg,#eef1ef,#d6ddd8 45%,#f6f8f6 60%,#c9d1cb);box-shadow:0 10px 24px rgba(40,60,50,.14)}
+:root[data-theme="dark"] .club.basic,:root[data-palette="pumpkin"] .club.basic,:root[data-palette="gothic"] .club.basic{color:#e8f0ea;background:linear-gradient(125deg,#2c3430,#414c46 45%,#2a312d 60%,#4a564f);box-shadow:0 10px 24px rgba(0,0,0,.3)}
+.club .shim{position:absolute;inset:0;background-image:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);background-size:200% 100%;animation:clubShim 4.5s linear infinite;pointer-events:none}
+.club.basic .shim{opacity:.5}
+@keyframes clubShim{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@media (prefers-reduced-motion: reduce){.club .shim{animation:none}}
+.club .bgh2{position:absolute;right:-26px;bottom:-34px;width:190px;height:130px;fill:none;stroke:rgba(255,255,255,.45);stroke-width:1.2;stroke-linejoin:round}
+.club>*{position:relative}
+.club .top{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.18em;font-weight:800}
+.club .top svg{width:26px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;opacity:.8}
+.club .avs{margin-top:16px}
+.club .av{width:44px;height:44px;font-size:17px;border:2px solid rgba(255,255,255,.8);background:rgba(255,255,255,.35);color:inherit}
+.club .av+.av{margin-left:-12px;background:rgba(0,0,0,.08)}
+.club .av.empty{border-style:dashed;background:transparent}
+.club h2{font-size:21px;margin-top:10px}
+.club .bot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:10px;font-size:11px;font-weight:700;letter-spacing:.07em;opacity:.85;text-transform:uppercase}
+.club .up{background:#1f2a24;color:#f6ead0;border-radius:99px;padding:7px 14px;font-size:12.5px;letter-spacing:0;text-transform:none;font-weight:700;text-decoration:none;opacity:1}
+.mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mstats div{background:var(--card);border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);text-align:center;padding:10px 4px;font-size:12.5px;color:var(--muted)}
+.mstats b{display:block;font-family:Lora,serif;font-size:21px;font-weight:600;color:var(--ink);line-height:1.2}
+.sq.gold{background:linear-gradient(135deg,#f6ead0,#e2c385);color:#8a6420}
+.pals .pl-tag{font-size:11px;font-weight:700;color:var(--muted);margin-top:-6px}
+.pals .pl-tag.lock{color:#a8833a}
+/* seasonal quick actions */
+.qa svg.qi{width:36px;height:36px}
+:root[data-palette="pumpkin"] .qa span{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(200,180,255,.25)}
+:root[data-palette="pumpkin"] .qa .hot span{background:radial-gradient(circle at 40% 35%,#4a2a10,#2a1508);box-shadow:0 0 18px rgba(255,140,40,.45),inset 0 0 0 1px rgba(255,170,90,.4)}
+:root[data-palette="gothic"] .qa span{background:#161111;box-shadow:inset 0 0 0 1px #3a1a1a}
+:root[data-palette="gothic"] .qa .hot span{background:#2a0d0d;box-shadow:0 0 16px rgba(200,30,30,.4),inset 0 0 0 1px #8e2a2a}
+:root[data-palette="gothic"] .t-days{box-shadow:inset 0 0 0 1px #8e2a2a}
+:root[data-palette="gothic"] .t-days::before{content:"";position:absolute;left:0;right:0;top:-1px;height:13px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 14' preserveAspectRatio='none'%3E%3Cpath d='M0 0H100V4C96 4 95 12 92 12S88 4 84 4 80 9 76 9 72 4 66 4 62 13 58 13 54 4 48 4 44 8 40 8 36 4 30 4 26 11 22 11 18 4 12 4 8 7 4 7 0 4 0 4Z' fill='%230b0909'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+:root[data-palette="pumpkin"] .t-next{background:rgba(30,20,52,.85);box-shadow:inset 0 0 0 1px rgba(255,160,80,.3)}
+:root[data-palette="pumpkin"] .t-next .n{color:#ffd2a0}
+.h-logo.pk{stroke:none;filter:drop-shadow(0 0 8px rgba(255,140,40,.55))}
+.giftpop{text-align:center;padding:30px 18px calc(30px + var(--safe-b));background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--accent) 35%,var(--card)),var(--card) 70%)}
+.giftpop .art{width:150px;height:150px;margin:18px auto 12px;animation:gpop .9s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes gpop{0%{transform:scale(.5) rotate(-10deg);opacity:0}100%{transform:none;opacity:1}}
 .k-code{text-align:center;box-shadow:inset 0 0 0 1px var(--line)}
 .k-code h2{font-size:19px}
 .btn.link.logout{margin:18px auto 0;color:#c0564f}
@@ -339,7 +378,9 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
   </section>
 
   <section id="tab-me" class="wrap hidden">
-    <div class="me-hero" id="meHero"></div>
+    <div class="club" id="meHero"></div>
+    <div class="mstats" id="meStats"></div>
+    <div class="card k-list" id="plusCard"></div>
     <div class="card k-code hidden" id="codeCard">
       <h2 data-t="partnerCode"></h2>
       <div class="code" id="inviteCode"></div>
@@ -351,6 +392,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
       <button type="button" class="mrow" data-edit="name"><span class="sq c1"><svg class="ic"><use href="#i-user"/></svg></span><span class="grow" data-t="myName"></span><span class="mval" id="vName"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <button type="button" class="mrow" data-edit="couple"><span class="sq c3"><svg class="ic"><use href="#i-heart"/></svg></span><span class="grow" data-t="coupleName"></span><span class="mval" id="vCouple"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
       <button type="button" class="mrow" data-edit="start"><span class="sq c2"><svg class="ic"><use href="#i-calendar"/></svg></span><span class="grow" data-t="startShort"></span><span class="mval" id="vStart"></span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+      <a class="mrow" href="gifts.html"><span class="sq c3"><svg class="ic"><use href="#i-gift"/></svg></span><span class="grow"><span data-t="giftBox"></span><small id="vGifts"></small></span><svg class="ic chev"><use href="#i-chev"/></svg></a>
     </div>
     <div class="grp" data-t="appGroup"></div>
     <div class="card k-list">
@@ -475,6 +517,13 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
   <div class="actions"><button class="btn" value="ok" data-t="done"></button></div>
 </form></dialog>
 
+<dialog id="giftPop"><div class="sheet giftpop">
+  <div class="muted small" id="gpFrom" style="letter-spacing:.08em;font-weight:700;text-transform:uppercase"></div>
+  <img class="art" id="gpArt" alt="">
+  <h2 id="gpName"></h2>
+  <a class="btn" id="gpOpen" style="margin-top:16px" data-t="gpOpen"></a>
+  <button type="button" class="btn link" id="gpLater" style="margin:6px auto 0" data-t="pwLater"></button>
+</div></dialog>
 <div class="toast" id="toast"></div>
 <div class="ptr" id="ptr"><svg class="ic"><use href="#i-refresh"/></svg></div>
 
@@ -488,7 +537,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=17"></script>
+<script src="common.js?v=18"></script>
 <script>
 addT({
 ru: {
@@ -541,7 +590,11 @@ ru: {
   usGroup:'Мы', appGroup:'Приложение', startShort:'Начали встречаться', themeLightS:'Светлая', themeDarkS:'Тёмная',
   tgOnShort:'подключено', tgOffShort:'выключено', waitPartner:'ждём вторую половинку',
   statDays:n => plural(n,'день','дня','дней'), statAnswers:n => plural(n,'ответ','ответа','ответов'), statMovies:n => plural(n,'фильм','фильма','фильмов'),
-  ansReady:n => `${n}: ответ готов`, needName:'Введите имя', editEventT:'Изменить событие', palette:'Цвет', palHint:'У вас и у партнёра может быть свой цвет. Он сохранится на всех устройствах.', pals:[['sage','Шалфей'],['clay','Глина'],['lavender','Лаванда'],['ocean','Океан'],['rose','Роза и слива'],['graphite','Графит и золото']], allAnswers:'Все ответы', searchPh:'Поиск по Duo', sAll:'Всё', sEvents:'События', sAnswers:'Ответы', sDates:'Даты',
+  giftBox:'Шкатулка подарков', giftsN:n => `${n} ${plural(n,'подарок','подарка','подарков')}`, giftsEmpty:'Подарите что-нибудь друг другу', gpOpen:'Открыть подарок', gpFrom:n => `${n} дарит тебе подарок`,
+  plusUntil:d => `до ${d}`, plusLife:'навсегда', plusTrialN:n => `пробный период, ещё ${n} ${plural(n,'день','дня','дней')}`, plusOff:'Фото без лимита, особые темы, итоги года', plusGift:'Подарить Plus или ввести код',
+  clubUp:'Улучшить', clubSince:d => `с ${d}`, clubTo:d => `до ${d}`, clubTrial:n => `пробный, ещё ${n} ${plural(n,'день','дня','дней')}`, statPhotos:n => 'фото', statGifts:n => plural(n,'подарок','подарка','подарков'),
+  sGifts:'Подарки', giftsSec:'Купоны, письма, цветы и звёзды', sWrapped:'Итоги года', wrappedSub:y => `ваш ${y} год вместе`, palFree:'бесплатно до 7 ноября', palPlus:'Duo Plus',
+  ansReady:n => `${n}: ответ готов`, needName:'Введите имя', editEventT:'Изменить событие', palette:'Цвет', palHint:'У вас и у партнёра может быть свой цвет. Он сохранится на всех устройствах.', pals:[['sage','Шалфей'],['clay','Глина'],['lavender','Лаванда'],['ocean','Океан'],['rose','Роза и слива'],['graphite','Графит и золото'],['pumpkin','Тыквенная ночь'],['gothic','Готика']], allAnswers:'Все ответы', searchPh:'Поиск по Duo', sAll:'Всё', sEvents:'События', sAnswers:'Ответы', sDates:'Даты',
   sNothing:'Ничего не нашлось', sHint:'Ищите по событиям, спискам, желаниям, поездкам и ответам на вопросы дня',
   mnLabel:'Идея на вечер', mnBoth:'совпали оба', mnWatch:t => `Смотрим в ${t}`, mnOther:'Другой', mnPlanned:'Вечер кино запланирован', mnEvTitle:n => `Кино: ${n}`,
   restoreDone:n => `Вернуть отмеченные (${n})`, tplTitle:'Обычный набор', tplHint:'Раз в неделю список сам заполнится этими пунктами, а купленное снова станет не отмеченным.',
@@ -556,7 +609,7 @@ ru: {
   delText:'Удалятся ваш профиль, желания, цикл, ответы, ваши фото и привязка Telegram. Общие события и списки останутся у партнёра.',
   delExport:'Сначала скачать мои данные', delWordV:'УДАЛИТЬ', delWordLabel:w => `Для подтверждения введите ${w}`, delWrong:'Слово введено неверно',
   exportTg:'Файл отправлен вам в Telegram', exportDl:'Файл сохранён', confirmLeave:'Выйти из пары? Вы перестанете видеть общие данные, а партнёр останется в паре один.',
-  momentsSubN:n => `${n} фото`, momentsEmpty:'Общий фотоальбом', budgetSubN:s => `${s} ₽ за месяц`, budgetEmpty:'Общие траты и копилки', anniv:'Годовщина', todayCap:'Сегодня', tomorrowCap:'Завтра', editDateT:'Изменить дату', ptrPull:'Потяните, чтобы обновить'
+  momentsSubN:n => `${n} фото`, momentsOf:n => `${n} из 10 фото`, momentsEmpty:'Общий фотоальбом', budgetSubN:s => `${s} ₽ за месяц`, budgetEmpty:'Общие траты и копилки', anniv:'Годовщина', todayCap:'Сегодня', tomorrowCap:'Завтра', editDateT:'Изменить дату', ptrPull:'Потяните, чтобы обновить'
 },
 en: {
   tagline:'A shared space for the two of you', tgLogin:'Sign in with Telegram', tgLoginHint:'No email or password. Notifications connect automatically.',
@@ -608,7 +661,11 @@ en: {
   usGroup:'Us', appGroup:'App', startShort:'Started dating', themeLightS:'Light', themeDarkS:'Dark',
   tgOnShort:'on', tgOffShort:'off', waitPartner:'waiting for your partner',
   statDays:n => n === 1 ? 'day' : 'days', statAnswers:n => n === 1 ? 'answer' : 'answers', statMovies:n => n === 1 ? 'film' : 'films',
-  ansReady:n => `${n} has answered`, needName:'Enter a name', editEventT:'Edit event', palette:'Colour', palHint:'You and your partner can each have your own colour. It is saved on all your devices.', pals:[['sage','Sage'],['clay','Clay'],['lavender','Lavender'],['ocean','Ocean'],['rose','Rose & plum'],['graphite','Graphite & gold']], allAnswers:'All answers', searchPh:'Search Duo', sAll:'All', sEvents:'Events', sAnswers:'Answers', sDates:'Dates',
+  giftBox:'Gift box', giftsN:n => `${n} ${n === 1 ? 'gift' : 'gifts'}`, giftsEmpty:'Give each other something', gpOpen:'Open the gift', gpFrom:n => `${n} sent you a gift`,
+  plusUntil:d => `until ${d}`, plusLife:'forever', plusTrialN:n => `free trial, ${n} ${n === 1 ? 'day' : 'days'} left`, plusOff:'Unlimited photos, special themes, year in review', plusGift:'Give Plus or enter a code',
+  clubUp:'Upgrade', clubSince:d => `since ${d}`, clubTo:d => `until ${d}`, clubTrial:n => `trial, ${n} ${n === 1 ? 'day' : 'days'} left`, statPhotos:n => n === 1 ? 'photo' : 'photos', statGifts:n => n === 1 ? 'gift' : 'gifts',
+  sGifts:'Gifts', giftsSec:'Coupons, letters, flowers and stars', sWrapped:'Year in review', wrappedSub:y => `your ${y} together`, palFree:'free until 7 November', palPlus:'Duo Plus',
+  ansReady:n => `${n} has answered`, needName:'Enter a name', editEventT:'Edit event', palette:'Colour', palHint:'You and your partner can each have your own colour. It is saved on all your devices.', pals:[['sage','Sage'],['clay','Clay'],['lavender','Lavender'],['ocean','Ocean'],['rose','Rose & plum'],['graphite','Graphite & gold'],['pumpkin','Pumpkin night'],['gothic','Gothic']], allAnswers:'All answers', searchPh:'Search Duo', sAll:'All', sEvents:'Events', sAnswers:'Answers', sDates:'Dates',
   sNothing:'Nothing found', sHint:'Search events, lists, wishes, trips and answers to the question of the day',
   mnLabel:'Idea for tonight', mnBoth:'you both liked it', mnWatch:t => `Watch at ${t}`, mnOther:'Another', mnPlanned:'Movie night planned', mnEvTitle:n => `Movie: ${n}`,
   restoreDone:n => `Uncheck all (${n})`, tplTitle:'Usual set', tplHint:'Once a week the list refills itself with these items, and checked ones become unchecked again.',
@@ -623,7 +680,7 @@ en: {
   delText:'Your profile, wishes, cycle, answers, your photos and the Telegram link will be deleted. Shared events and lists stay with your partner.',
   delExport:'Download my data first', delWordV:'DELETE', delWordLabel:w => `To confirm, type ${w}`, delWrong:'The word doesn\'t match',
   exportTg:'The file was sent to you in Telegram', exportDl:'File saved', confirmLeave:'Leave the couple? You will stop seeing shared data and your partner stays on their own.',
-  momentsSubN:n => `${n} ${n === 1 ? 'photo' : 'photos'}`, momentsEmpty:'Shared photo album', budgetSubN:s => `${s} this month`, budgetEmpty:'Shared spending and savings', anniv:'Anniversary', todayCap:'Today', tomorrowCap:'Tomorrow', editDateT:'Edit date', ptrPull:'Pull to refresh'
+  momentsSubN:n => `${n} ${n === 1 ? 'photo' : 'photos'}`, momentsOf:n => `${n} of 10 photos`, momentsEmpty:'Shared photo album', budgetSubN:s => `${s} this month`, budgetEmpty:'Shared spending and savings', anniv:'Anniversary', todayCap:'Today', tomorrowCap:'Tomorrow', editDateT:'Edit date', ptrPull:'Pull to refresh'
 }});
 
 // ===== State =====
@@ -742,6 +799,7 @@ async function loadAll(){
   ]);
   for (const r of [c,p,dt,l,it,ev,q,an]) if (r.error) throw r.error;
   S.couple = c.data;
+  guardPalette(S.couple, S.user.id);
   S.profile = p.data.find(x => x.id === S.user.id) || S.profile;
   S.partner = p.data.find(x => x.id !== S.user.id) || null;
   S.dates = dt.data; S.lists = l.data; S.items = it.data; S.events = ev.data; S.answers = an.data;
@@ -753,7 +811,7 @@ async function loadAll(){
 }
 // Small summaries for the section tiles (each section has its own page)
 async function loadSummary(){
-  const [w, tr, cs, pcs, mm, ac, wc, mst, mo, ex] = await Promise.all([
+  const [w, tr, cs, pcs, mm, ac, wc, mst, mo, ex, gfl] = await Promise.all([
     sb.from('wishes').select('owner_id, received, created_at'),
     sb.from('trips').select('title,start_date,end_date').order('start_date', { ascending: true, nullsFirst: false }),
     sb.rpc('cycle_status'),
@@ -763,12 +821,16 @@ async function loadSummary(){
     sb.from('movie_status').select('qid', { count:'exact', head:true }).eq('status', 'watched'),
     sb.from('movie_status').select('qid,status'),
     sb.from('moments').select('id', { count:'exact', head:true }),
-    sb.from('expenses').select('amount').eq('is_settle', false).gte('spent_on', ymd(new Date(today().getFullYear(), today().getMonth(), 1)))
+    sb.from('expenses').select('amount').eq('is_settle', false).gte('spent_on', ymd(new Date(today().getFullYear(), today().getMonth(), 1))),
+    sb.rpc('gifts_list')
   ]);
+  const gifts = Array.isArray(gfl.data) ? gfl.data : [];
   S.summary = { wishes: w.data || [], trips: tr.data || [], cycle: cs.data, partnerCycle: pcs.data, movieMatches: (mm.data || []).length,
     answersCount: ac.count || 0, watchedCount: wc.count || 0, matches: mm.data || [],
     movieStatus: Object.fromEntries((mst.data || []).map(x => [x.qid, x.status])), momentsCount: mo.count || 0,
-    monthSpent: (ex.data || []).reduce((a, x) => a + Number(x.amount), 0) };
+    monthSpent: (ex.data || []).reduce((a, x) => a + Number(x.amount), 0),
+    giftsCount: gifts.length, giftNew: gifts.some(g => g.to_user === S.user.id && !g.seen_at) };
+  giftPopup(gifts.find(g => g.to_user === S.user.id && !g.seen_at));
   // Period days (actual and forecast) to show in the Plan calendar
   const { data: per } = await sb.from('cycle_periods').select('user_id,start_date,end_date').gte('start_date', ymd(addDays(today(), -400)));
   const set = new Set();
@@ -855,6 +917,7 @@ function dayDots(d){
 const shortTitle = x => LANG === 'ru' ? x.replace(/^день рождения/i, 'ДР') : x.replace(/^birthday/i, 'B-day');
 function renderHome(){
   $('hNames').textContent = coupleTitle();
+  themeQa();
   // partner's mood (only today's counts)
   if (S.partner) {
     const m = S.partner.mood && sameDay(new Date(S.partner.mood_at), today()) ? t('moods')[S.partner.mood] : null;
@@ -1220,11 +1283,16 @@ function tileDefs(){
     { id:'trips', icon:'plane', c:'c1', href:'trips.html', title:t('sTrips'), sub: now ? t('tripsNow', now.title) : next ? t('tripsNext', next.title, untilLabel(parseYmd(next.start_date))) : t('tripsEmpty') },
     { id:'cycle', icon:'droplet', c:'c3', href:'cycle.html', title:t('sCycle'), sub: cycleSub },
     { id:'lists', icon:'list', c:'c5', action:'lists', title:t('sLists'), sub: t('listsSub', S.lists.length) },
-    { id:'moments', icon:'photo', c:'c3', href:'moments.html', title:t('sMoments'), sub: sm.momentsCount ? t('momentsSubN', sm.momentsCount) : t('momentsEmpty') },
+    { id:'moments', icon:'photo', c:'c3', href:'moments.html', title:t('sMoments'), sub: !plusOn(S.couple) && sm.momentsCount ? t('momentsOf', sm.momentsCount) : sm.momentsCount ? t('momentsSubN', sm.momentsCount) : t('momentsEmpty') },
     { id:'budget', icon:'wallet', c:'c2', href:'budget.html', title:t('sBudget'), sub: sm.monthSpent ? t('budgetSubN', fmtMoney(sm.monthSpent)) : t('budgetEmpty') },
+    { id:'gifts', icon:'gift', c:'c5', href:'gifts.html', title:t('sGifts'), sub: sm.giftsCount ? t('giftsN', sm.giftsCount) : t('giftsSec'), dot: !!sm.giftNew },
+    ...(wrappedSeason() ? [{ id:'wrapped', icon:'sparkle', c:'c1', href:'wrapped.html', title:t('sWrapped'), sub:t('wrappedSub', wrappedYear()) }] : []),
   ];
 }
 const SOON = () => [];
+// the year in review shows up from 15 December until the end of January
+const wrappedSeason = () => { const d = today(); return (d.getMonth() === 11 && d.getDate() >= 15) || d.getMonth() === 0; };
+const wrappedYear = () => { const d = today(); return d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear(); };
 function renderTiles(){
   if (!S.couple) return;
   const hidden = hiddenTiles();
@@ -1255,18 +1323,28 @@ $('editSections').onclick = () => { editingTiles = !editingTiles; renderTiles();
 // ===== Profile =====
 function renderMe(){
   const ini = n => esc((n || '?').trim().charAt(0).toUpperCase());
-  const sm = S.summary || {}, bgh = `<svg class="bgh" viewBox="0 0 24 24">${HEART_PATH}</svg>`;
-  const days = S.couple.start_date ? dayDiff(parseYmd(S.couple.start_date), today()) + 1 : 0;
-  const stat = (n, f) => `<div><b>${n.toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU')}</b>${t(f, n)}</div>`;
-  $('meHero').innerHTML = `${bgh}<div class="avs"><div class="av">${ini(S.profile.display_name)}</div>${S.partner ? `<div class="av">${ini(S.partner.display_name)}</div>` : '<div class="av empty">+</div>'}</div>
+  const sm = S.summary || {}, c = S.couple, on = plusOn(c), loc = LANG === 'en' ? 'en-GB' : 'ru-RU';
+  const days = c.start_date ? dayDiff(parseYmd(c.start_date), today()) + 1 : 0;
+  const dstr = v => new Date(v).toLocaleDateString(loc);
+  const right = c.plus_lifetime ? t('plusLife') : on ? (plusTrial(c) ? t('clubTrial', plusDaysLeft(c)) : t('clubTo', dstr(c.plus_until))) : '';
+  $('meHero').className = 'club' + (on ? '' : ' basic');
+  $('meHero').innerHTML = `<div class="shim"></div><svg class="bgh2" viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z"/></svg>
+    <div class="top"><span>${on ? 'DUO PLUS' : 'DUO'}</span><svg viewBox="5.6 11.6 27.2 18.6"><path d="M15 29s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 23 18c0 6.2-8 11-8 11z"/><path d="M25 26s-6.5-3.9-6.5-8.9a3.7 3.7 0 0 1 6.5-2.3 3.7 3.7 0 0 1 6.5 2.3c0 5-6.5 8.9-6.5 8.9z" opacity=".6"/></svg></div>
+    <div class="avs"><div class="av">${ini(S.profile.display_name)}</div>${S.partner ? `<div class="av">${ini(S.partner.display_name)}</div>` : '<div class="av empty">+</div>'}</div>
     <h2>${esc(S.partner ? coupleTitle() : S.profile.display_name)}</h2>
-    <div class="since">${S.partner ? (S.couple.start_date ? t('togetherSince', fmtDay(parseYmd(S.couple.start_date), true)) : '') : t('waitPartner')}</div>
-    ${S.partner ? `<div class="stats">${stat(days, 'statDays')}${stat(sm.answersCount || 0, 'statAnswers')}${stat(sm.watchedCount || 0, 'statMovies')}</div>` : ''}`;
-  $('inviteCode').textContent = S.couple.invite_code;
+    <div class="bot"><span>${S.partner ? (c.start_date ? t('clubSince', parseYmd(c.start_date).toLocaleDateString(loc)) : '') : t('waitPartner')}</span>${on ? `<span>${esc(right)}</span>` : `<a class="up" href="plus.html">${t('clubUp')}</a>`}</div>`;
+  const stat = (n, f) => `<div><b>${Number(n).toLocaleString(LANG === 'en' ? 'en-US' : 'ru-RU')}</b>${t(f, n)}</div>`;
+  $('meStats').innerHTML = S.partner ? stat(days, 'statDays') + stat(sm.momentsCount || 0, 'statPhotos') + stat(sm.giftsCount || 0, 'statGifts') : '';
+  $('meStats').classList.toggle('hidden', !S.partner);
+  const sub = c.plus_lifetime ? t('plusLife') : on ? (plusTrial(c) ? t('plusTrialN', plusDaysLeft(c)) : t('plusUntil', dstr(c.plus_until))) : t('plusOff');
+  $('plusCard').innerHTML = `<a class="mrow" href="plus.html"><span class="sq gold">${icon('sparkle')}</span><span class="grow">Duo Plus<small>${esc(sub)}</small></span><svg class="ic chev"><use href="#i-chev"/></svg></a>
+    <a class="mrow" href="plus.html#gift"><span class="sq c3">${icon('gift')}</span><span class="grow">${t('plusGift')}</span><svg class="ic chev"><use href="#i-chev"/></svg></a>`;
+  $('vGifts').textContent = sm.giftsCount ? t('giftsN', sm.giftsCount) : t('giftsEmpty');
+  $('inviteCode').textContent = c.invite_code;
   $('codeCard').classList.toggle('hidden', !!S.partner);
   $('vName').textContent = S.profile.display_name || '';
-  $('vCouple').textContent = S.couple.name && S.couple.name !== 'Мы' ? S.couple.name : coupleTitle();
-  $('vStart').textContent = S.couple.start_date ? parseYmd(S.couple.start_date).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU') : '—';
+  $('vCouple').textContent = c.name && c.name !== 'Мы' ? c.name : coupleTitle();
+  $('vStart').textContent = c.start_date ? parseYmd(c.start_date).toLocaleDateString(loc) : '—';
   $('tgStatus').textContent = S.tgLinked ? t('tgOnShort') : t('tgOffShort');
   renderNotif(); renderPal();
   $('tgSw').classList.toggle('on', !!S.tgLinked);
@@ -1435,20 +1513,77 @@ $('delSheet').onclose = async () => {
   await sb.auth.signOut(); location.replace(location.pathname);
 };
 
+// ===== A new gift: show it when Duo opens =====
+function giftPopup(g){
+  if (!g || $('giftPop').open || document.querySelector('dialog[open]')) return;
+  const shown = (() => { try { return JSON.parse(sessionStorage.getItem('giftShown') || '[]'); } catch(_) { return []; } })();
+  if (shown.includes(g.id)) return;
+  try { sessionStorage.setItem('giftShown', JSON.stringify([...shown, g.id])); } catch(_){}
+  $('gpFrom').textContent = t('gpFrom', S.partner?.display_name || t('partner'));
+  $('gpArt').src = 'gifts/' + g.kind + '.png';
+  $('gpName').textContent = giftTitle(g);
+  $('gpOpen').href = 'gifts.html?open=' + g.id;
+  $('giftPop').showModal(); haptic();
+}
+const GIFT_NAMES = { ru:{ heart:'Сердце', bouquet:'Букет', box:'Сюрприз', pumpkin:'Тыква', ghost:'Привидение', star:'Звезда', coupon:'Купон', ticket:'Билет на свидание', scratch:'Скретч-карта', letter:'Письмо с сургучом', flower:'Цветок', note:'Записка', vinyl:'Песня' },
+  en:{ heart:'Heart', bouquet:'Bouquet', box:'Surprise', pumpkin:'Pumpkin', ghost:'Ghost', star:'Star', coupon:'Coupon', ticket:'Date ticket', scratch:'Scratch card', letter:'Sealed letter', flower:'Flower', note:'Note', vinyl:'Song' } };
+const giftTitle = g => (g.kind === 'coupon' || g.kind === 'ticket') && g.data?.title ? g.data.title : (GIFT_NAMES[LANG] || GIFT_NAMES.ru)[g.kind] || g.kind;
+$('gpLater').onclick = () => $('giftPop').close();
+
+// ===== Seasonal quick actions =====
+const QA_SVG = {
+  lantern:'<path d="M15 6c0-2 1.5-3 3-3" stroke="#5c8a3e" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="9.5" cy="17" rx="6" ry="8" fill="#d9621f"/><ellipse cx="20.5" cy="17" rx="6" ry="8" fill="#d9621f"/><ellipse cx="15" cy="17" rx="6.2" ry="8.6" fill="#ff8a2a"/><path d="M11 14.5l2-2 2 2zM16 14.5l2-2 2 2z" fill="#ffe27a"/><path d="M12.5 19.5c1.5 2 3.5 2 5 0" stroke="#ffe27a" stroke-width="1.6" fill="none" stroke-linecap="round"/>',
+  ghost:'<path d="M7 26V14a8 8 0 0 1 16 0v12l-3-2.4-2.6 2.4-2.4-2.4-2.4 2.4-2.6-2.4z" fill="#f4f1ff"/><circle cx="12.3" cy="14.5" r="1.6" fill="#2e2440"/><circle cx="17.7" cy="14.5" r="1.6" fill="#2e2440"/><path d="M12.5 19c1.5-1.4 3.5-1.4 5 0" stroke="#2e2440" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
+  film:'<rect x="5" y="8" width="20" height="16" rx="3" fill="#2a1d45"/><path d="M5 12h20M5 20h20" stroke="#ff8a2a" stroke-width="1.2"/><circle cx="15" cy="16" r="3" fill="#ff8a2a"/><path d="M9 6l4 2M21 6l-4 2" stroke="#b9a8d8" stroke-width="1.4" stroke-linecap="round"/>',
+  candy:'<path d="M5 10l5 3-1 5-5-3zM25 20l-5-3 1-5 5 3z" fill="#c08cff"/><circle cx="15" cy="15" r="6.5" fill="#ff8a2a"/><path d="M10 12c3 1 7 5 9.5 7.5M12 9.5c3 1.5 6 5 8 8" stroke="#ffe27a" stroke-width="1.5" fill="none"/>',
+  gheart:'<path d="M15 25S5 19 4 12.5C3 7.5 7 4 11 5.5c2 .8 3.4 2.4 4 4 .6-1.6 2-3.2 4-4C23 4 27 7.5 26 12.5 25 19 15 25 15 25z" fill="#8e1b1b"/><path d="M15 9.5v3M15 15v1" stroke="#ffb3b3" stroke-width="1.4" stroke-linecap="round"/>',
+  candle:'<path d="M15 3c2 3 2.5 5 0 7-2.5-2-2-4 0-7z" fill="#ffb04d"/><rect x="11" y="10" width="8" height="15" rx="1.5" fill="#e9dfd6"/><rect x="8" y="24" width="14" height="3" rx="1.5" fill="#5a4444"/>',
+  eye:'<path d="M3 15c3-5 7.5-8 12-8s9 3 12 8c-3 5-7.5 8-12 8S6 20 3 15z" fill="#1a1010" stroke="#8e1b1b" stroke-width="1.4"/><circle cx="15" cy="15" r="4.5" fill="#d64545"/><circle cx="15" cy="15" r="1.8" fill="#0b0909"/><circle cx="16.4" cy="13.6" r=".9" fill="#fff"/>',
+  key:'<circle cx="10" cy="11" r="5.5" fill="none" stroke="#c9a15a" stroke-width="2"/><path d="M13.5 15l11 9M20 20l2-2.4M22.5 22l2-2.4" stroke="#c9a15a" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="1.8" fill="#8e1b1b"/>'
+};
+const QA_THEMES = {
+  pumpkin:{ ping:['lantern','Свечу\nтебе','Lighting\nfor you','flick'], mood:['ghost','Как твоя\nдуша?','How is\nyour soul?','bob'], movies:['film','Ужастик','Horror'], wishes:['candy','Сладости','Treats'] },
+  gothic:{ ping:['gheart','Зов\nсердца','Heart\'s\ncall'], mood:['candle','Свеча\nдуши','Soul\ncandle','flick'], movies:['eye','Кошмар\nна вечер','Nightmare\ntonight'], wishes:['key','Тайные\nжелания','Secret\nwishes'] }
+};
+const QA_DEF = {};
+function themeQa(){
+  const th = QA_THEMES[pref('palette', 'sage')];
+  const els = { ping:$('qaPing'), mood:$('qaMood'), movies:document.querySelector('.qa a[href="movies.html"]'), wishes:document.querySelector('.qa a[href="wishes.html"]') };
+  for (const [k, el] of Object.entries(els)) {
+    if (!el) continue;
+    if (!QA_DEF[k]) QA_DEF[k] = el.querySelector('span').innerHTML;
+    const em = el.querySelector('em');
+    if (th) { const [ic, ru, en, cls] = th[k]; el.querySelector('span').innerHTML = `<svg class="qi ${cls || ''}" viewBox="0 0 30 30">${QA_SVG[ic]}</svg>`; em.textContent = LANG === 'en' ? en : ru; }
+    else { el.querySelector('span').innerHTML = QA_DEF[k]; em.textContent = t(em.dataset.t); }
+  }
+  const logo = document.querySelector('.h-logo');
+  if (logo) {
+    if (pref('palette', 'sage') === 'pumpkin') { if (!logo.dataset.def) logo.dataset.def = logo.innerHTML;
+      logo.classList.add('pk'); logo.setAttribute('viewBox', '0 0 64 44');
+      logo.innerHTML = `<g class="flick"><svg x="0" y="2" width="38" height="38" viewBox="0 0 30 30">${QA_SVG.lantern}</svg><svg x="26" y="8" width="32" height="32" viewBox="0 0 30 30">${QA_SVG.lantern}</svg></g>`; }
+    else if (logo.dataset.def) { logo.classList.remove('pk'); logo.setAttribute('viewBox', '5.6 11.6 27.2 18.6'); logo.innerHTML = logo.dataset.def; delete logo.dataset.def; }
+  }
+}
+langHooks.push(themeQa);
+
 // ===== Colour palette =====
 const PAL_SW = { sage:['#4f8a6b','#9cc7a6','#f3e3c4','#141b17'], clay:['#c0674b','#e6a98f','#f4e4c6','#1b1512'], lavender:['#7a62c9','#b6a6ec','#fbe4d8','#16141d'],
-  ocean:['#2b84a8','#7cc2dc','#f2ecc4','#0f161c'], rose:['#b84a74','#e79bb6','#f6e5d4','#1a1216'], graphite:['#2f2f2f','#a8833a','#f2e8cf','#121212'] };
+  ocean:['#2b84a8','#7cc2dc','#f2ecc4','#0f161c'], rose:['#b84a74','#e79bb6','#f6e5d4','#1a1216'], graphite:['#2f2f2f','#a8833a','#f2e8cf','#121212'],
+  pumpkin:['#ff8a2a','#7a2f86','#ffe7b0','#120c1f'], gothic:['#7a1414','#2a0909','#d64545','#0b0909'] };
 function renderPal(){
   const cur = pref('palette', 'sage'), sw = PAL_SW[cur] || PAL_SW.sage;
   $('palSub').textContent = (t('pals').find(p => p[0] === cur) || t('pals')[0])[1];
   $('palDots').innerHTML = sw.slice(0, 3).map(c => `<i style="background:${c}"></i>`).join('');
   $('palPick').innerHTML = t('pals').map(([k, l]) => { const c = PAL_SW[k];
-    return `<button type="button" data-pal="${k}" class="${k === cur ? 'on' : ''}"><span class="prev" style="background:linear-gradient(150deg,${c[0]},${c[1]})"><i style="width:22px;height:22px;background:${c[2]}"></i><i style="width:14px;height:14px;background:${c[3]};opacity:.85"></i></span><b>${esc(l)}</b></button>`; }).join('');
+    const sp = SPECIAL_PALS.includes(k), ok = palAllowed(k, S.couple);
+    const tag = sp ? `<span class="pl-tag ${ok ? '' : 'lock'}">${ymd(today()) < HALLOWEEN_FREE_UNTIL ? t('palFree') : t('palPlus')}</span>` : '';
+    return `<button type="button" data-pal="${k}" class="${k === cur ? 'on' : ''}"><span class="prev" style="background:linear-gradient(150deg,${c[0]},${c[1]})"><i style="width:22px;height:22px;background:${c[2]}"></i><i style="width:14px;height:14px;background:${c[3]};opacity:.85"></i></span><b>${esc(l)}</b>${tag}</button>`; }).join('');
 }
 $('palRow').onclick = () => { renderPal(); $('palSheet').showModal(); };
 $('palPick').onclick = async e => {
   const k = e.target.closest('[data-pal]')?.dataset.pal; if (!k) return;
-  setPref('palette', k); applyTheme(); renderPal(); haptic();
+  if (!palAllowed(k, S.couple)) { $('palSheet').close(); showPaywall('theme'); return; }
+  setPref('palette', k); applyTheme(); renderPal(); themeQa(); haptic();
   if (S.profile) { S.profile.palette = k; const { error } = await sb.from('profiles').update({ palette:k }).eq('id', S.user.id); if (error) console.error(error); }
 };
 

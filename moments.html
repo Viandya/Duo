@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script>(function(){try{var p=localStorage.getItem('duo.theme')||'auto';document.documentElement.dataset.theme=(p==='dark'||(p==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';var c=localStorage.getItem('duo.palette');if(c&&c!=='sage')document.documentElement.dataset.palette=c;}catch(e){}})();</script>
-<link rel="stylesheet" href="common.css?v=17">
+<link rel="stylesheet" href="common.css?v=18">
 <style>
 .topbar .add-btn{margin-left:auto}
 .mem{position:relative;border-radius:22px;overflow:hidden;height:190px;margin-bottom:16px;cursor:pointer;background:var(--accent-soft)}
@@ -85,7 +85,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=17"></script>
+<script src="common.js?v=18"></script>
 <script>
 addT({
 ru: { mTitle:'Моменты', date:'Дата', vFeed:'Лента', vAlbums:'Альбомы', vMap:'Карта', mNew:'Новый момент', mCaption:'Подпись', mCaptionPh:'Ужин на крыше',
@@ -219,9 +219,11 @@ $('vDel').onclick = async () => {
 
 // ---- add
 let getAlbum, getEv;
-$('addBtn').onclick = () => $('file').click();
+const FREE_PHOTOS = 10;
+const roomLeft = () => plusOn(MO.ctx.couple) ? Infinity : Math.max(0, FREE_PHOTOS - MO.items.length);
+$('addBtn').onclick = () => { if (!roomLeft()) return showPaywall('photos'); $('file').click(); };
 $('file').onchange = async () => {
-  const files = [...$('file').files].slice(0, 20); $('file').value = ''; if (!files.length) return;
+  const files = [...$('file').files].slice(0, Math.min(20, roomLeft())); $('file').value = ''; if (!files.length) return;
   MO.files = [];
   for (const f of files) { let ex = {}; try { ex = readExif(await f.slice(0, 256 * 1024).arrayBuffer()); } catch(_){} MO.files.push({ f, ex, url:URL.createObjectURL(f) }); }
   const d0 = MO.files.find(x => x.ex.date)?.ex.date;
@@ -248,7 +250,7 @@ $('newSheet').onclose = async () => {
   const base = { couple_id:MO.ctx.couple.id, caption:$('nCaption').value.trim() || null, album:album || null, event_id:getEv() || null };
   const day = getDate($('nDate')) || ymd(today());
   const note = document.createElement('div'); note.className = 'upl'; document.body.appendChild(note);
-  let i = 0;
+  let i = 0, limitHit = false;
   for (const x of MO.files) {
     note.textContent = t('mUploading', ++i, MO.files.length);
     try {
@@ -257,11 +259,11 @@ $('newSheet').onclose = async () => {
       const u1 = await sb.storage.from('moments').upload(path, big.blob, { contentType:'image/jpeg' }); if (u1.error) throw u1.error;
       await sb.storage.from('moments').upload(thumbOf(path), small.blob, { contentType:'image/jpeg' });
       const { error } = await sb.from('moments').insert({ ...base, path, taken_on: MO.files.length > 1 && x.ex.date ? x.ex.date : day, lat:x.ex.lat ?? null, lng:x.ex.lng ?? null, w:big.w, h:big.h });
-      if (error) throw error;
+      if (error) { if (String(error.message).includes('photo_limit')) { await sb.storage.from('moments').remove([path, thumbOf(path)]); limitHit = true; break; } throw error; }
     } catch(e) { console.error(e); alert(errText(e)); break; }
   }
   note.remove(); MO.files.forEach(x => URL.revokeObjectURL(x.url)); MO.files = [];
-  load();
+  await load(); if (limitHit) showPaywall('photos');
 };
 
 (async () => {
