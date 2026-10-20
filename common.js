@@ -270,13 +270,15 @@ applyTheme();
 // ===== Bottom sheets: close on backdrop tap and on swipe down =====
 (function(){
   const open = HTMLDialogElement.prototype.showModal;
-  HTMLDialogElement.prototype.showModal = function(){ this.returnValue = ''; const s = this.querySelector('.sheet'); if (s) { s.style.transform = ''; s.style.transition = ''; } return open.call(this); };
+  const stack = [];
+  HTMLDialogElement.prototype.showModal = function(){ this.returnValue = ''; const i = stack.indexOf(this); if (i >= 0) stack.splice(i, 1); stack.push(this); const s = this.querySelector('.sheet'); if (s) { s.style.transform = ''; s.style.transition = ''; } return open.call(this); };
   // Escape should never count as "save"
   document.addEventListener('cancel', e => { if (e.target.tagName === 'DIALOG') e.target.returnValue = 'cancel'; }, true);
   // A tap on the dimmed area: works with pointer events (iOS doesn't send click to non-clickable elements)
   const outside = (d, x, y) => { const s = d.querySelector('.sheet') || d.firstElementChild; if (!s) return true;
     const r = s.getBoundingClientRect(); return y < r.top || y > r.bottom || x < r.left || x > r.right; };
-  const topDialog = () => [...document.querySelectorAll('dialog[open]')].pop();
+  // the most recently opened dialog that is still open is the one on top
+  const topDialog = () => { for (let i = stack.length - 1; i >= 0; i--) if (stack[i].open) return stack[i]; stack.length = 0; return null; };
   let down = null;
   document.addEventListener('pointerdown', e => { const d = topDialog(); down = d && outside(d, e.clientX, e.clientY) ? { d, x:e.clientX, y:e.clientY } : null; }, true);
   document.addEventListener('pointerup', e => {
