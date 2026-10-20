@@ -72,7 +72,8 @@
 .scr{position:relative;height:280px;border-radius:22px;overflow:hidden;margin-top:18px;box-shadow:0 12px 26px rgba(90,60,160,.25)}
 .scr .under{position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,#ffd3a8,transparent 50%),linear-gradient(160deg,#e4a87c,#a35466 60%,#5b2a86);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:22px;text-align:center}
 .scr .under b{font-family:Lora,serif;font-size:24px;line-height:1.25;font-weight:500}
-.scr canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
+.scr canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.scr{touch-action:none;overscroll-behavior:contain}
 /* letter */
 .env{position:relative;height:190px;margin:26px 6px 0;background:linear-gradient(170deg,#f3e3c8,#e2cba6);border-radius:10px;box-shadow:0 18px 34px rgba(0,0,0,.25)}
 .env svg.flap{position:absolute;inset:0;width:100%;height:100%}
@@ -126,7 +127,7 @@
 
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="common.js?v=18"></script>
+<script src="common.js?v=19"></script>
 <script src="gift-art.js?v=2"></script>
 <script>
 addT({
@@ -356,7 +357,10 @@ function scratchSetup(g){
   cv.onpointermove = e => { if (!d) return; const [nx, ny] = p(e); x.beginPath(); x.moveTo(lx, ly); x.lineTo(nx, ny); x.stroke(); lx = nx; ly = ny;
     if (++moves % 25 === 0 && !done) { const px = x.getImageData(0, 0, cv.width, cv.height).data; let clear = 0; for (let i = 3; i < px.length; i += 64) if (px[i] === 0) clear++;
       if (clear / (px.length / 64) > .5) { done = true; cv.style.transition = 'opacity .6s'; cv.style.opacity = 0; confetti(); if (g.to_user === G.ctx.user.id) act(g, 'scratch').then(render); } } };
-  cv.onpointerup = () => d = false;
+  cv.onpointerup = cv.onpointercancel = () => d = false;
+  // keep the finger on the card: no page scroll, no swipe-to-close while scratching
+  const stop = e => { e.preventDefault(); e.stopPropagation(); };
+  cv.addEventListener('touchstart', stop, { passive:false }); cv.addEventListener('touchmove', stop, { passive:false });
 }
 function openGift(id, reveal){
   const g = G.list.find(x => x.id === id); if (!g) return;

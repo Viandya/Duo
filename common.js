@@ -381,7 +381,7 @@ applyTheme();
   let drag = null;
   document.addEventListener('touchstart', e => {
     const s = e.target.closest?.('dialog[open] .sheet'); if (!s || s.scrollTop > 0) return;
-    if (e.target.closest('input,textarea,select,.mcard')) return;
+    if (e.target.closest('input,textarea,select,.mcard,canvas,[data-noswipe]')) return;
     drag = { s, y: e.touches[0].clientY, dy: 0 };
   }, { passive: true });
   document.addEventListener('touchmove', e => {
