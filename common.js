@@ -348,7 +348,10 @@ async function requireCouple(){
 }
 // Back navigation for section pages (also Telegram's own back button)
 function setupBack(){
-  const go = () => { if (history.length > 1 && document.referrer.includes(location.host)) history.back(); else location.href = 'index.html#sections'; };
+  const go = () => {
+    // "back" first closes an open sheet, then leaves the page
+    const open = [...document.querySelectorAll('dialog[open]')]; if (open.length) { open[open.length - 1].close('cancel'); return; }
+    if (history.length > 1 && document.referrer.includes(location.host)) history.back(); else location.href = 'index.html#sections'; };
   document.querySelectorAll('[data-back]').forEach(b => b.onclick = go);
   const a = tgApp(); if (inTG && a?.BackButton) { try { a.BackButton.show(); a.BackButton.onClick(go); } catch(_){} }
 }

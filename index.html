@@ -1529,6 +1529,9 @@ const GIFT_NAMES = { ru:{ heart:'Сердце', bouquet:'Букет', box:'Сю�
   en:{ heart:'Heart', bouquet:'Bouquet', box:'Surprise', pumpkin:'Pumpkin', ghost:'Ghost', star:'Star', coupon:'Coupon', ticket:'Date ticket', scratch:'Scratch card', letter:'Sealed letter', flower:'Flower', note:'Note', vinyl:'Song' } };
 const giftTitle = g => (g.kind === 'coupon' || g.kind === 'ticket') && g.data?.title ? g.data.title : (GIFT_NAMES[LANG] || GIFT_NAMES.ru)[g.kind] || g.kind;
 $('gpLater').onclick = () => $('giftPop').close();
+// opening the gift leaves this page: close the popup so it isn't there again after "back"
+$('gpOpen').onclick = () => { const g = $('giftPop'); setTimeout(() => g.close(), 0); };
+window.addEventListener('pageshow', () => { if ($('giftPop').open) $('giftPop').close(); });
 
 // ===== Seasonal quick actions =====
 const QA_SVG = {
