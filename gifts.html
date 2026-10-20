@@ -139,7 +139,7 @@ ru: { gfTitle:'Подарки', tShop:'Подарить', tBox:'Шкатулка
     flower:'Семечко растёт 7 дней, если его поливать. Расцветёт и покажет вашу подпись.', note:'Записка придёт в Telegram в то время, которое вы выберете.',
     vinyl:'Ссылка на песню на крутящейся пластинке. Все песни соберутся в ваш плейлист.', star:'Звезда загорится на вашем небе и останется навсегда.',
     heart:'Маленький знак внимания.', bouquet:'Цветы без повода.', box:'Коробка с бантом. Просто так.', pumpkin:'Светящаяся тыква к Хеллоуину.', ghost:'Милое привидение к Хеллоуину.' },
-  forP:n => `Для: ${n}`, msg:'Подпись', msgPh:'Например: просто так, люблю', payN:n => `Подарить за ${n} ★`,
+  forP:n => `Для: ${n}`, payTest:'Подарить бесплатно (тестовая пара)', msg:'Подпись', msgPh:'Например: просто так, люблю', payN:n => `Подарить за ${n} ★`,
   cpWhat:'Купон на', cpOwn:'Свой вариант', cpOwnPh:'Например, ужин, который готовлю я', cpSub:'Уточнение', cpSubPh:'Например: с блинчиками', cpUntil:'Действует до',
   cpPre:[['Завтрак в постель'],['Массаж 20 минут'],['Фильм выбираешь ты'],['Обнимашки без лимита'],['День без споров'],['Свидание моей мечты']],
   tkWhat:'Куда идём', tkWhatPh:'Например, ужин на крыше', tkSub:'Подробности', tkSubPh:'и прогулка по набережной', tkDate:'Дата', tkTime:'Время', tkPlace:'Место', tkDress:'Дресс-код', tkDressPh:'красиво',
@@ -164,7 +164,7 @@ en: { gfTitle:'Gifts', tShop:'Give', tBox:'Gift box', tSky:'Sky',
     flower:'A seed that grows for 7 days if watered. It blooms and shows your message.', note:'The note arrives in Telegram at the time you choose.',
     vinyl:'A song link on a spinning record. All songs make your playlist.', star:'The star lights up in your sky and stays forever.',
     heart:'A small sign of love.', bouquet:'Flowers for no reason.', box:'A box with a bow. Just because.', pumpkin:'A glowing Halloween pumpkin.', ghost:'A cute Halloween ghost.' },
-  forP:n => `For: ${n}`, msg:'Message', msgPh:'For example: just because, love you', payN:n => `Give for ${n} ★`,
+  forP:n => `For: ${n}`, payTest:'Give for free (test couple)', msg:'Message', msgPh:'For example: just because, love you', payN:n => `Give for ${n} ★`,
   cpWhat:'Coupon for', cpOwn:'Your own', cpOwnPh:'For example, a dinner I cook', cpSub:'Details', cpSubPh:'For example: with pancakes', cpUntil:'Valid until',
   cpPre:[['Breakfast in bed'],['20-minute massage'],['You pick the film'],['Unlimited hugs'],['A day without arguments'],['My dream date']],
   tkWhat:'Where we go', tkWhatPh:'For example, dinner on a rooftop', tkSub:'Details', tkSubPh:'and a walk by the river', tkDate:'Date', tkTime:'Time', tkPlace:'Place', tkDress:'Dress code', tkDressPh:'dress up',
@@ -218,7 +218,7 @@ function compose(k){
   G.kind = k; G.get = {};
   $('cArt').style.background = GIFT_CAT[k][1]; $('cArt').innerHTML = giftSvg(k, 84);
   $('cTitle').textContent = nm(k); $('cHint').textContent = t('hl')[k] + ' ' + t('forP', pname()) + '.';
-  $('cPay').textContent = t('payN', GIFT_CAT[k][0]); $('cErr').textContent = '';
+  $('cPay').textContent = G.ctx.couple.test_mode ? t('payTest') : t('payN', GIFT_CAT[k][0]); $('cErr').textContent = '';
   let h = '';
   if (k === 'coupon') h = `<label>${t('cpWhat')}</label><div class="chips" id="cpPick"></div><div id="cpOwnW" class="hidden" style="margin-top:8px"><input id="cpOwn" maxlength="60" placeholder="${esc(t('cpOwnPh'))}"></div>`
     + F.text('cSub', t('cpSub'), t('cpSubPh')) + F.date('cUntil', t('cpUntil'));
@@ -268,6 +268,10 @@ $('cmpForm').onsubmit = async e => {
   let d; try { d = collect(); } catch(err) { $('cErr').textContent = err.message; return; }
   $('cPay').disabled = true;
   try {
+    if (G.ctx.couple.test_mode) {
+      const { error } = await sb.rpc('gift_send_test', { p_data: d }); if (error) throw error;
+      $('cmp').close('ok'); await load(); toast(t('paid')); setTab('box'); return;
+    }
     const n0 = G.list.length, st = await payStars('gift', d);
     if (st === 'external') toast(t('notTg'));
     if (st !== 'paid') return;
