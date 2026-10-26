@@ -205,6 +205,13 @@
 .act-it .g div{color:var(--muted);font-size:12.5px;margin-top:2px}
 .act-it .dt{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex:none}
 .qcard .lb{display:flex;justify-content:space-between;align-items:center}
+.wk .cy{color:#b8506a}
+.wk .cy:after{content:"";position:absolute;left:24%;right:24%;bottom:2px;height:3px;border-radius:2px;background:#f3a9bb}
+.wk .cy.cyn:after{background:#e2456b}
+.wk .on.cy{color:var(--sel-ink)}
+.cyline{display:flex;gap:8px;align-items:center;margin-top:10px;background:color-mix(in srgb,var(--rose) 55%,var(--card));border-radius:12px;padding:9px 12px;color:var(--rose-ink);font-size:13px;font-weight:600;text-decoration:none}
+.cyline .ic{width:16px;height:16px}
+.cyline .chev{margin-left:auto;opacity:.7}
 .qlb{display:inline-flex;align-items:center;gap:8px}
 .flame{display:inline-flex;align-items:center;gap:3px;background:color-mix(in srgb,#fff 70%,var(--warm));color:#c0562a;border-radius:99px;padding:2px 9px 2px 6px;font-weight:800;font-size:12px;letter-spacing:0;text-transform:none;box-shadow:0 2px 8px rgba(192,86,42,.16)}
 :root[data-theme="dark"] .flame,:root[data-palette="pumpkin"] .flame,:root[data-palette="gothic"] .flame{background:rgba(255,140,60,.14);color:#ffb07a;box-shadow:none}
@@ -376,6 +383,7 @@ mark{background:color-mix(in srgb,#c99a3b 35%,transparent);color:inherit;border-
     <div class="card k-day">
       <div class="kh"><h2 id="wkTitle"></h2><button class="btn link" id="wkPlan"><span data-t="plan"></span> ›</button></div>
       <div class="wk" id="wkStrip"></div>
+      <a class="cyline hidden" id="cyLine" href="cycle.html"></a>
       <div id="wkItems"></div>
     </div>
     <div class="card mn-card hidden" id="mnCard"></div>
@@ -656,6 +664,8 @@ ru: {
   stNext:(n, b) => `Ответьте сегодня оба, и будет ${n}${b > 1 ? `. Рекорд: ${b}` : ''}`, stStart:'Ответьте оба сегодня, и начнётся серия',
   nuTitle:'Вечернее напоминание', nuOn:'В 20:00 напомнить ответить на вопрос дня, если партнёр уже ответил',
   offline:t => `Нет интернета. Показаны данные на ${t}`,
+  cyNow:(d, n) => `Месячные, день ${d} из ${n}`, cyLate:n => `Задержка ${n} ${plural(n,'день','дня','дней')}`, cyDay:n => `день цикла ${n}`,
+  cySoon:(n, d) => n === 0 ? 'Месячные ожидаются сегодня' : n === 1 ? 'Месячные ожидаются завтра' : n < 7 ? `Месячные ожидаются ${['в воскресенье','в понедельник','во вторник','в среду','в четверг','в пятницу','в субботу'][d.getDay()]}` : `Месячные через ${n} ${plural(n,'день','дня','дней')}, ${fmtDay(d)}`,
   actTitle:'Что нового', actEmpty:'Здесь будет всё, что делает партнёр: события, ответы, подарки, желания', actToday:'Сегодня', actYest:'Вчера', actEarlier:'Раньше', actMin:n => n < 1 ? 'только что' : `${n} мин назад`, actHour:n => `${n} ${plural(n,'час','часа','часов')} назад`,
   giftBox:'Шкатулка подарков', giftsN:n => `${n} ${plural(n,'подарок','подарка','подарков')}`, giftsEmpty:'Подарите что-нибудь друг другу', gpOpen:'Открыть подарок', gpFrom:n => `${n} дарит тебе подарок`,
   plusUntil:d => `до ${d}`, plusLife:'навсегда', plusTrialN:n => `пробный период, ещё ${n} ${plural(n,'день','дня','дней')}`, plusOff:'Фото без лимита, особые темы, итоги года', plusGift:'Подарить Plus или ввести код',
@@ -736,6 +746,8 @@ en: {
   stNext:(n, b) => `Both answer today and it becomes ${n}${b > 1 ? `. Record: ${b}` : ''}`, stStart:'Both answer today to start a streak',
   nuTitle:'Evening reminder', nuOn:'At 20:00 remind me to answer the question of the day if my partner already has',
   offline:t => `No connection. Showing data from ${t}`,
+  cyNow:(d, n) => `Period, day ${d} of ${n}`, cyLate:n => `${n} ${n === 1 ? 'day' : 'days'} late`, cyDay:n => `cycle day ${n}`,
+  cySoon:(n, d) => n === 0 ? 'Period expected today' : n === 1 ? 'Period expected tomorrow' : n < 7 ? `Period expected on ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]}` : `Period in ${n} days, ${fmtDay(d)}`,
   actTitle:'What\'s new', actEmpty:'Everything your partner does will show up here: events, answers, gifts, wishes', actToday:'Today', actYest:'Yesterday', actEarlier:'Earlier', actMin:n => n < 1 ? 'just now' : `${n} min ago`, actHour:n => `${n} ${n === 1 ? 'hour' : 'hours'} ago`,
   giftBox:'Gift box', giftsN:n => `${n} ${n === 1 ? 'gift' : 'gifts'}`, giftsEmpty:'Give each other something', gpOpen:'Open the gift', gpFrom:n => `${n} sent you a gift`,
   plusUntil:d => `until ${d}`, plusLife:'forever', plusTrialN:n => `free trial, ${n} ${n === 1 ? 'day' : 'days'} left`, plusOff:'Unlimited photos, special themes, year in review', plusGift:'Give Plus or enter a code',
@@ -930,7 +942,7 @@ async function loadSummary(){
     if (st.next_start) for (let c = 0; c < 4; c++) { const s0 = addDays(parseYmd(st.next_start), (st.cycle_length || 28) * c); for (let i = 0; i < plen; i++) set.add(ymd(addDays(s0, i))); }
   }
   S.cycleDays = set;
-  renderTiles(); renderCal(); renderMe(); renderMovieNight();
+  renderTiles(); renderCal(); renderMe(); renderMovieNight(); renderWeekCycle();
 }
 let reloadTimer;
 function scheduleReload(){ clearTimeout(reloadTimer); reloadTimer = setTimeout(() => loadAll().catch(e => { console.error(e); const sn = readSnap(S.user?.id); if (sn && !navigator.onLine) showOffline(sn.at); }), 250); }
@@ -1043,6 +1055,7 @@ function renderHome(){
     return `<button type="button" data-wk="${k}" class="${sameDay(d, sel) ? 'on' : ''} ${sameDay(d, td) ? 'td' : ''}"><small>${t('dow')[i]}</small>${d.getDate()}${dots ? `<span class="dots">${dots}</span>` : ''}</button>`;
   }).join('');
   $('wkTitle').textContent = dayTitle(sel);
+  renderWeekCycle();
   const items = dayItems(sel);
   $('wkItems').innerHTML = items.length ? items.map(itemRow).join('') : `<div class="empty" style="padding:10px 0 2px">${t('wkFree')}</div>`;
 
@@ -1606,6 +1619,28 @@ $('delSheet').onclose = async () => {
   try { localStorage.clear(); sessionStorage.clear(); } catch(_){}
   await sb.auth.signOut(); location.replace(location.pathname);
 };
+
+// ===== Period days in the home week strip =====
+function cycleText(st, who){
+  if (!st?.has_data) return null;
+  const td = today(), ph = t('phase')[st.phase] || '';
+  const pre = who ? who + ': ' : '';
+  if (st.phase === 'period' && st.day) return pre + t('cyNow', st.day, st.period_length || 5);
+  if (st.next_start) {
+    const n = dayDiff(td, parseYmd(st.next_start));
+    if (n < 0) return pre + t('cyLate', -n);
+    if (n <= 14) return pre + t('cySoon', n, parseYmd(st.next_start)) + (st.day && !who ? ' · ' + t('cyDay', st.day) : '');
+  }
+  return st.day ? pre + t('cyDay', st.day) + (ph ? ' · ' + ph : '') : null;
+}
+function renderWeekCycle(){
+  const set = S.cycleDays || new Set(), td = ymd(today());
+  document.querySelectorAll('#wkStrip [data-wk]').forEach(b => { const k = b.dataset.wk; b.classList.toggle('cy', set.has(k)); b.classList.toggle('cyn', set.has(k) && k <= td); });
+  const sm = S.summary || {};
+  const lines = [cycleText(sm.cycle, null), S.partner ? cycleText(sm.partnerCycle, S.partner.display_name) : null].filter(Boolean);
+  $('cyLine').classList.toggle('hidden', !lines.length);
+  if (lines.length) $('cyLine').innerHTML = `${icon('droplet')}<span>${lines.map(esc).join('<br>')}</span><svg class="ic chev"><use href="#i-chev"/></svg>`;
+}
 
 // ===== Answer streak =====
 const FLAME = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 1.8 1 2.8 2 3.2C11 8.5 11.5 5 12 2z" fill="#ff7a2a"/><path d="M12 12c.6 1.8 2.5 2.4 2.5 4.6a2.5 2.5 0 0 1-5 0c0-1.2.6-2 1.3-2.5.1.8.5 1.3 1.1 1.5-.2-1.4 0-2.6.1-3.6z" fill="#ffd36b"/></svg>';
